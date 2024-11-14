@@ -19,11 +19,16 @@ module.exports = {
       },
       animation: {
         scroll: "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+        sparkles: "sparkles 5s linear infinite",
       },
       keyframes: {
         scroll: {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
+        },
+        sparkles: {
+          "0%, 100%": { opacity: 0 },
+          "50%": { opacity: 1 },
         },
       },
     },
@@ -55,6 +60,9 @@ module.exports = {
   ],
 };
 
+/**
+ * Adds CSS variables for all theme colors so they can be referenced in CSS.
+ */
 function addVariablesForColors({ addBase, theme }) {
   let allColors = flattenColorPalette(theme("colors"));
   let newVars = Object.fromEntries(

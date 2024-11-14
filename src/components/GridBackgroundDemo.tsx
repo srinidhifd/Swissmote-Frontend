@@ -1,23 +1,25 @@
+
+
 export function GridBackgroundDemo() {
   return (
     <div className="relative h-[100vh] w-full bg-black flex flex-col items-center justify-center">
       {/* Subtle Grid Background with Gold Lines */}
-      <div className="absolute inset-0 bg-grid-gold/[0.1] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-grid-white/[0.1] pointer-events-none"></div>
 
       {/* Centralized Text */}
       <div className="relative z-10 text-center px-4 max-w-3xl">
-        <h1 className="text-6xl font-extrabold text-[#D4AF37] mb-4">
+        <h1 className="text-6xl font-extrabold text-[#D4AF37] mb-6 leading-tight">
           Welcome to Swissmote
         </h1>
-        <p className="text-xl text-[#B3B3B3] mb-6">
+        <p className="text-xl text-[#B3B3B3] mb-8 max-w-2xl mx-auto leading-relaxed">
           Connect with top-tier talent for your projects or find your next big opportunity.
         </p>
-        <p className="text-lg text-[#E0E0E0] mb-8 max-w-lg mx-auto">
+        <p className="text-lg text-[#E0E0E0] mb-12 max-w-lg mx-auto leading-relaxed">
           A streamlined platform that brings job seekers and recruiters together in one efficient ecosystem.
         </p>
-        
+
         {/* Search Bar */}
-        <div className="relative mb-8 w-full max-w-md mx-auto">
+        <div className="relative mb-12 w-full max-w-lg mx-auto">
           <input 
             type="text" 
             placeholder="Search jobs, companies, or skills..." 
@@ -36,22 +38,6 @@ export function GridBackgroundDemo() {
           <button className="px-8 py-3 bg-[#800020] text-white font-semibold rounded-md shadow-md hover:bg-[#940026] transition">
             Post a Job
           </button>
-        </div>
-      </div>
-
-      {/* Illustrative Icons for Features */}
-      <div className="absolute bottom-8 w-full flex justify-center space-x-8 text-[#D4AF37] opacity-80">
-        <div className="flex flex-col items-center">
-          <img src="/assets/job-posting.png" alt="Job Posting" className="h-12 w-12 mb-2" />
-          <p className="text-sm">Job Postings</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <img src="/assets/candidate-search.png" alt="Candidate Search" className="h-12 w-12 mb-2" />
-          <p className="text-sm">Candidate Search</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <img src="/assets/match.png" alt="Smart Matching" className="h-12 w-12 mb-2" />
-          <p className="text-sm">Smart Matching</p>
         </div>
       </div>
     </div>
