@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import DashboardLayout from "../src/components/DashboardLayout";
 import DashboardHome from "../src/pages/dashboard/DashboardHome";
@@ -10,10 +10,10 @@ import SettingsPage from "../src/pages/dashboard/SettingsPage";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHome />} />
           <Route path="job-listings" element={<JobListingsPage />} />
           <Route path="assignments" element={<AssignmentsPage />} />
