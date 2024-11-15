@@ -1,11 +1,9 @@
-// src/components/Footer.tsx
-
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 export function Footer() {
   return (
     <footer className="py-12 bg-black text-gray-400">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 px-4">
         
         {/* Brand Section */}
         <div className="text-center md:text-left">

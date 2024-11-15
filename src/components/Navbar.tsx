@@ -45,7 +45,7 @@ const NavBar = () => {
         <div className="absolute top-16 left-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-lg md:hidden">
           <div className="flex flex-col items-center py-4 space-y-4">
             <a href="#how-it-works" className="text-white hover:text-gray-300" onClick={toggleMenu}>
-              How It Works
+              Process
             </a>
             <a href="#features" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               Features
