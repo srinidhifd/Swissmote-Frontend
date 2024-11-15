@@ -35,14 +35,14 @@ const NavBar = () => {
 
       {/* Mobile Menu Icon */}
       <div className="md:hidden">
-        <button onClick={toggleMenu} className="text-white focus:outline-none">
+        <button onClick={toggleMenu} className="text-white focus:outline-none ">
           {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-lg md:hidden">
+        <div className="absolute top-16 left-0 w-full bg-primary  backdrop-blur-md border-t border-white/20 shadow-lg md:hidden">
           <div className="flex flex-col items-center py-4 space-y-4">
             <a href="#how-it-works" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               Process

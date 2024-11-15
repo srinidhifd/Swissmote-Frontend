@@ -31,9 +31,9 @@ export function Footer() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="p-2 rounded-l bg-gray-700 text-white focus:outline-none w-2/3"
+              className="p-2 rounded-l bg-secondary text-white focus:outline-none w-2/3"
             />
-            <button className="bg-white text-black px-4 py-2 rounded-r hover:bg-blue-600 transition">
+            <button className="bg-white text-black px-4 py-2 rounded-r hover:bg-gray-400 transition">
               Subscribe
             </button>
           </form>
