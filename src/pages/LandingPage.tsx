@@ -1,31 +1,34 @@
-// src/pages/LandingPage.tsx
-import React from "react";
 import { SparklesPreview } from "../components/SparklesPreview";
 import { KeyFeaturesDemo } from "../components/KeyFeaturesDemo";
+import { HowItWorksSection } from "../components/HowItWorksSection";
+import { TestimonialsSection } from "../components/TestimonialsSection";
+import { ReadyToProveSection } from "../components/ReadyToProveSection";
+import  NavBar  from "../components/Navbar";
+import {Footer} from "../components/Footer";
+import Divider from "../components/Divider";
+import { ContactSection } from "../components/ContactSection";
 
-const LandingPage: React.FC = () => {
+
+const LandingPage = () => {
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
+      <NavBar />
       <SparklesPreview />
+      <Divider />
+      <HowItWorksSection />
+      <Divider />
 
-      {/* Key Features Section */}
-      <section className="py-20 px-4 md:px-8 lg:px-16 bg-black text-white">
-        <h2 className="text-4xl font-bold mb-12 text-center text-[#D4AF37]">
-          Why Choose Swissmote?
-        </h2>
+      <section id="features" className="py-24">
         <KeyFeaturesDemo />
       </section>
+      <Divider />
 
-      {/* Footer */}
-      <footer className="py-8 bg-black text-gray-400 text-center border-t border-gray-800">
-        <p className="text-sm md:text-base">© 2024 Swissmote. All rights reserved.</p>
-        <div className="mt-4 flex justify-center gap-6 text-xs md:text-sm">
-          <a href="#about" className="hover:text-white transition-colors">About Us</a>
-          <a href="#contact" className="hover:text-white transition-colors">Contact</a>
-          <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-        </div>
-      </footer>
+      <TestimonialsSection />
+
+      <ReadyToProveSection />
+      <ContactSection />
+      <Divider />  
+      <Footer />
     </div>
   );
 };
