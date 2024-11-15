@@ -12,17 +12,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react';
-            if (id.includes('lodash')) return 'lodash';
-            if (id.includes('axios')) return 'axios';
-            return 'vendor'; // other dependencies
-          }
+        manualChunks: {
+          // Split large dependencies into separate chunks
+          react: ['react', 'react-dom'],
+          vendor: ['lodash', 'axios'], // Adjust based on other large dependencies
         },
       },
     },
-    // Adjust chunk size warning limit to 1500kB for more flexibility
-    chunkSizeWarningLimit: 1500,
+    // Adjust chunk size warning limit if needed
+    chunkSizeWarningLimit: 1000,
   },
 })
