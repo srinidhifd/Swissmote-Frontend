@@ -10,10 +10,10 @@ import SettingsPage from "../src/pages/dashboard/SettingsPage";
 
 function App() {
   return (
-    <Router basename="/">
+    <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="dashboard" element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHome />} />
           <Route path="job-listings" element={<JobListingsPage />} />
           <Route path="assignments" element={<AssignmentsPage />} />
