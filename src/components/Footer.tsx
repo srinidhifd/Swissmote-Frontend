@@ -17,6 +17,7 @@ export function Footer() {
         <div className="text-center md:text-left">
           <h2 className="font-bold text-white text-2xl">Quick Links</h2>
           <ul className="space-y-2 mt-2">
+            <li><a href="/dashboard" className="hover:text-white">Dashboard</a></li>
             <li><a href="#features" className="hover:text-white">Features</a></li>
             <li><a href="#how-it-works" className="hover:text-white">Process</a></li>
             <li><a href="#contact" className="hover:text-white">Contact</a></li>

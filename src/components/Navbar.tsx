@@ -28,6 +28,9 @@ const NavBar = () => {
         <a href="#contact" className="text-white hover:text-gray-300">
           Contact
         </a>
+        <a href="/dashboard" className="text-white hover:text-gray-300">
+          Dashboard
+        </a>
       </div>
 
       {/* Desktop Button */}
