@@ -4,22 +4,23 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // For proper asset loading
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Ensure "@" points to "src" directory
+      '@': path.resolve(__dirname, './src'), // Keeping your existing alias
     },
   },
   build: {
+    outDir: 'dist', // Specify build output directory
     rollupOptions: {
       output: {
         manualChunks: {
-          // Split large dependencies into separate chunks
+          // Keeping your existing chunks configuration
           react: ['react', 'react-dom'],
-          vendor: ['lodash', 'axios'], // Adjust based on other large dependencies
+          vendor: ['lodash', 'axios'],
         },
       },
     },
-    // Adjust chunk size warning limit if needed
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1000, // Keeping your existing limit
   },
 })
