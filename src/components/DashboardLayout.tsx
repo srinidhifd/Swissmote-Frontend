@@ -1,7 +1,7 @@
 // src/components/DashboardLayout.tsx
 
 import { NavLink, Outlet } from "react-router-dom";
-import { FaBriefcase, FaTasks, FaBullhorn, FaEnvelope, FaCog } from "react-icons/fa";
+import { FaBriefcase, FaTasks, FaBullhorn, FaEnvelope, FaCog, FaHome } from "react-icons/fa";
 
 const DashboardLayout = () => {
   return (
@@ -49,6 +49,14 @@ const DashboardLayout = () => {
             }
           >
             <FaCog className="inline mr-2" /> Settings
+          </NavLink>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? "text-blue-400" : "text-gray-300"
+            }
+          >
+            <FaHome className="inline mr-2" /> Home
           </NavLink>
         </nav>
       </aside>
