@@ -11,7 +11,7 @@ const DashboardLayout = () => {
         <h2 className="text-2xl font-bold mb-8">Swissmote Dashboard</h2>
         <nav className="flex flex-col space-y-4">
           <NavLink
-            to="/dashboard"
+            to="/dashboard/job-listings"
             className={({ isActive }) =>
               isActive ? "text-blue-400" : "text-gray-300"
             }

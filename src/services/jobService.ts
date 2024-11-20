@@ -1,11 +1,13 @@
-// src/services/jobService.ts
-
 import axios from "axios";
-import { Job } from "../types";
 
-const API_URL = "https://api.trollgold.org/persistventures/assignment";
+const API_BASE_URL = "https://api.trollgold.org/persistventures/assignment";
 
-export const getJobListings = async (): Promise<Job[]> => {
-  const response = await axios.get(`${API_URL}/get_listings`);
+export const getActiveListings = async () => {
+  const response = await axios.get(`${API_BASE_URL}/activeListing`);
+  return response.data;
+};
+
+export const getClosedListings = async () => {
+  const response = await axios.get(`${API_BASE_URL}/closedListings`);
   return response.data;
 };
