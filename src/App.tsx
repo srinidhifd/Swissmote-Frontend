@@ -7,6 +7,10 @@ import AssignmentsPage from "../src/pages/dashboard/AssignmentsPage";
 import AnnouncementsPage from "../src/pages/dashboard/AnnouncementsPage";
 import MessagesPage from "../src/pages/dashboard/MessagesPage";
 import SettingsPage from "../src/pages/dashboard/SettingsPage";
+import CandidateEmailPage from "./pages/dashboard/CandidateEmailPage";
+import GetUpdatesPage from "./pages/dashboard/GetUpdatesPage";
+import GetQuestionsPage from "./pages/dashboard/GetQuestionsPage";
+import GetChatPage from "./pages/dashboard/GetChatPage";
 
 function App() {
   return (
@@ -20,6 +24,10 @@ function App() {
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="messages" element={<MessagesPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="candidate-email" element={<CandidateEmailPage />} />
+          <Route path="get-updates" element={<GetUpdatesPage />} />
+          <Route path="get-questions" element={<GetQuestionsPage />} />
+          <Route path="chat" element={<GetChatPage />} />
         </Route>
       </Routes>
     </Router>

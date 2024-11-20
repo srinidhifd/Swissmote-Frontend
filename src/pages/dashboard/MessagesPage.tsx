@@ -1,43 +1,73 @@
-// src/pages/dashboard/MessagesPage.tsx
-
-import { useEffect, useState } from "react";
-import { getMessages } from "../../services/messageService";
-import { Message } from "../../types";
+import { useState } from "react";
+import axios from "axios";
 
 const MessagesPage = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [messageType, setMessageType] = useState("invite_message");
+  const [messageData, setMessageData] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const data = await getMessages();
-        setMessages(data);
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to fetch messages.");
-        setLoading(false);
-      }
-    };
-
-    fetchMessages();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const fetchMessage = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.trollgold.org/persistventures/assignment/getMessage`,
+        {
+          params: { message: messageType },
+        }
+      );
+      setMessageData(response.data.message);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch message. Please try again.");
+      setMessageData(null);
+    }
+  };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Messages</h1>
-      <ul className="space-y-4">
-        {messages.map((message) => (
-          <li key={message.id} className="bg-white p-4 shadow rounded">
-            <h3 className="font-bold">{message.sender}</h3>
-            <p>{message.content}</p>
-          </li>
-        ))}
-      </ul>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Messages</h1>
+
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="mb-4">
+          <label
+            htmlFor="messageType"
+            className="block text-sm font-medium text-gray-600"
+          >
+            Select Message Type
+          </label>
+          <select
+            id="messageType"
+            value={messageType}
+            onChange={(e) => setMessageType(e.target.value)}
+            className="mt-2 block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          >
+            <option value="invite_message">Invite Message</option>
+            <option value="assignment_message">Assignment Message</option>
+            <option value="hired_message">Hired Message</option>
+          </select>
+        </div>
+
+        <button
+          onClick={fetchMessage}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold transition-all"
+        >
+          Fetch Message
+        </button>
+
+        {error && (
+          <div className="mt-4 p-4 bg-red-100 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
+        {messageData && (
+          <div className="mt-4 p-4 bg-gray-100 border border-gray-200 rounded-lg">
+            <h2 className="text-sm font-medium text-gray-800 mb-2">
+              Retrieved Message:
+            </h2>
+            <p className="text-gray-700">{messageData}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
