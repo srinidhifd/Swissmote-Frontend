@@ -9,6 +9,7 @@ Swissmote is a modern, streamlined platform connecting job seekers with unique h
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Sections](#sections)
+- [Dashboard Features](#dashboard-features)
 - [Setup Instructions](#setup-instructions)
 - [Project Status](#project-status)
 
@@ -22,12 +23,15 @@ Swissmote is designed to provide a unique hiring experience by using skill-based
 - **Modern UI Components**: Tailored sections with animations, gradients, and smooth transitions for a seamless UX.
 - **Contact Form**: A user-friendly contact form to reach out to Swissmote.
 - **Get Started Button**: Direct access for users ready to begin their first assignment.
+- **Admin Dashboard**: Manage jobs, assignments, messaging, candidates, evaluations, and more with a responsive and interactive admin interface.
 
 ## Technologies Used
 - **React**: Component-based UI library for a dynamic user experience.
 - **Tailwind CSS**: A utility-first CSS framework for styling.
 - **Framer Motion**: Used for animations to enhance user interaction.
 - **React Icons**: For easily adding and customizing icons.
+- **Vite**: Modern front-end tooling for better performance.
+- **Axios**: Simplified HTTP requests for backend API communication.
 
 ## Sections
 
@@ -55,6 +59,35 @@ An intuitive contact form that allows users to submit their name, email, and mes
 ### Footer
 A footer containing brand information, quick links, a subscription form, and social media icons for easy navigation and staying connected.
 
+## Dashboard Features
+
+### Job Management
+A module for admins to create, manage, and post job listings. It includes features like filtering by job type and posting both full-time and freelance opportunities.
+
+### Listings
+Provides a detailed overview of all job listings, categorized into active, closed, and automated. Admins can interact with these listings and update their status as needed.
+
+### Assignments
+Allows admins to manage assignments and track candidates' progress. Features include managing assignment details, creating new assignments, and reviewing completed ones.
+
+### Messaging System
+Admins can send direct messages to candidates and make important announcements using the messaging feature. Includes automated responses and customizable templates.
+
+### Candidate Management
+Enables admins to manage candidate profiles, access their information, and view email details. The module supports filtering candidates by different stages of the hiring process.
+
+### Evaluations
+This feature includes options to mark candidates for evaluation, complete evaluations, and review future evaluations. Admins can efficiently handle different stages of the candidate evaluation process.
+
+### Reviews
+Admin users can add review links for listings and manage candidate feedback. This helps to maintain transparency and gather valuable insights into candidate experiences.
+
+### Daily Updates
+Admins can monitor candidate progress through daily updates. This section includes options to reply to updates, review progress, and provide feedback.
+
+### Questions Management
+Manage questions submitted by candidates regarding assignments or job opportunities. Admins can view, respond, and manage all queries effectively.
+
 ## Setup Instructions
 
 1. **Clone the repository**:
@@ -75,7 +108,5 @@ A footer containing brand information, quick links, a subscription form, and soc
 
 The application will start on `localhost:5173` by default.
 
-## Project Status
 
-# Landing page is Completed
-# Dashboard in progress...
+Stay tuned for more updates as we continue to expand and refine the features of Swissmote.
