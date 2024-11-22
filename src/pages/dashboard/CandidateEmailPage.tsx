@@ -30,80 +30,82 @@ const CandidateEmailPage = () => {
           },
         }
       );
-      setEmailData(response.data.email || "No email found");
+      if (response.data.success) {
+        setEmailData(response.data.email || "No email found");
+      } else {
+        setError("Candidate email not found.");
+      }
     } catch (err) {
       setError("Failed to fetch candidate email. Please try again.");
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Candidate Email</h1>
-      <div className="bg-white shadow rounded-lg p-6 space-y-4">
-        {/* Candidate ID Input */}
-        <div>
-          <label
-            htmlFor="candidateId"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Candidate ID
-          </label>
-          <input
-            type="text"
-            id="candidateId"
-            value={candidateId}
-            onChange={(e) => setCandidateId(e.target.value)}
-            placeholder="Enter candidate ID"
-            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Get Candidate Email</h1>
+        <p className="text-gray-600 mb-6">Retrieve candidate email information.</p>
 
-        {/* Organization Dropdown */}
-        <div>
-          <label
-            htmlFor="organization"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Select Organization
-          </label>
-          <select
-            id="organization"
-            value={selectedOrg}
-            onChange={(e) => setSelectedOrg(e.target.value)}
-            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="" disabled>
-              -- Select an organization --
-            </option>
-            {organizations.map((org) => (
-              <option key={org.value} value={org.value}>
-                {org.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="space-y-6">
+          {/* Candidate ID Input */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Candidate ID <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={candidateId}
+                onChange={(e) => setCandidateId(e.target.value)}
+                placeholder="Enter candidate ID"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        {/* Fetch Button */}
-        <button
-          onClick={fetchCandidateEmail}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Fetch Email
-        </button>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mt-6 p-4 bg-red-100 text-red-800 rounded-md">
-            <strong>Error:</strong> {error}
+            {/* Organization Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Organization <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={selectedOrg}
+                onChange={(e) => setSelectedOrg(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="" disabled>
+                  Select organization
+                </option>
+                {organizations.map((org) => (
+                  <option key={org.value} value={org.value}>
+                    {org.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        )}
 
-        {/* Success Message */}
-        {emailData && (
-          <div className="mt-6 p-4 bg-green-100 text-green-800 rounded-md">
-            <strong>Candidate Email:</strong> {emailData}
-          </div>
-        )}
+          {/* Fetch Button */}
+          <button
+            onClick={fetchCandidateEmail}
+            className="w-full mt-4 md:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Fetch Email
+          </button>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Success Message */}
+          {emailData && (
+            <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg">
+              <strong>Candidate Email:</strong> {emailData}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

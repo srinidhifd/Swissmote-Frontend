@@ -1,22 +1,27 @@
-// src/pages/dashboard/AssignmentsPage.tsx
+import { useState, useEffect } from "react";
 
-import { useEffect, useState } from "react";
-import { getAssignments } from "../../services/assignmentService";
-import { Assignment } from "../../types";
+interface Assignment {
+  title: string;
+  // Add other properties as needed
+}
 
-const AssignmentsPage = () => {
+const AssignmentsPage: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAssignments = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const data = await getAssignments();
+        const response = await fetch("https://api.example.com/assignments");
+        if (!response.ok) throw new Error("Failed to fetch assignments.");
+        const data = await response.json();
         setAssignments(data);
-        setLoading(false);
       } catch (err) {
-        setError("Failed to fetch assignments.");
+        setError("Error fetching assignments.");
+      } finally {
         setLoading(false);
       }
     };
@@ -24,30 +29,21 @@ const AssignmentsPage = () => {
     fetchAssignments();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Assignments</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2">Title</th>
-            <th className="py-2">Description</th>
-            <th className="py-2">Due Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {assignments.map((assignment) => (
-            <tr key={assignment.id}>
-              <td className="py-2">{assignment.title}</td>
-              <td className="py-2">{assignment.description}</td>
-              <td className="py-2">{assignment.dueDate}</td>
-            </tr>
+    <div className="p-6 bg-white shadow-md rounded-md">
+      <h1 className="text-2xl font-bold mb-4">Assignments</h1>
+      {error && <p className="text-red-500">{error}</p>}
+      {loading ? (
+        <p className="text-gray-500">Loading...</p>
+      ) : (
+        <ul>
+          {assignments.map((assignment, index) => (
+            <li key={index} className="mb-2">
+              {assignment.title}
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      )}
     </div>
   );
 };

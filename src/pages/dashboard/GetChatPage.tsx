@@ -45,98 +45,106 @@ const GetChatPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Chat Messages</h1>
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Chat Messages</h1>
+        <p className="text-gray-600 mb-6">View chat messages between listing and candidate.</p>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="listing"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Listing ID
-            </label>
-            <input
-              type="number"
-              id="listing"
-              value={listing}
-              onChange={(e) => setListing(e.target.value)}
-              placeholder="Enter listing ID"
-              className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+        <div className="space-y-6">
+          {/* Input Fields */}
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Listing Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={listing}
+                onChange={(e) => setListing(e.target.value)}
+                placeholder="Enter listing number"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Candidate ID <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={candidateId}
+                onChange={(e) => setCandidateId(e.target.value)}
+                placeholder="Enter candidate ID"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="candidateId"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Candidate ID
-            </label>
-            <input
-              type="number"
-              id="candidateId"
-              value={candidateId}
-              onChange={(e) => setCandidateId(e.target.value)}
-              placeholder="Enter candidate ID"
-              className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
+          {/* Fetch Chat Button */}
           <button
             onClick={fetchChat}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Fetch Chat
           </button>
         </div>
 
+        {/* Error Message */}
         {error && (
           <div className="mt-6 p-4 bg-red-100 text-red-800 rounded-md">
             <strong>Error:</strong> {error}
           </div>
         )}
 
+        {/* Chat Messages */}
         {chatMessages.length > 0 && (
-          <div className="mt-6 space-y-4">
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+          <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Retrieved Chat Messages
             </h2>
-            {chatMessages.map((message) => (
-              <div
-                key={message.id}
-                className="p-4 bg-gray-100 rounded-lg shadow border border-gray-200"
-              >
-                <p>
-                  <strong>Time:</strong> {message.time}
-                </p>
-                <p>
-                  <strong>Date:</strong> {message.date}
-                </p>
-                <p>
-                  <strong>Message:</strong> {message.message}
-                </p>
-                {message.assignment && (
-                  <>
-                    <p>
-                      <strong>Assignment:</strong> {message.assignment.message}
+            <div className="space-y-4">
+              {chatMessages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex flex-col ${
+                    message.assignment ? "items-end" : "items-start"
+                  }`}
+                >
+                  <div
+                    className={`p-4 max-w-md rounded-lg shadow-md ${
+                      message.assignment
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    <p className="text-sm font-medium mb-1">
+                      <strong>{message.assignment ? "Assignment Message" : "Candidate Message"}</strong>
                     </p>
-                    {message.assignment.due_date && (
-                      <p>
-                        <strong>Due Date:</strong> {message.assignment.due_date}
-                      </p>
+                    <p>{message.message}</p>
+                    <p className="mt-1 text-xs text-gray-600">
+                      {message.date} at {message.time}
+                    </p>
+
+                    {message.assignment && (
+                      <div className="mt-2 text-sm text-gray-700">
+                        <p>
+                          <strong>Assignment Details:</strong> {message.assignment.message}
+                        </p>
+                        {message.assignment.due_date && (
+                          <p>
+                            <strong>Due Date:</strong> {message.assignment.due_date}
+                          </p>
+                        )}
+                        {message.assignment.past_due_date_msg && (
+                          <p className="text-red-600">
+                            <strong>Past Due Date Message:</strong> {message.assignment.past_due_date_msg}
+                          </p>
+                        )}
+                      </div>
                     )}
-                    {message.assignment.past_due_date_msg && (
-                      <p>
-                        <strong>Past Due Date Message:</strong>{" "}
-                        {message.assignment.past_due_date_msg}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -61,9 +61,9 @@ const NavBar = () => {
             <a href="#contact" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               Contact
             </a>
-            <button className="px-6 py-2 bg-white text-black font-semibold rounded-md shadow hover:bg-gray-200 transition">
-              Get Started
-            </button>
+            <a href="/dashboard" className="text-white hover:text-gray-300" onClick={toggleMenu}>
+              Dashboard
+              </a>
           </div>
         </div>
       )}
