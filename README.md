@@ -110,3 +110,4 @@ The application will start on `localhost:5173` by default.
 
 
 Stay tuned for more updates as we continue to expand and refine the features of Swissmote.
+"# Swissmote-Frontend" 
