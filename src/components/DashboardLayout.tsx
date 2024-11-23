@@ -23,11 +23,15 @@ interface MenuItem {
 
 const DashboardLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null); // Tracks hovered category
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null); // Tracks expanded category
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed((prev) => !prev);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    setExpandedCategory((prev) => (prev === category ? null : category));
   };
 
   const menuItems: MenuItem[] = [
@@ -109,7 +113,7 @@ const DashboardLayout = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100 relative">
+    <div className="flex min-h-screen bg-white relative">
       {/* Sidebar */}
       <aside
         className={`${
@@ -138,33 +142,25 @@ const DashboardLayout = () => {
           </button>
         </div>
 
-        <nav className="flex flex-col space-y-4 relative">
+        <nav className="flex flex-col space-y-4">
           {menuItems.map((item) => (
-            <div
-              key={item.label}
-              className="relative group"
-              onMouseEnter={() => setHoveredCategory(item.label)}
-              onMouseLeave={() => setHoveredCategory(null)}
-            >
-              <NavLink
-                to={item.to || "#"}
+            <div key={item.label} className="relative">
+              <div
+                onClick={() => handleCategoryClick(item.label)}
                 className="flex items-center space-x-2 text-gray-300 hover:text-gray-100 transition cursor-pointer"
               >
                 <item.icon className="text-lg" />
                 {!isSidebarCollapsed && <span>{item.label}</span>}
-              </NavLink>
+              </div>
 
               {/* Subcategories */}
-              {item.subItems && hoveredCategory === item.label && (
-                <div
-                  className="absolute top-0 left-full bg-black text-white p-4 rounded shadow-lg space-y-2 z-50"
-                  style={{ minWidth: "200px" }}
-                >
+              {item.subItems && expandedCategory === item.label && (
+                <div className={`ml-8 mt-2 space-y-2 ${isSidebarCollapsed ? "hidden" : "block"}`}>
                   {item.subItems.map((subItem) => (
                     <NavLink
                       key={subItem.label}
                       to={subItem.to}
-                      className="block text-sm hover:text-blue-400"
+                      className="block text-sm text-gray-300 hover:text-blue-400"
                     >
                       {subItem.label}
                     </NavLink>
