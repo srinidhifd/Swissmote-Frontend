@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const SigninPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -23,7 +24,7 @@ const SigninPage = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5555/api/auth/signin", formData);
+      const response = await axios.post(`${apiUrl}/api/auth/signin`, formData);
       if (response.status === 200) {
         const token = response.data.token;
 

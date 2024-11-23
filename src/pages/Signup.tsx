@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -23,7 +24,7 @@ const SignupPage = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5555/api/auth/signup", formData);
+      const response = await axios.post(`${apiUrl}/api/auth/signup`, formData);
       if (response.status === 201) {
         toast.success("Signup successful! Redirecting to Sign-in Page...", {
           position: "top-right",
