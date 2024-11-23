@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import DashboardLayout from "./components/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
+import PrivateRoute from "./components/PrivateRoute"; // Private Route to protect dashboard
 import PostFullTimeJobPage from "./pages/dashboard/PostFullTimeJobPage";
 import PostInternshipPage from "./pages/dashboard/PostInternshipPage";
 import PostUnpaidInternshipPage from "./pages/dashboard/PostUnpaidInternshipPage";
@@ -36,11 +39,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Route */}
+        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
 
         {/* Protected Dashboard Routes */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
           <Route index element={<DashboardHome />} />
           {/* Job Management */}
           <Route path="job-management/full-time" element={<PostFullTimeJobPage />} />

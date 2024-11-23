@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -11,7 +13,7 @@ const NavBar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full px-8 py-4 flex justify-between items-center backdrop-blur-md bg-white/4 border-b border-white/20 z-50 shadow-lg">
       <div className="text-2xl font-bold text-white hover:cursor-pointer">
-        <a href="">Swissmote</a>
+        <a href="/">Swissmote</a>
       </div>
 
       {/* Desktop Links */}
@@ -33,21 +35,33 @@ const NavBar = () => {
         </a>
       </div>
 
-      {/* Desktop Button */}
-      <button className="hidden md:block px-6 py-2 bg-white text-black font-semibold rounded-md shadow hover:bg-gray-200 transition">
-        Get Started
-      </button>
+      {/* Desktop Buttons */}
+      <div className="hidden md:flex space-x-4">
+        
+        <button
+          onClick={() => navigate("/signup")}
+          className="px-4 py-2 bg-white text-black font-semibold rounded-md shadow hover:bg-gray-200 transition"
+        >
+          Sign Up
+        </button>
+        <button
+          onClick={() => navigate("/signin")}
+          className="px-4 py-2 bg-gray-700 text-white font-semibold rounded-md shadow hover:bg-gray-600 transition"
+        >
+          Sign In
+        </button>
+      </div>
 
       {/* Mobile Menu Icon */}
       <div className="md:hidden">
-        <button onClick={toggleMenu} className="text-white focus:outline-none ">
+        <button onClick={toggleMenu} className="text-white focus:outline-none">
           {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-primary  backdrop-blur-md border-t border-white/20 shadow-lg md:hidden">
+        <div className="absolute top-16 left-0 w-full bg-primary backdrop-blur-md border-t border-white/20 shadow-lg md:hidden">
           <div className="flex flex-col items-center py-4 space-y-4">
             <a href="#how-it-works" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               Process
@@ -63,7 +77,26 @@ const NavBar = () => {
             </a>
             <a href="/dashboard" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               Dashboard
-              </a>
+            </a>
+            <button
+              onClick={() => {
+                navigate("/signup");
+                toggleMenu();
+              }}
+              className=" px-4 py-2 bg-white text-black font-semibold rounded-md shadow hover:bg-gray-200 transition"
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={() => {
+                navigate("/signin");
+                toggleMenu();
+              }}
+              className=" px-4 py-2 bg-gray-700 text-white font-semibold rounded-md shadow hover:bg-gray-700 transition"
+            >
+              Sign In
+            </button>
+            
           </div>
         </div>
       )}

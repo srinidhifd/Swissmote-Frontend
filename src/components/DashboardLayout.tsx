@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import useAuth from '../hooks/useAuth';
 import {
   FaBriefcase,
   FaClipboardList,
@@ -12,6 +13,7 @@ import {
   FaTasks,
   FaQuestion,
   FaCommentDots,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 interface MenuItem {
@@ -22,6 +24,7 @@ interface MenuItem {
 }
 
 const DashboardLayout = () => {
+  useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null); // Tracks expanded category
   const navigate = useNavigate();
@@ -32,6 +35,11 @@ const DashboardLayout = () => {
 
   const handleCategoryClick = (category: string) => {
     setExpandedCategory((prev) => (prev === category ? null : category));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/signin");
   };
 
   const menuItems: MenuItem[] = [
@@ -142,7 +150,7 @@ const DashboardLayout = () => {
           </button>
         </div>
 
-        <nav className="flex flex-col space-y-4">
+        <nav className="flex flex-col space-y-4 flex-grow">
           {menuItems.map((item) => (
             <div key={item.label} className="relative">
               <div
@@ -170,6 +178,15 @@ const DashboardLayout = () => {
             </div>
           ))}
         </nav>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="mt-8 flex items-center space-x-2 text-red-500 hover:text-red-400 transition ml-2"
+        >
+          <FaSignOutAlt className="text-lg" />
+          {!isSidebarCollapsed && <span>Logout</span>}
+        </button>
       </aside>
 
       {/* Main Content */}
