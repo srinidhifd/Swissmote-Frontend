@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { TailSpin } from 'react-loader-spinner';
 
 const PostFullTimeJobPage = () => {
   const [title, setTitle] = useState("");
@@ -9,24 +12,37 @@ const PostFullTimeJobPage = () => {
   const [minExperience, setMinExperience] = useState<number | "">("");
   const [minSalary, setMinSalary] = useState<number | "">("");
   const [maxSalary, setMaxSalary] = useState<number | "">("");
-  const [organization, setOrganization] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const organizations = ["Org 1", "Org 2", "Org 3"]; // Example organizations
+  const [organization, setOrganization] = useState<"pv" | "sa" | "">("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
     // Validate input fields
     if (!title.trim()) {
-      setError("Job Title is required.");
+      toast.error("Job Title is required.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     if (skills.length === 0) {
-      setError("Please enter at least one skill.");
+      toast.error("Please enter at least one skill.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     if (!organization) {
-      setError("Please select an organization.");
+      toast.error("Please select an organization.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (Number(minSalary) < 200000) {
+      toast.error("Minimum salary must be at least 200,000.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -41,28 +57,31 @@ const PostFullTimeJobPage = () => {
       min_salary: Number(minSalary),
       max_salary: Number(maxSalary),
       account: organization,
+      post_on_linkedin: false,
     };
 
+    setIsLoading(true); // Start loader
+
     try {
-      const response = await fetch(
-        "https://api.trollgold.org/persistventures/assignment/make_Job",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(jobData),
-        }
-      );
+      const response = await fetch("https://api.trollgold.org/postJob?dev=true", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`, // Add the Authorization token here
+        },
+        body: JSON.stringify(jobData),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to post the job. Please try again.");
       }
 
       const data = await response.json();
-      setSuccessMessage(data.message || "Job posted successfully!");
-      setError(null);
+      toast.success(data.message || "Job posted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
 
       // Reset form fields
       setTitle("");
@@ -75,21 +94,33 @@ const PostFullTimeJobPage = () => {
       setMaxSalary("");
       setOrganization("");
     } catch (error: any) {
-      setError(error.message || "Something went wrong.");
-      setSuccessMessage(null);
+      toast.error(error.message || "Something went wrong.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsLoading(false); // Stop loader
     }
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen w-100">
+    <div className="p-8 bg-gray-100 min-h-screen w-100 relative">
+      {/* Loader */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+          <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+        </div>
+      )}
+
+      {/* Toast Container */}
+      <ToastContainer />
+
+      {/* Job Post Form */}
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Post Full-Time Job</h1>
         <p className="text-gray-600 mb-8">
           Create a professional job posting to attract the best talent for your organization.
         </p>
-
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-        {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -97,10 +128,7 @@ const PostFullTimeJobPage = () => {
             <input
               type="text"
               value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                setError(null);
-              }}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Software Engineer"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -165,7 +193,7 @@ const PostFullTimeJobPage = () => {
               type="number"
               value={minSalary}
               onChange={(e) => setMinSalary(e.target.value ? Number(e.target.value) : "")}
-              placeholder="e.g., 50000"
+              placeholder="e.g., 200000"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -175,7 +203,7 @@ const PostFullTimeJobPage = () => {
               type="number"
               value={maxSalary}
               onChange={(e) => setMaxSalary(e.target.value ? Number(e.target.value) : "")}
-              placeholder="e.g., 100000"
+              placeholder="e.g., 500000"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -183,15 +211,12 @@ const PostFullTimeJobPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
             <select
               value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
+              onChange={(e) => setOrganization(e.target.value as "pv" | "sa")}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select an Organization</option>
-              {organizations.map((org) => (
-                <option key={org} value={org}>
-                  {org}
-                </option>
-              ))}
+              <option value="pv">PV</option>
+              <option value="sa">SA</option>
             </select>
           </div>
         </div>

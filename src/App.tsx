@@ -8,7 +8,6 @@ import PrivateRoute from "./components/PrivateRoute"; // Private Route to protec
 import PostFullTimeJobPage from "./pages/dashboard/PostFullTimeJobPage";
 import PostInternshipPage from "./pages/dashboard/PostInternshipPage";
 import PostUnpaidInternshipPage from "./pages/dashboard/PostUnpaidInternshipPage";
-import AutomateListingsPage from "./pages/dashboard/AutomateListingsPage";
 import AssignmentsPage from "./pages/dashboard/AssignmentsPage";
 import AddAssignmentPage from "./pages/dashboard/AddAssignmentPage";
 import GetAssignmentsPage from "./pages/dashboard/GetAssignmentsPage";
@@ -32,7 +31,6 @@ import ReplyToDailyUpdatePage from "./pages/dashboard/ReplyToDailyUpdatePage";
 import AutoListingsPage from "./pages/dashboard/AutoListingsPage";
 import ActiveListingsPage from "./pages/dashboard/ActiveListingsPage";
 import ClosedListingsPage from "./pages/dashboard/ClosedListingsPage";
-import ListingStatusPage from "./pages/dashboard/ListingStatusPage";
 import SendMessagePage from "./pages/dashboard/SendMessagePage";
 
 function App() {
@@ -53,10 +51,8 @@ function App() {
           <Route path="job-management/unpaid-internship" element={<PostUnpaidInternshipPage />} />
           {/* Listings */}
           <Route path="listings/auto" element={<AutoListingsPage />} />
-          <Route path="listings/automate" element={<AutomateListingsPage />} />
           <Route path="listings/active" element={<ActiveListingsPage />} />
           <Route path="listings/closed" element={<ClosedListingsPage />} />
-          <Route path="listings/status" element={<ListingStatusPage />} />
           {/* Assignments */}
           <Route path="assignments" element={<AssignmentsPage />} />
           <Route path="assignments/add" element={<AddAssignmentPage />} />

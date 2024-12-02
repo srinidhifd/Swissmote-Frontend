@@ -8,7 +8,7 @@ const useAuth = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    console.log("Checking authToken:", token);
+    // console.log("Checking authToken:", token);
     if (!token) {
       // If no token found, redirect to the signin page
       navigate("/signin");

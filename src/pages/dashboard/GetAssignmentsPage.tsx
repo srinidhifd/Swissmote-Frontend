@@ -1,16 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from 'react-router-dom';
 
 const GetAssignmentsPage: React.FC = () => {
-  const [listingNumber, setListingNumber] = useState("");
-  const [rowData, setRowData] = useState("");
-  const [offsetData, setOffsetData] = useState("");
+  const location = useLocation();
+  const { listingNumber, source } = location.state || {};
+
+  const [rowData, setRowData] = useState<number>(10);
+  const [offsetData, setOffsetData] = useState<number>(0);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (listingNumber && source) {
+      handleFetchAssignments();
+    }
+  }, [listingNumber, source]);
+
   const handleFetchAssignments = async () => {
-    if (!listingNumber.trim() || !rowData.trim() || !offsetData.trim()) {
-      setError("All fields are required.");
+    if (!listingNumber || !source) {
+      setError("Listing Number and Source are required.");
       return;
     }
 
@@ -20,17 +29,19 @@ const GetAssignmentsPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://api.trollgold.org/persistventures/assignment/getAssignments",
+        "https://api.trollgold.org/get_assignments",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            Authorization: `Bearer Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`,
           },
           body: JSON.stringify({
-            listing: Number(listingNumber),
-            row_data: Number(rowData),
-            offset_data: Number(offsetData),
+            listing: listingNumber,
+            source: source,
+            row_data: rowData,
+            offset_data: offsetData,
           }),
         }
       );
@@ -40,8 +51,7 @@ const GetAssignmentsPage: React.FC = () => {
       }
 
       const data = await response.json();
-      const formattedData = Object.values(data);
-      setAssignments(formattedData);
+      setAssignments(data.assignments || []);
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -53,59 +63,7 @@ const GetAssignmentsPage: React.FC = () => {
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Get Assignments</h1>
-        <p className="text-gray-600 mb-8">
-          View and manage assignment submissions.
-        </p>
-
-        {/* Input Form */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Listing Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={listingNumber}
-              onChange={(e) => setListingNumber(e.target.value)}
-              placeholder="e.g., 123"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Row Data <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={rowData}
-              onChange={(e) => setRowData(e.target.value)}
-              placeholder="e.g., 3"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Offset Data <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={offsetData}
-              onChange={(e) => setOffsetData(e.target.value)}
-              placeholder="e.g., 2"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        {/* Fetch Assignments Button */}
-        <div className="flex justify-start mb-8">
-          <button
-            onClick={handleFetchAssignments}
-            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
-          >
-            Fetch Assignments
-          </button>
-        </div>
+        <p className="text-gray-600 mb-8">View and manage assignment submissions.</p>
 
         {/* Error and Loading States */}
         {loading && <p className="text-gray-500">Loading assignments...</p>}
@@ -117,61 +75,33 @@ const GetAssignmentsPage: React.FC = () => {
             <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">
               <thead className="bg-gray-100 rounded-t-md">
                 <tr>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Name
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Status
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    From
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Received On
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Location
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Experience
-                  </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
-                    Relocation
-                  </th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Name</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Status</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">From</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Received On</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Location</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Experience</th>
+                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Relocation</th>
                 </tr>
               </thead>
               <tbody>
                 {assignments.map((assignment, index) => (
                   <tr key={index} className="hover:bg-gray-50 transition">
-                    <td className="p-4 border-b border-gray-300 text-gray-900 font-medium">
-                      {assignment.name}
-                    </td>
+                    <td className="p-4 border-b border-gray-300 text-gray-900 font-medium">{assignment.name}</td>
                     <td className="p-4 border-b border-gray-300">
                       <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                         {assignment.status}
                       </span>
                     </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {assignment.from}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {assignment.recieved_on}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {assignment.location}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {assignment.job_expreince}
-                    </td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.from}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.received_on}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.location}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.job_experience}</td>
                     <td className="p-4 border-b border-gray-300 text-center">
                       {assignment.relocation ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                          Yes
-                        </span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Yes</span>
                       ) : (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
-                          No
-                        </span>
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">No</span>
                       )}
                     </td>
                   </tr>

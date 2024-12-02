@@ -57,10 +57,8 @@ const DashboardLayout = () => {
       icon: FaClipboardList,
       subItems: [
         { label: "Auto Listings", to: "/dashboard/listings/auto" },
-        { label: "Automate Listings", to: "/dashboard/listings/automate" },
         { label: "Active Listings", to: "/dashboard/listings/active" },
         { label: "Closed Listings", to: "/dashboard/listings/closed" },
-        { label: "Listing Status", to: "/dashboard/listings/status" },
       ],
     },
     {

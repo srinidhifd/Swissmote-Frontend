@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
+import { TailSpin } from "react-loader-spinner";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,11 +25,12 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await axios.post(`${apiUrl}/api/auth/signup`, formData);
       if (response.status === 201) {
-        toast.success("Signup successful! Redirecting to Sign-in Page...", {
+        toast.success("Signup successfull! Redirecting to Sign-in Page...", {
           position: "top-right",
           autoClose: 3000,
         });
@@ -35,15 +39,27 @@ const SignupPage = () => {
         }, 3000);
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to sign up. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error(
+        error.response?.data?.message || "Failed to sign up. Please try again.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="h-[100vh] relative w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+      {/* Loader */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+        </div>
+      )}
+
       {/* Toast Container */}
       <ToastContainer />
 
@@ -91,20 +107,22 @@ const SignupPage = () => {
             <label htmlFor="password" className="text-gray-300 font-semibold mb-2">
               Password
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="p-3 rounded-md border border-gray-300 focus:outline-none focus:border-blue-400"
-              required
-            />
-            <div
-              onClick={togglePasswordVisibility}
-              className="absolute right-3 top-10 text-gray-400 cursor-pointer"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="p-3 w-full rounded-md border border-gray-300 focus:outline-none focus:border-blue-400"
+                required
+              />
+              <div
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-400"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </div>
             </div>
           </div>
           <button

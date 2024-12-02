@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { TailSpin } from 'react-loader-spinner';
 
 const PostInternshipPage = () => {
   const [title, setTitle] = useState("");
@@ -7,25 +10,38 @@ const PostInternshipPage = () => {
   const [jobPartFull, setJobPartFull] = useState<"part" | "full">("part");
   const [numPosition, setNumPosition] = useState<number | "">("");
   const [duration, setDuration] = useState<number | "">("");
-  const [salary, setSalary] = useState<number | "">("");
-  const [organization, setOrganization] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const organizations = ["Org 1", "Org 2", "Org 3"]; // Example organizations
+  const [stipend, setStipend] = useState<number | "">("");
+  const [organization, setOrganization] = useState<"pv" | "sa" | "">("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
     // Validate input fields
     if (!title.trim()) {
-      setError("Internship Title is required.");
+      toast.error("Internship Title is required.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     if (skills.length === 0) {
-      setError("Please enter at least one skill.");
+      toast.error("Please enter at least one skill.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     if (!organization) {
-      setError("Please select an organization.");
+      toast.error("Please select an organization.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (Number(stipend) < 8000) {
+      toast.error("Stipend must be at least 8000.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -37,30 +53,33 @@ const PostInternshipPage = () => {
       job_part_full: jobPartFull,
       num_position: Number(numPosition),
       duration: Number(duration),
-      salary: Number(salary),
+      salary: Number(stipend),
       account: organization,
+      post_on_linkedin: false,
     };
 
+    setIsLoading(true); // Start loader
+
     try {
-      const response = await fetch(
-        "https://api.trollgold.org/persistventures/assignment/make_Internship",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(internshipData),
-        }
-      );
+      const response = await fetch("https://api.trollgold.org/postInternship?dev=true", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`, // Add the Authorization token here
+        },
+        body: JSON.stringify(internshipData),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to post the internship. Please try again.");
       }
 
       const data = await response.json();
-      setSuccessMessage(data.message || "Internship posted successfully!");
-      setError(null);
+      toast.success(data.message || "Internship posted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
 
       // Reset form fields
       setTitle("");
@@ -69,24 +88,36 @@ const PostInternshipPage = () => {
       setJobPartFull("part");
       setNumPosition("");
       setDuration("");
-      setSalary("");
+      setStipend("");
       setOrganization("");
     } catch (error: any) {
-      setError(error.message || "Something went wrong.");
-      setSuccessMessage(null);
+      toast.error(error.message || "Something went wrong.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsLoading(false); // Stop loader
     }
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-screen w-100 relative">
+      {/* Loader */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+          <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+        </div>
+      )}
+
+      {/* Toast Container */}
+      <ToastContainer />
+
+      {/* Internship Post Form */}
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Post Internship</h1>
         <p className="text-gray-600 mb-8">
           Create an internship posting to attract talented individuals for your organization.
         </p>
-
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-        {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -94,10 +125,7 @@ const PostInternshipPage = () => {
             <input
               type="text"
               value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                setError(null);
-              }}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Software Development Intern"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -160,8 +188,8 @@ const PostInternshipPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Stipend</label>
             <input
               type="number"
-              value={salary}
-              onChange={(e) => setSalary(e.target.value ? Number(e.target.value) : "")}
+              value={stipend}
+              onChange={(e) => setStipend(e.target.value ? Number(e.target.value) : "")}
               placeholder="e.g., 10000"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -170,15 +198,12 @@ const PostInternshipPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
             <select
               value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
+              onChange={(e) => setOrganization(e.target.value as "pv" | "sa")}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select an Organization</option>
-              {organizations.map((org) => (
-                <option key={org} value={org}>
-                  {org}
-                </option>
-              ))}
+              <option value="pv">PV</option>
+              <option value="sa">SA</option>
             </select>
           </div>
         </div>

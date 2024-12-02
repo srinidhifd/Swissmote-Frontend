@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import SearchBar from "../../components/SearchBar";
 import SortDropdown from "../../components/SortDropdown";
 import Pagination from "../../components/Pagination";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { TailSpin } from 'react-loader-spinner';
 
 const ActiveListingsPage = () => {
   const [listings, setListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -15,15 +19,14 @@ const ActiveListingsPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(
-          "https://api.trollgold.org/persistventures/assignment/activeListing",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch("https://api.trollgold.org/active_listing", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`,
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch active listings. Please try again.");
         }
@@ -32,6 +35,7 @@ const ActiveListingsPage = () => {
         setFilteredListings(data || []);
       } catch (err: any) {
         setError(err.message || "Something went wrong.");
+        toast.error(err.message || "Something went wrong.");
       } finally {
         setLoading(false);
       }
@@ -41,6 +45,7 @@ const ActiveListingsPage = () => {
   }, []);
 
   const handleSearch = (keyword: string) => {
+    setCurrentPage(1);
     if (keyword) {
       setFilteredListings(
         listings.filter((listing) =>
@@ -64,18 +69,27 @@ const ActiveListingsPage = () => {
       sortedListings.sort((a, b) => b["Project Name"].localeCompare(a["Project Name"]));
     }
     setFilteredListings(sortedListings);
+    setCurrentPage(1);
   };
 
-  const handlePageChange = (currentPage: number) => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    setFilteredListings(listings.slice(startIndex, endIndex));
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
+
+  // Calculate the listings to display on the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="bg-gray-100 min-h-screen w-full">
-      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+            <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+          </div>
+        )}
+        <ToastContainer />
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
           <h1 className="text-3xl font-bold text-gray-800">Active Listings</h1>
           <div className="flex items-center space-x-4">
             <SearchBar onSearch={handleSearch} />
@@ -83,42 +97,41 @@ const ActiveListingsPage = () => {
           </div>
         </div>
 
-        {loading && <p className="text-gray-500">Loading active listings...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        {filteredListings.length > 0 ? (
+        {currentListings.length > 0 ? (
           <div className="overflow-x-auto mt-4">
             <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">
-              <thead className="bg-gray-100 rounded-t-md">
+              <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Project Name
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Organization
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Listing No
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Process
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Designation
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Date
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Conversion Rate
                   </th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">
                     Links
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredListings.map((listing, index) => (
+                {currentListings.map((listing, index) => (
                   <tr key={index} className="hover:bg-gray-50 transition">
                     <td className="p-4 border-b border-gray-300 text-blue-600 font-semibold">
                       {listing["Project Name"]}
@@ -141,39 +154,20 @@ const ActiveListingsPage = () => {
                     <td className="p-4 border-b border-gray-300 text-gray-600">
                       {listing["Conversion Rate"]}
                     </td>
-                    <td className="p-4 border-b border-gray-300 text-center space-y-1">
-                      <a
-                        href={listing.Internshala}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block w-full px-3 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
-                      >
-                        Internshala
-                      </a>
-                      <a
-                        href={listing["Leader link"]}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block w-full px-3 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
-                      >
-                        Leader Link
-                      </a>
-                      <a
-                        href={listing["Candidate link"]}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block w-full px-3 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
-                      >
-                        Candidate Link
-                      </a>
-                      <a
-                        href={listing["Assignment link"]}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block w-full px-3 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
-                      >
-                        Assignment Link
-                      </a>
+                    <td className="p-4 border-b border-gray-300 text-center space-y-2">
+                      {["Internshala", "Leader link", "Candidate link", "Assignment link"].map((key, idx) => (
+                        listing[key] && (
+                          <a
+                            key={idx}
+                            href={listing[key]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
+                          >
+                            {key.replace(/_/g, ' ')}
+                          </a>
+                        )
+                      ))}
                     </td>
                   </tr>
                 ))}
@@ -184,11 +178,13 @@ const ActiveListingsPage = () => {
           <p className="text-gray-500 mt-4">No active listings found.</p>
         )}
 
-        <Pagination
-          totalItems={listings.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-        />
+        <div className="mt-4">
+          <Pagination
+            totalItems={filteredListings.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
     </div>
   );
