@@ -16,6 +16,7 @@ const AutoListingsPage = () => {
   const [activeTab, setActiveTab] = useState("automated");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [process, setProcess] = useState("assignment");
 
   const fetchListings = async () => {
     setLoading(true);
@@ -42,6 +43,46 @@ const AutoListingsPage = () => {
       setData(fetchedData);
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAutomate = async (listing: any) => {
+    const payload = {
+      listing: listing.listing_number,
+      listing_name: listing.listing_name,
+      name: "Project Name",
+      process,
+      post_over: "normal",
+      assignment_link: "www.example.com",
+      designation: "intern",
+      active_status: true,
+      emp_type: empType,
+      ctc: "10,000",
+      account,
+    };
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${apiUrl}/automateListing`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Automation failed. Please try again.");
+      }
+
+      const result = await response.json();
+      toast.success(`Successfully automated listing ${result.Listing_num}`);
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -94,9 +135,22 @@ const AutoListingsPage = () => {
             </div>
           )}
           {activeTab === "not_automated" && (
-            <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-              Automate
-            </button>
+            <div className="flex gap-2 items-center">
+              <select
+                className="border p-2 rounded"
+                value={process}
+                onChange={(e) => setProcess(e.target.value)}
+              >
+                <option value="assignment">Assignment</option>
+                <option value="offer">Offer</option>
+              </select>
+              <button
+                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                onClick={() => handleAutomate(item)}
+              >
+                Automate
+              </button>
+            </div>
           )}
         </td>
       </tr>

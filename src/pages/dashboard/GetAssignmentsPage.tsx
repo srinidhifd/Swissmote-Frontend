@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 const GetAssignmentsPage: React.FC = () => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const authToken = import.meta.env.VITE_AUTH_TOKEN;
+
   const location = useLocation();
   const { listingNumber, source } = location.state || {};
 
-  const [rowData, setRowData] = useState<number>(10);
-  const [offsetData, setOffsetData] = useState<number>(0);
+  const [rowData] = useState<number>(10);
+  const [offsetData] = useState<number>(0);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,23 +31,20 @@ const GetAssignmentsPage: React.FC = () => {
     setAssignments([]);
 
     try {
-      const response = await fetch(
-        "https://api.trollgold.org/get_assignments",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`,
-          },
-          body: JSON.stringify({
-            listing: listingNumber,
-            source: source,
-            row_data: rowData,
-            offset_data: offsetData,
-          }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/get_assignments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          listing: listingNumber,
+          source: source,
+          row_data: rowData,
+          offset_data: offsetData,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch assignments. Please try again.");
@@ -65,11 +65,9 @@ const GetAssignmentsPage: React.FC = () => {
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Get Assignments</h1>
         <p className="text-gray-600 mb-8">View and manage assignment submissions.</p>
 
-        {/* Error and Loading States */}
         {loading && <p className="text-gray-500">Loading assignments...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* Assignments Table */}
         {assignments.length > 0 && (
           <div className="overflow-x-auto mt-4">
             <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">

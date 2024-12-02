@@ -4,6 +4,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { TailSpin } from 'react-loader-spinner';
 
 const PostFullTimeJobPage = () => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const authToken = import.meta.env.VITE_AUTH_TOKEN;
+
   const [title, setTitle] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [type, setType] = useState("virtual");
@@ -63,12 +66,12 @@ const PostFullTimeJobPage = () => {
     setIsLoading(true); // Start loader
 
     try {
-      const response = await fetch("https://api.trollgold.org/postJob?dev=true", {
+      const response = await fetch(`${apiUrl}/postJob?dev=true`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`, // Add the Authorization token here
+          Authorization: `Bearer ${authToken}`, // Add the Authorization token here
         },
         body: JSON.stringify(jobData),
       });

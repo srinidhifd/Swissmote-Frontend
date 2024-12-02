@@ -3,10 +3,13 @@ import SearchBar from "../../components/SearchBar";
 import SortDropdown from "../../components/SortDropdown";
 import Pagination from "../../components/Pagination";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { TailSpin } from 'react-loader-spinner';
+import "react-toastify/dist/ReactToastify.css";
+import { TailSpin } from "react-loader-spinner";
 
 const ActiveListingsPage = () => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const authToken = import.meta.env.VITE_AUTH_TOKEN;
+
   const [listings, setListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -19,12 +22,12 @@ const ActiveListingsPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("https://api.trollgold.org/active_listing", {
+        const response = await fetch(`${apiUrl}/active_listing`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2giLCJleHAiOjE3MzI5NzM1OTd9.7HJ2YFcF16nhTnqY_-Ji5maM2T4TPnVwNt8Hvw-kl_8`,
+            Authorization: `Bearer ${authToken}`,
           },
         });
         if (!response.ok) {
@@ -76,7 +79,6 @@ const ActiveListingsPage = () => {
     setCurrentPage(page);
   };
 
-  // Calculate the listings to display on the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
 
@@ -104,30 +106,14 @@ const ActiveListingsPage = () => {
             <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">
               <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Project Name
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Organization
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Listing No
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Process
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Designation
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Date
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Conversion Rate
-                  </th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">
-                    Links
-                  </th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Project Name</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Organization</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Listing No</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Process</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Designation</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Date</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Conversion Rate</th>
+                  <th className="p-4 text-left font-semibold border-b border-gray-300">Links</th>
                 </tr>
               </thead>
               <tbody>
@@ -136,24 +122,12 @@ const ActiveListingsPage = () => {
                     <td className="p-4 border-b border-gray-300 text-blue-600 font-semibold">
                       {listing["Project Name"]}
                     </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {listing.Organisation}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {listing["Listing No"]}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-green-600 font-semibold">
-                      {listing.Process}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {listing.Designation}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {listing.Date}
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">
-                      {listing["Conversion Rate"]}
-                    </td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Organisation}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing["Listing No"]}</td>
+                    <td className="p-4 border-b border-gray-300 text-green-600 font-semibold">{listing.Process}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Designation}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Date}</td>
+                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing["Conversion Rate"]}</td>
                     <td className="p-4 border-b border-gray-300 text-center space-y-2">
                       {["Internshala", "Leader link", "Candidate link", "Assignment link"].map((key, idx) => (
                         listing[key] && (
@@ -164,7 +138,7 @@ const ActiveListingsPage = () => {
                             rel="noopener noreferrer"
                             className="inline-block w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
                           >
-                            {key.replace(/_/g, ' ')}
+                            {key.replace(/_/g, " ")}
                           </a>
                         )
                       ))}
