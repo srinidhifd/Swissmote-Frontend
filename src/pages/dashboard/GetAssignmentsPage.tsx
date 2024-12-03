@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { TailSpin } from "react-loader-spinner";
+import { FaCheckCircle, FaTimesCircle, FaDownload } from "react-icons/fa";
 
 const GetAssignmentsPage: React.FC = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -9,38 +11,36 @@ const GetAssignmentsPage: React.FC = () => {
   const { listingNumber, source } = location.state || {};
 
   const [rowData] = useState<number>(10);
-  const [offsetData] = useState<number>(0);
+  const [offsetData, setOffsetData] = useState<number>(0);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     if (listingNumber && source) {
       handleFetchAssignments();
+    } else {
+      setError("Missing listingNumber or source in navigation state.");
     }
-  }, [listingNumber, source]);
+  }, [listingNumber, source, offsetData]);
 
   const handleFetchAssignments = async () => {
-    if (!listingNumber || !source) {
-      setError("Listing Number and Source are required.");
-      return;
-    }
-
     setLoading(true);
     setError(null);
-    setAssignments([]);
 
     try {
       const response = await fetch(`${apiUrl}/get_assignments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
           Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           listing: listingNumber,
-          source: source,
+          source,
           row_data: rowData,
           offset_data: offsetData,
         }),
@@ -51,12 +51,50 @@ const GetAssignmentsPage: React.FC = () => {
       }
 
       const data = await response.json();
-      setAssignments(data.assignments || []);
+
+      if (data.success && data.data) {
+        const parsedAssignments = Object.values(data.data);
+        setAssignments(parsedAssignments);
+        setTotalRecords(data.count || 0);
+      } else {
+        setAssignments([]);
+        setError("No assignments found or invalid response format.");
+      }
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setOffsetData((newPage - 1) * rowData);
+  };
+
+  const renderAttachments = (attachments: any[]) => {
+    return attachments.map((attachment: any, index: number) => (
+      <a
+        key={index}
+        href={attachment[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 hover:underline flex items-center"
+      >
+        {attachment[1]} <FaDownload className="ml-2" />
+      </a>
+    ));
+  };
+
+  const filteredAssignments = assignments.filter((assignment) => {
+    if (filter === "evaluated") return assignment.evaluated;
+    if (filter === "future") return assignment.future_consideration;
+    return true;
+  });
+
+  const toggleStatus = (assignment: any, field: string) => {
+    assignment[field] = !assignment[field];
+    setAssignments([...assignments]);
   };
 
   return (
@@ -65,47 +103,150 @@ const GetAssignmentsPage: React.FC = () => {
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Get Assignments</h1>
         <p className="text-gray-600 mb-8">View and manage assignment submissions.</p>
 
-        {loading && <p className="text-gray-500">Loading assignments...</p>}
+        {/* Filter Dropdown */}
+        <div className="flex justify-between items-center mb-6">
+          <p className="text-gray-600">
+            Showing {filteredAssignments.length} of {totalRecords} records
+          </p>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="all">All</option>
+            <option value="evaluated">Evaluated</option>
+            <option value="future">Future Consideration</option>
+          </select>
+        </div>
+
+        {loading && (
+          <div className="flex justify-center items-center mb-6">
+            <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+          </div>
+        )}
+
         {error && <p className="text-red-500">{error}</p>}
 
-        {assignments.length > 0 && (
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">
-              <thead className="bg-gray-100 rounded-t-md">
-                <tr>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Name</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Status</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">From</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Received On</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Location</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Experience</th>
-                  <th className="p-4 text-left text-gray-700 font-semibold border-b border-gray-300">Relocation</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assignments.map((assignment, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition">
-                    <td className="p-4 border-b border-gray-300 text-gray-900 font-medium">{assignment.name}</td>
-                    <td className="p-4 border-b border-gray-300">
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                        {assignment.status}
-                      </span>
-                    </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.from}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.received_on}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.location}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{assignment.job_experience}</td>
-                    <td className="p-4 border-b border-gray-300 text-center">
-                      {assignment.relocation ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Yes</span>
+        {filteredAssignments.length > 0 ? (
+          <div className="space-y-6">
+            {filteredAssignments.map((assignment: any, index: number) => (
+              <div
+                key={index}
+                className="bg-white shadow-md rounded-md p-6 border border-gray-300 flex justify-between"
+              >
+                {/* Left Section */}
+                <div className="w-1/2">
+                  <h2 className="text-lg font-semibold text-gray-800 mb-2">{assignment.name}</h2>
+                  <p className="text-gray-600">
+                    <strong>From:</strong> {assignment.from}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Received On:</strong> {assignment.recieved_on}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Location:</strong> {assignment.location}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Experience:</strong> {assignment.job_expreince}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Relocation:</strong> {assignment.relocation ? "Yes" : "No"}
+                  </p>
+                </div>
+
+                {/* Right Section */}
+                <div className="w-1/2">
+                  <div>
+                    <strong>Attachments:</strong>
+                    <div className="space-y-2 mt-2 overflow-hidden">
+                      {assignment.assignment?.length > 0
+                        ? renderAttachments(assignment.assignment)
+                        : "No attachments"}
+                    </div>
+                  </div>
+                  <div className="flex space-x-4 mt-6">
+                    <button
+                      onClick={() => toggleStatus(assignment, "evaluated")}
+                      className={`px-4 py-2 flex items-center rounded-md text-white ${
+                        assignment.evaluated ? "bg-green-500" : "bg-yellow-500"
+                      }`}
+                    >
+                      {assignment.evaluated ? (
+                        <>
+                          <FaCheckCircle className="mr-2" /> Evaluated
+                        </>
                       ) : (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">No</span>
+                        <>
+                          <FaTimesCircle className="mr-2" /> Mark as Evaluated
+                        </>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </button>
+                    <button
+                      onClick={() => toggleStatus(assignment, "future_consideration")}
+                      className={`px-4 py-2 flex items-center rounded-md text-white ${
+                        assignment.future_consideration ? "bg-green-500" : "bg-yellow-500"
+                      }`}
+                    >
+                      {assignment.future_consideration ? (
+                        <>
+                          <FaCheckCircle className="mr-2" /> Marked for Future Consideration
+                        </>
+                      ) : (
+                        <>
+                          <FaTimesCircle className="mr-2" /> Mark for Future Consideration
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          !loading && <p>No assignments found.</p>
+        )}
+
+        {/* Pagination */}
+        {filteredAssignments.length > 0 && (
+          <div className="flex justify-between items-center mt-6">
+            <p className="text-gray-600">
+              Showing {currentPage} of {Math.ceil(totalRecords / rowData)} pages
+            </p>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded ${
+                  currentPage === 1 ? "bg-gray-300 text-gray-500" : "bg-blue-500 text-white"
+                }`}
+              >
+                Previous
+              </button>
+              {[...Array(Math.ceil(totalRecords / rowData))].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-4 py-2 rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-300 text-gray-500"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === Math.ceil(totalRecords / rowData)}
+                className={`px-4 py-2 rounded ${
+                  currentPage === Math.ceil(totalRecords / rowData)
+                    ? "bg-gray-300 text-gray-500"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

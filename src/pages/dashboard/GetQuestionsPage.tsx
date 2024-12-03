@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 interface Question {
   id: number;
@@ -10,52 +11,54 @@ interface Question {
 }
 
 const GetQuestionsPage = () => {
-  const [listing, setListing] = useState("");
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const authToken = import.meta.env.VITE_AUTH_TOKEN;
+
+  const location = useLocation();
+  const { listingNumber } = location.state || {};
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [limit] = useState(10);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [error, setError] = useState("");
   const [totalPages, setTotalPages] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (listing) {
+    if (listingNumber) {
       fetchQuestions();
+    } else {
+      setError("Listing number is missing. Unable to fetch questions.");
     }
-  }, [offset, limit]);
+  }, [offset, limit, listingNumber]);
 
   const fetchQuestions = async () => {
-    setError("");
+    setError(null);
     setLoading(true);
-    setQuestions([]);
-
-    if (!listing) {
-      setError("Listing ID is required.");
-      setLoading(false);
-      return;
-    }
 
     try {
-      const response = await axios.get(
-        `https://api.trollgold.org/persistventures/assignment/getQuestions`,
-        {
-          params: {
-            listing,
-            offset,
-            limit,
-          },
-        }
-      );
+      const response = await axios.get(`${apiUrl}/getQuestions`, {
+        params: { listing: listingNumber, offset, limit },
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-      if (response.data.success) {
-        setQuestions(response.data.questions || []);
-        setTotalPages(response.data.pagination.total_pages);
+      const data = response.data;
+
+      if (data.success) {
+        setQuestions(data.questions || []);
+        setTotalPages(data.pagination.total_pages || 1);
+      } else if (data.detail) {
+        // Show error detail if provided in the response
+        setError(data.detail);
       } else {
         setError("Failed to fetch questions. Please try again.");
       }
-    } catch (err) {
-      setError("Failed to fetch questions. Please try again.");
+    } catch (err: any) {
+      // Handle Axios error and show a default error message
+      setError(err.response?.data?.detail || "Failed to fetch questions. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -71,35 +74,8 @@ const GetQuestionsPage = () => {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">Questions</h1>
-        <p className="text-gray-600 mb-6">View and manage listing questions</p>
-
-        {/* Search Section */}
-        <div className="flex items-center space-x-4 mb-6">
-          <input
-            type="text"
-            value={listing}
-            onChange={(e) => setListing(e.target.value)}
-            placeholder="Enter listing number"
-            className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            onClick={fetchQuestions}
-            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
-          >
-            Search
-          </button>
-          <button
-            onClick={() => {
-              setListing("");
-              setQuestions([]);
-              setError("");
-            }}
-            className="px-4 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none"
-          >
-            Clear
-          </button>
-        </div>
+        <h1 className="text-3xl font-bold mb-4 text-gray-800"> Get Questions</h1>
+        <p className="text-gray-600 mb-6">View and manage listing questions for listing #{listingNumber}</p>
 
         {/* Error Message */}
         {error && (
@@ -110,7 +86,9 @@ const GetQuestionsPage = () => {
 
         {/* Loading State */}
         {loading ? (
-          <p className="text-gray-500">Loading...</p>
+          <div className="flex justify-center items-center mt-6">
+            <p className="text-gray-500">Loading...</p>
+          </div>
         ) : (
           <>
             {/* Questions Table */}
@@ -121,6 +99,7 @@ const GetQuestionsPage = () => {
                     <tr>
                       <th className="p-4 text-left">Question ID</th>
                       <th className="p-4 text-left">Question</th>
+                      <th className="p-4 text-left">Type</th>
                       <th className="p-4 text-left">Timestamp</th>
                     </tr>
                   </thead>
@@ -128,10 +107,8 @@ const GetQuestionsPage = () => {
                     {questions.map((question) => (
                       <tr key={question.id} className="border-t border-gray-200">
                         <td className="p-4">{question.id}</td>
-                        <td className="p-4">
-                          <p className="font-semibold">{question.type}</p>
-                          <p>{question.question}</p>
-                        </td>
+                        <td className="p-4">{question.question}</td>
+                        <td className="p-4">{question.type}</td>
                         <td className="p-4">
                           {new Date(question.time_stamp).toLocaleString()}
                         </td>
@@ -143,8 +120,7 @@ const GetQuestionsPage = () => {
             ) : (
               !loading && (
                 <div className="mt-6 p-6 text-gray-500 text-center">
-                  <div className="text-6xl mb-4">📂</div>
-                  <p>No data available</p>
+                  <p>No questions found.</p>
                 </div>
               )
             )}

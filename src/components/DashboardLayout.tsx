@@ -10,7 +10,6 @@ import {
   FaAngleDoubleRight,
   FaUserTie,
   FaChartBar,
-  FaTasks,
   FaQuestion,
   FaCommentDots,
   FaSignOutAlt,
@@ -62,14 +61,6 @@ const DashboardLayout = () => {
       ],
     },
     {
-      label: "Assignments",
-      icon: FaTasks,
-      subItems: [
-        { label: "View Assignments", to: "/dashboard/assignments/get" },
-        { label: "Add Assignment", to: "/dashboard/assignments/add" },
-      ],
-    },
-    {
       label: "Messaging",
       icon: FaEnvelope,
       subItems: [
@@ -102,7 +93,6 @@ const DashboardLayout = () => {
       label: "Questions",
       icon: FaQuestion,
       subItems: [
-        { label: "Get Questions", to: "/dashboard/questions/get" },
         { label: "Reply to Questions", to: "/dashboard/questions/reply" },
       ],
     },

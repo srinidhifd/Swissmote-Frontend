@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TailSpin } from "react-loader-spinner";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const AutoListingsPage = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -17,6 +19,14 @@ const AutoListingsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [process, setProcess] = useState("assignment");
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<any>(null);
+  const [source, setSource] = useState<string>("");
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [postURL, setPostURL] = useState("");
+
+  const navigate = useNavigate();
 
   const fetchListings = async () => {
     setLoading(true);
@@ -88,15 +98,90 @@ const AutoListingsPage = () => {
     }
   };
 
+  const handleGetAssignment = (listing: any) => {
+    setSelectedListing(listing);
+    setIsSourceModalOpen(true);
+  };
+
+  const confirmGetAssignment = () => {
+    if (!source) {
+      toast.error("Please select a valid source.");
+      return;
+    }
+    navigate("/dashboard/assignments/get", {
+      state: { listingNumber: selectedListing.listing_number, source },
+    });
+    setIsSourceModalOpen(false);
+    setSource("");
+  };
+
+  const handlePostAssignment = (listing: any) => {
+    setSelectedListing(listing);
+    setIsPostModalOpen(true);
+  };
+
+  const confirmPostAssignment = async () => {
+    if (!postURL.trim()) {
+      toast.error("Please enter a valid URL.");
+      return;
+    }
+
+    const payload = {
+      listing: selectedListing.listing_number,
+      link: [postURL],
+    };
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${apiUrl}/add_assignment`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to post assignment. Please try again.");
+      }
+
+      toast.success("Assignment posted successfully!");
+      setIsPostModalOpen(false);
+      setPostURL("");
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetQuestions = (listing: any) => {
+    navigate("/dashboard/questions/get", {
+      state: { listingNumber: listing.listing_number },
+    });
+  };
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(".dropdown")) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+
   const renderTableRows = (listings: any[]) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginatedData = listings.slice(startIndex, startIndex + itemsPerPage);
 
     return paginatedData.map((item: any, index: number) => (
-      <tr
-        key={index}
-        className="hover:bg-gray-100 transition border-b border-gray-300"
-      >
+      <tr key={index} className="hover:bg-gray-100 transition border-b border-gray-300">
         <td className="px-4 py-2">{item.listing_name}</td>
         <td className="px-4 py-2">{item.listing_number}</td>
         {activeTab !== "not_automated" && (
@@ -123,16 +208,42 @@ const AutoListingsPage = () => {
             </td>
           </>
         )}
-        <td className="px-4 py-2 text-center">
+        <td className="px-4 py-2 text-center dropdown relative">
           {activeTab === "automated" && (
-            <div className="flex gap-2 justify-center">
-              <button className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600">
-                Get Assignment
+            <>
+              <button
+                className="text-gray-600 hover:text-gray-800"
+                onClick={() =>
+                  dropdownOpen === item.listing_number
+                    ? setDropdownOpen(null)
+                    : setDropdownOpen(item.listing_number)
+                }
+              >
+                <BsThreeDotsVertical />
               </button>
-              <button className="px-3 py-1 bg-blue-500 text-sm text-white rounded hover:bg-blue-600">
-                Post Assignment
-              </button>
-            </div>
+              {dropdownOpen === item.listing_number && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-10">
+                  <button
+                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                    onClick={() => handleGetAssignment(item)}
+                  >
+                    Get Assignment
+                  </button>
+                  <button
+                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                    onClick={() => handlePostAssignment(item)}
+                  >
+                    Post Assignment
+                  </button>
+                  <button
+                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                    onClick={() => handleGetQuestions(item)}
+                  >
+                    Get Questions
+                  </button>
+                </div>
+              )}
+            </>
           )}
           {activeTab === "not_automated" && (
             <div className="flex gap-2 items-center">
@@ -292,7 +403,7 @@ const AutoListingsPage = () => {
 
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold text-gray-800">Manage Listings</h1>
+          <h1 className="text-3xl font-semibold text-gray-800">Auto Listings</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -357,6 +468,86 @@ const AutoListingsPage = () => {
 
         {renderTable()}
       </div>
+
+      {/* Source Selection Modal */}
+      {isSourceModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="relative bg-white p-6 rounded-lg shadow-lg w-96">
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+              onClick={() => setIsSourceModalOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Select Source</h2>
+            <label
+              htmlFor="source"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Source
+            </label>
+            <select
+              id="source"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Source</option>
+              <option value="itn">Internshala</option>
+              <option value="db">Database</option>
+            </select>
+            <div className="flex justify-end mt-6 space-x-4">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-md hover:bg-gray-400 transition"
+                onClick={() => setIsSourceModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 font-semibold rounded-md ${
+                  source
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                }`}
+                onClick={confirmGetAssignment}
+                disabled={!source}
+              >
+                Get Assignment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Post Assignment Modal */}
+      {isPostModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">Add Assignment URL</h2>
+            <input
+              type="text"
+              value={postURL}
+              onChange={(e) => setPostURL(e.target.value)}
+              placeholder="Enter assignment URL"
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded mr-2"
+                onClick={() => setIsPostModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded"
+                onClick={confirmPostAssignment}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
