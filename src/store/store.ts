@@ -1,9 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
-import themeReducer from './themeSlice';
+// store.ts
+import { configureStore } from "@reduxjs/toolkit";
+import themeReducer from "./themeSlice";
+import autoListingReducer from "./slices/autoListingSlice";
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
+    autoListing: autoListingReducer,
   },
 });
 

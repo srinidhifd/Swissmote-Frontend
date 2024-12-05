@@ -5,12 +5,11 @@ import {
   FaBriefcase,
   FaClipboardList,
   FaEnvelope,
-  FaHome,
+  // FaHome,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
   FaUserTie,
   FaChartBar,
-  FaQuestion,
   FaCommentDots,
   FaSignOutAlt,
 } from "react-icons/fa";
@@ -64,7 +63,6 @@ const DashboardLayout = () => {
       label: "Messaging",
       icon: FaEnvelope,
       subItems: [
-        { label: "Announcements", to: "/dashboard/announcements" },
         { label: "Get Messages", to: "/dashboard/get-messages" },
         { label: "Send Message", to: "/dashboard/send-message" },
         { label: "Chat", to: "/dashboard/chat" },
@@ -74,38 +72,25 @@ const DashboardLayout = () => {
       label: "Candidate Management",
       icon: FaUserTie,
       subItems: [
-        { label: "Reply to Candidate", to: "/dashboard/candidate-management/reply" },
         { label: "Reply via Bot", to: "/dashboard/candidate-management/bot-reply" },
-        { label: "Hire Candidate", to: "/dashboard/candidate-management/hire" },
-        { label: "Email Candidates", to: "/dashboard/candidate-management/email" },
       ],
     },
     {
       label: "Evaluation",
       icon: FaChartBar,
       subItems: [
-        { label: "Mark Evaluation", to: "/dashboard/evaluation/mark" },
         { label: "Mark Bot Evaluation", to: "/dashboard/evaluation/bot-mark" },
-        { label: "Mark Future Evaluation", to: "/dashboard/evaluation/future-mark" },
-      ],
-    },
-    {
-      label: "Questions",
-      icon: FaQuestion,
-      subItems: [
-        { label: "Reply to Questions", to: "/dashboard/questions/reply" },
       ],
     },
     {
       label: "Reviews & Updates",
       icon: FaCommentDots,
       subItems: [
-        { label: "Add Review", to: "/dashboard/reviews/add" },
         { label: "Daily Updates", to: "/dashboard/reviews/daily" },
         { label: "Reply to Daily Updates", to: "/dashboard/reviews/reply" },
       ],
     },
-    { label: "Home", icon: FaHome, to: "/" },
+    // { label: "Home", icon: FaHome, to: "/" },
   ];
 
   return (
@@ -113,7 +98,7 @@ const DashboardLayout = () => {
       {/* Sidebar */}
       <aside
         className={`${
-          isSidebarCollapsed ? "w-20" : "w-64"
+          isSidebarCollapsed ? "w-15" : "w-55"
         } bg-black text-white flex flex-col p-4 transition-all duration-300 ease-in-out shadow-lg`}
       >
         <div className="flex justify-between items-center mb-8">

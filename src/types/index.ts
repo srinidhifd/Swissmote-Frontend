@@ -1,52 +1,61 @@
-export interface Job {
-  id: string;
-  title: string;
-  location: string;
-  type: "full-time" | "part-time" | "contract" | "freelance" | "internship"; 
-  // Restricted type values
-  status: "active" | "closed" | "draft"; // Restricted status options
-  skillsRequired?: string[]; // Optional field for required skills
-  postedDate?: string; // Optional field for when the job was posted
-  applicationDeadline?: string; // Optional field for the application deadline
-  companyName?: string; // Optional field for company name
-  minSalary?: number; // Optional field for minimum salary
-  maxSalary?: number; // Optional field for maximum salary
-  description?: string; 
-  duration?:number;
-  salary?: number;
-  minExperience?: number;
-  skills?: string[];
-  numPosition: number;
-  account: string;// Optional field for job description
-  jobPartFull: 'part' | 'full';
+
+// Base interface for common fields
+export interface BaseEntity {
+  id?: string; // Optional unique identifier for the entity
+  title?: string; // Optional title of the entity
+  createdAt?: string; // Optional field for entity creation date
+  updatedAt?: string; // Optional field for the last updated date
 }
 
-export interface Assignment {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string; // ISO 8601 date format
-  assignedTo?: string[]; // Optional field for assigned users (user IDs)
-  status?: "pending" | "completed" | "overdue"; // Optional status field
-  createdAt?: string; // Optional field for assignment creation date
-  updatedAt?: string; // Optional field for last updated date
+// Interface for automated job listings
+export interface AutomatedJob extends BaseEntity {
+  listing_name: string; // Name of the listing
+  listing_number: string; // Unique identifier for the listing
+  projectname?: string; // Optional project name
+  date?: string; // Optional, date associated with the listing
+  conversion_rate?: string; // Optional, conversion rate as a string
+  assignment_link?: string[]; // Optional, array of assignment links
+  review_link?: string[]; // Optional, array of review links
 }
 
-export interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  postedDate?: string; // Optional field for when the announcement was posted
-  category?: string; // Optional field for categorizing announcements
-  author?: string; // Optional field for the author of the announcement
+// Interface for not automated job listings
+export interface NotAutomatedJob extends BaseEntity {
+  listing_name: string; // Name of the listing
+  listing_number: string; // Unique identifier for the listing
 }
 
-export interface Message {
-  id: string;
-  sender: string; // Sender's name or ID
-  content: string;
-  timestamp?: string; // Optional field for message timestamp
-  recipient?: string; // Optional field for the recipient's name or ID
-  type?: "text" | "file" | "image"; // Optional field for the type of message
-  status?: "sent" | "delivered" | "read"; // Optional field for message status
+// Interface for closed automated job listings
+export interface ClosedAutomatedJob extends BaseEntity {
+  listing_number: string; // Unique identifier for the listing
+  projectname?: string; // Optional project name
+  date?: string; // Optional, date associated with the listing
+  conversion_rate?: string; // Optional, conversion rate as a string
+  assignment_link?: string[]; // Optional, array of assignment links
+  review_link?: string[]; // Optional, array of review links
+}
+
+// Interface for assignments
+export interface Assignment extends BaseEntity {
+  description: string; // Description of the assignment
+  dueDate: string; // ISO 8601 date format for the due date
+  assignedTo?: string[]; // Optional, list of users assigned to this assignment
+  status?: "pending" | "completed" | "overdue"; // Optional, status of the assignment
+}
+
+// Interface for announcements
+export interface Announcement extends BaseEntity {
+  content: string; // Content of the announcement
+  postedDate?: string; // Optional, date the announcement was posted
+  category?: string; // Optional, category of the announcement
+  author?: string; // Optional, author of the announcement
+}
+
+// Interface for messages
+export interface Message extends BaseEntity {
+  sender: string; // Sender of the message
+  content: string; // Content of the message
+  timestamp?: string; // Optional, timestamp of the message
+  recipient?: string; // Optional, recipient of the message
+  type?: "text" | "file" | "image"; // Optional, type of the message
+  status?: "sent" | "delivered" | "read"; // Optional, status of the message
 }
