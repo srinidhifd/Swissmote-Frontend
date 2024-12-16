@@ -1,5 +1,4 @@
 import svgToDataUri from "mini-svg-data-uri";
-import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette.js";
 
 export default {
   content: ["./src/**/*.{ts,tsx,js,jsx}"],
@@ -44,7 +43,7 @@ export default {
             )}")`,
           }),
         },
-        { values: flattenColorPalette(theme("backgroundColor")), type: "color" }
+        { values: theme("colors"), type: "color" } // Use theme("colors") instead of flattenColorPalette
       );
     },
   ],
