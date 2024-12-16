@@ -747,7 +747,7 @@ const AutoListingsPage = () => {
     return (
       <div className="relative">
         <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border bg-white border-gray-200 rounded-lg shadow-lg">
+          <table className="table-auto w-full border  bg-white border-gray-300 rounded-lg shadow-lg">
             <thead className="bg-gray-200">
               <tr>
                 {activeTab === "not_automated" && (
