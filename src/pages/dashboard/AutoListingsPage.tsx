@@ -612,7 +612,8 @@ const AutoListingsPage = () => {
 
 
 
-            <td className="px-4 py-2 text-center dropdown sticky right-1 bg-white" onClick={(e) => e.stopPropagation()}>
+            <td className="px-4 py-2 text-center dropdown sticky-column "
+            onClick={(e) => e.stopPropagation()}>
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() =>
@@ -623,12 +624,9 @@ const AutoListingsPage = () => {
               >
                 <BsThreeDotsVertical />
               </button>
+
               {dropdownOpen === item.listing_number && (
-                <div className="absolute z-50 right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg"
-                  style={{
-                    top: "auto",
-                    bottom: "100%",
-                  }}
+                <div className="dropdown-menu"
                 >
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
