@@ -27,15 +27,15 @@
 /* Dropdown Container */
 .dropdown-menu {
   position: absolute;
-  top: 100%; /* Dropdown appears below the button */
-  right: 0; 
+  top: 0.5%; /* Dropdown appears below the button */
+  right: 88px; 
   z-index: 50; /* Higher than the sticky column */
   background-color: #fff;
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 0.375rem;
   overflow: hidden;
-  min-width: 310px;
+  min-width: 200px;
 }
 
 /* Ensure dropdown buttons don't wrap */
