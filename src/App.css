@@ -23,6 +23,7 @@
     right: 0;
     background-color: #f9fafb; 
     z-index: 10; /* Ensures it stays above the table content */
-    box-shadow: inset 1px 0 0 #e5e7eb; /* Adds a subtle divider */
+    box-shadow: inset 1px 0 0 #e5e7eb;
   }
-    
+  
+  

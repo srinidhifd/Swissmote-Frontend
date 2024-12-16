@@ -552,7 +552,7 @@ const AutoListingsPage = () => {
             </td>
             <td className="px-4 py-2">
               <div className="truncate-text">
-                {"messages" in item && typeof item.messages === "object" && "intro" in (item.messages as Record<string, unknown>) 
+                {"messages" in item && typeof item.messages === "object" && "intro" in (item.messages as Record<string, unknown>)
                   ? String((item.messages as Record<string, string>).intro)
                   : "No Intro Message"
                 }
@@ -560,7 +560,7 @@ const AutoListingsPage = () => {
             </td>
             <td className="px-4 py-2">
               <div className="truncate-text">
-                {"messages" in item && typeof item.messages === "object" && "assignment" in (item.messages as Record<string, unknown>) 
+                {"messages" in item && typeof item.messages === "object" && "assignment" in (item.messages as Record<string, unknown>)
                   ? String((item.messages as Record<string, string>).assignment)
                   : "No Assignment Message"
                 }
@@ -572,8 +572,8 @@ const AutoListingsPage = () => {
                 <>
                   <span
                     className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${"status" in item.day2followup && item.day2followup.status === 1
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
                       }`}
                   >
                     {"status" in item.day2followup && item.day2followup.status === 1 ? "Completed" : "Pending"}
@@ -593,8 +593,8 @@ const AutoListingsPage = () => {
                 <>
                   <span
                     className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${"status" in item.day4followup && item.day4followup.status === 1
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
                       }`}
                   >
                     {"status" in item.day4followup && item.day4followup.status === 1 ? "Completed" : "Pending"}
@@ -612,7 +612,7 @@ const AutoListingsPage = () => {
 
 
 
-            <td className="px-4 py-2 text-center dropdown sticky right-0 bg-white" onClick={(e) => e.stopPropagation()}>
+            <td className="px-4 py-2 text-center dropdown sticky right-1 bg-white" onClick={(e) => e.stopPropagation()}>
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() =>
@@ -624,7 +624,12 @@ const AutoListingsPage = () => {
                 <BsThreeDotsVertical />
               </button>
               {dropdownOpen === item.listing_number && (
-                <div className="absolute z-100 right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
+                <div className="absolute z-50 right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg"
+                  style={{
+                    top: "auto",
+                    bottom: "100%",
+                  }}
+                >
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => handleGetAssignment(item)}
