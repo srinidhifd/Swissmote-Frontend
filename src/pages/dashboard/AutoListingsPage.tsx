@@ -422,6 +422,7 @@ const AutoListingsPage = () => {
 
   const handleOpenEditFollowupModal = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     setSelectedListing(listing);
+    setIsEditFollowupModalOpen(true);
   };
 
   const handleUpdateFollowupMessage = async () => {
