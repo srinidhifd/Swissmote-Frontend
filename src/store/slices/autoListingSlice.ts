@@ -16,7 +16,7 @@ interface AutoListingState {
 }
 
 const initialState: AutoListingState = {
-  empType: "internship",
+  empType: "job",
   account: "pv",
   activeTab: "automated",
   currentPage: 1,

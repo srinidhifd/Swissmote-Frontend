@@ -18,7 +18,6 @@ import CandidateEmailPage from "./pages/dashboard/CandidateEmailPage";
 import GetUpdatesPage from "./pages/dashboard/GetUpdatesPage";
 import GetQuestionsPage from "./pages/dashboard/GetQuestionsPage";
 import ReplyToQuestionsPage from "./pages/dashboard/ReplyToQuestionsPage";
-import GetChatPage from "./pages/dashboard/GetChatPage";
 import ReplyToCandidatePage from "./pages/dashboard/ReplyToCandidatePage";
 import ReplyViaBotPage from "./pages/dashboard/ReplyViaBotPage";
 import HireCandidatePage from "./pages/dashboard/HireCandidatePage";
@@ -32,6 +31,7 @@ import AutoListingsPage from "./pages/dashboard/AutoListingsPage";
 import ActiveListingsPage from "./pages/dashboard/ActiveListingsPage";
 import ClosedListingsPage from "./pages/dashboard/ClosedListingsPage";
 import SendMessagePage from "./pages/dashboard/SendMessagePage";
+import ChatPage from "./pages/dashboard/ChatPage";
 
 function App() {
   return (
@@ -60,7 +60,7 @@ function App() {
           {/* Messaging */}
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="get-messages" element={<MessagesPage />} />
-          <Route path="chat" element={<GetChatPage />} />
+          <Route path="chat" element={<ChatPage />} />
           <Route path="send-message" element={<SendMessagePage />} />
           {/* Candidate Management */}
           <Route path="candidate-management/reply" element={<ReplyToCandidatePage />} />

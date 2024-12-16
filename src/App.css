@@ -1,0 +1,28 @@
+::-webkit-scrollbar {
+    height: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a0aec0;
+  }
+  
+  .truncate-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* For single line */
+    max-height: 2rem; /* Adjust for 1-2 lines */
+    line-clamp: 2;
+    max-width: 250px;
+  }
+  .sticky-column {
+    position: sticky;
+    right: 0;
+    background-color: #f9fafb; 
+    z-index: 10; /* Ensures it stays above the table content */
+    box-shadow: inset 1px 0 0 #e5e7eb; /* Adds a subtle divider */
+  }
+    

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import SearchBar from "../../components/SearchBar";
 import SortDropdown from "../../components/SortDropdown";
 import Pagination from "../../components/Pagination";
@@ -15,7 +16,7 @@ const ActiveListingsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -83,65 +84,76 @@ const ActiveListingsPage = () => {
   const currentListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="bg-gray-100 min-h-screen w-full">
-      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
-            <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
-          </div>
-        )}
-        <ToastContainer />
-        <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
-          <h1 className="text-3xl font-bold text-gray-800">Active Listings</h1>
-          <div className="flex items-center space-x-4">
+    <div className="p-8 bg-gray-50 min-h-screen relative">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+          <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
+        </div>
+      )}
+
+      <ToastContainer />
+
+      <div className="max-w-7xl mx-auto bg-white shadow-xl rounded-lg p-8">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Active Listings</h1>
+          <div className="flex items-center space-x-4 mt-4 lg:mt-0">
             <SearchBar onSearch={handleSearch} />
             <SortDropdown onSort={handleSort} />
           </div>
         </div>
 
-        {error && <p className="text-red-500">{error}</p>}
+        {/* Error Display */}
+        {error && <p className="text-red-500 font-semibold">{error}</p>}
 
+        {/* Listings Table */}
         {currentListings.length > 0 ? (
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full bg-white border border-gray-300 rounded-md shadow-md">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Project Name</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Organization</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Listing No</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Process</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Designation</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Date</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Conversion Rate</th>
-                  <th className="p-4 text-left font-semibold border-b border-gray-300">Links</th>
+          <div className="overflow-x-auto rounded-md border border-gray-200">
+            <table className="w-full bg-white rounded-lg shadow">
+              <thead className="bg-gray-100 border-b">
+                <tr className="text-sm font-semibold text-gray-600 uppercase">
+                  <th className="px-6 py-4 text-left">Project Name</th>
+                  <th className="px-6 py-4 text-left">Organization</th>
+                  <th className="px-6 py-4 text-center">Listing No</th>
+                  <th className="px-6 py-4 text-center">Process</th>
+                  <th className="px-6 py-4 text-center">Designation</th>
+                  <th className="px-6 py-4 text-center">Date</th>
+                  <th className="px-6 py-4 text-center">Conversion Rate</th>
+                  <th className="px-6 py-4 text-center">Links</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white">
                 {currentListings.map((listing, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition">
-                    <td className="p-4 border-b border-gray-300 text-blue-600 font-semibold">
-                      {listing["Project Name"]}
+                  <tr
+                    key={index}
+                    className="hover:bg-gray-50 transition duration-150 ease-in-out border-b last:border-b-0"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium">{listing["Project Name"]}</td>
+                    <td className="px-6 py-4 text-sm">{listing.Organisation}</td>
+                    <td className="px-6 py-4 text-sm text-center">{listing["Listing No"]}</td>
+                    <td className="px-6 py-4 text-sm text-center text-green-600 font-medium">
+                      {listing.Process}
                     </td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Organisation}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing["Listing No"]}</td>
-                    <td className="p-4 border-b border-gray-300 text-green-600 font-semibold">{listing.Process}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Designation}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing.Date}</td>
-                    <td className="p-4 border-b border-gray-300 text-gray-600">{listing["Conversion Rate"]}</td>
-                    <td className="p-4 border-b border-gray-300 text-center space-y-2">
-                      {["Internshala", "Leader link", "Candidate link", "Assignment link"].map((key, idx) => (
-                        listing[key] && (
-                          <a
-                            key={idx}
-                            href={listing[key]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
-                          >
-                            {key.replace(/_/g, " ")}
-                          </a>
-                        )
-                      ))}
+                    <td className="px-6 py-4 text-sm text-center">{listing.Designation}</td>
+                    <td className="px-6 py-4 text-sm text-center">
+                      {dayjs(listing.Date).format("DD MMM YYYY")}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-center">{listing["Conversion Rate"]}</td>
+                    <td className="px-6 py-4 text-sm text-center space-y-2">
+                      {["Internshala", "Leader link", "Candidate link", "Assignment link"].map(
+                        (key, idx) =>
+                          listing[key] && (
+                            <a
+                              key={idx}
+                              href={listing[key]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block px-4 py-2 text-blue-600 border border-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition duration-150 ease-in-out"
+                            >
+                              {key.replace(/_/g, " ")}
+                            </a>
+                          )
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -149,10 +161,11 @@ const ActiveListingsPage = () => {
             </table>
           </div>
         ) : (
-          <p className="text-gray-500 mt-4">No active listings found.</p>
+          <p className="text-gray-500 text-center mt-6">No active listings found.</p>
         )}
 
-        <div className="mt-4">
+        {/* Pagination */}
+        <div className="mt-8 flex justify-center">
           <Pagination
             totalItems={filteredListings.length}
             itemsPerPage={itemsPerPage}

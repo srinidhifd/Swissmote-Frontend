@@ -1,61 +1,74 @@
-
 // Base interface for common fields
 export interface BaseEntity {
   id?: string; // Optional unique identifier for the entity
   title?: string; // Optional title of the entity
-  createdAt?: string; // Optional field for entity creation date
-  updatedAt?: string; // Optional field for the last updated date
+  createdAt?: string; // ISO 8601 formatted creation date
+  updatedAt?: string; // ISO 8601 formatted last updated date
 }
 
 // Interface for automated job listings
 export interface AutomatedJob extends BaseEntity {
-  listing_name: string; // Name of the listing
-  listing_number: string; // Unique identifier for the listing
-  projectname?: string; // Optional project name
-  date?: string; // Optional, date associated with the listing
-  conversion_rate?: string; // Optional, conversion rate as a string
-  assignment_link?: string[]; // Optional, array of assignment links
-  review_link?: string[]; // Optional, array of review links
+  listing_name: string; // Required: Name of the listing
+  listing_number: string; // Required: Unique identifier for the listing
+  projectname?: string; // Optional: Project name
+  date?: string; // Optional: Date associated with the listing
+  conversion_rate?: string; // Optional: Conversion rate (string)
+  assignment_link?: string[]; // Optional: Array of assignment links
+  review_link?: string[]; // Optional: Array of review links
+  day2followup?: FollowupDetail; // Optional: Day 2 follow-up details
+  day4followup?: FollowupDetail; // Optional: Day 4 follow-up details
+  messages?: {
+    intro?: string; 
+    assignment?: string;
+  };
+  followup2Message?: string; // Added property
+  followup4Message?: string; // Added property
 }
 
 // Interface for not automated job listings
 export interface NotAutomatedJob extends BaseEntity {
-  listing_name: string; // Name of the listing
-  listing_number: string; // Unique identifier for the listing
+  listing_name: string; // Required: Name of the listing
+  listing_number: string; // Required: Unique identifier for the listing
 }
 
 // Interface for closed automated job listings
 export interface ClosedAutomatedJob extends BaseEntity {
-  listing_number: string; // Unique identifier for the listing
-  projectname?: string; // Optional project name
-  date?: string; // Optional, date associated with the listing
-  conversion_rate?: string; // Optional, conversion rate as a string
-  assignment_link?: string[]; // Optional, array of assignment links
-  review_link?: string[]; // Optional, array of review links
+  listing_number: string; // Required: Unique identifier for the listing
+  projectname?: string; // Optional: Project name
+  date?: string; // Optional: Date associated with the listing
+  conversion_rate?: string; // Optional: Conversion rate (string)
+  assignment_link?: string[]; // Optional: Array of assignment links
+  review_link?: string[]; // Optional: Array of review links
+}
+
+// Shared interface for follow-up details
+export interface FollowupDetail {
+  followup: string; // Follow-up message
+  status: number; // 1 = Completed, 0 = Pending
 }
 
 // Interface for assignments
 export interface Assignment extends BaseEntity {
-  description: string; // Description of the assignment
-  dueDate: string; // ISO 8601 date format for the due date
-  assignedTo?: string[]; // Optional, list of users assigned to this assignment
-  status?: "pending" | "completed" | "overdue"; // Optional, status of the assignment
+  description: string; // Required: Description of the assignment
+  dueDate: string; // ISO 8601 format: Due date
+  assignedTo?: string[]; // Optional: Array of users assigned to this task
+  status?: "pending" | "completed" | "overdue"; // Optional: Status of the assignment
 }
 
 // Interface for announcements
 export interface Announcement extends BaseEntity {
-  content: string; // Content of the announcement
-  postedDate?: string; // Optional, date the announcement was posted
-  category?: string; // Optional, category of the announcement
-  author?: string; // Optional, author of the announcement
+  content: string; // Required: Content of the announcement
+  postedDate?: string; // ISO 8601 format: Posted date
+  category?: string; // Optional: Category of the announcement
+  author?: string; // Optional: Author name
 }
 
 // Interface for messages
 export interface Message extends BaseEntity {
-  sender: string; // Sender of the message
-  content: string; // Content of the message
-  timestamp?: string; // Optional, timestamp of the message
-  recipient?: string; // Optional, recipient of the message
-  type?: "text" | "file" | "image"; // Optional, type of the message
-  status?: "sent" | "delivered" | "read"; // Optional, status of the message
+  sender: string; // Required: Sender of the message
+  content: string; // Required: Message content
+  timestamp?: string; // ISO 8601 format: Timestamp of the message
+  recipient?: string; // Optional: Recipient of the message
+  type?: "text" | "file" | "image"; // Optional: Type of the message
+  status?: "sent" | "delivered" | "read"; // Optional: Status of the message
 }

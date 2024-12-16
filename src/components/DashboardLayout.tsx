@@ -1,49 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import useAuth from '../hooks/useAuth';
-import {
-  FaBriefcase,
-  FaClipboardList,
-  FaEnvelope,
-  // FaHome,
-  FaAngleDoubleLeft,
-  FaAngleDoubleRight,
-  FaUserTie,
-  FaChartBar,
-  FaCommentDots,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import useAuth from "../hooks/useAuth";
+import { FaSignOutAlt, FaBars, FaTimes, FaAngleDown } from "react-icons/fa";
 
 interface MenuItem {
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
   subItems?: { label: string; to: string }[];
-  to?: string;
 }
 
 const DashboardLayout = () => {
   useAuth();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null); // Tracks expanded category
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed((prev) => !prev);
-  };
-
-  const handleCategoryClick = (category: string) => {
-    setExpandedCategory((prev) => (prev === category ? null : category));
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     navigate("/signin");
   };
 
+  const handleDropdownClick = (category: string) => {
+    setActiveDropdown((prev) => (prev === category ? null : category));
+  };
+
+  const closeDropdown = () => {
+    setActiveDropdown(null);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const isInsideMenu = target.closest(".mobile-menu, .dropdown, .hamburger-btn");
+      
+      if (!isInsideMenu) {
+        closeDropdown();
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const menuItems: MenuItem[] = [
     {
       label: "Job Management",
-      icon: FaBriefcase,
       subItems: [
         { label: "Post Full-time Job", to: "/dashboard/job-management/full-time" },
         { label: "Post Internship", to: "/dashboard/job-management/internship" },
@@ -52,7 +59,6 @@ const DashboardLayout = () => {
     },
     {
       label: "Listings",
-      icon: FaClipboardList,
       subItems: [
         { label: "Auto Listings", to: "/dashboard/listings/auto" },
         { label: "Active Listings", to: "/dashboard/listings/active" },
@@ -60,112 +66,140 @@ const DashboardLayout = () => {
       ],
     },
     {
-      label: "Messaging",
-      icon: FaEnvelope,
-      subItems: [
-        { label: "Get Messages", to: "/dashboard/get-messages" },
-        { label: "Send Message", to: "/dashboard/send-message" },
-        { label: "Chat", to: "/dashboard/chat" },
-      ],
-    },
-    {
-      label: "Candidate Management",
-      icon: FaUserTie,
-      subItems: [
-        { label: "Reply via Bot", to: "/dashboard/candidate-management/bot-reply" },
-      ],
-    },
-    {
-      label: "Evaluation",
-      icon: FaChartBar,
-      subItems: [
-        { label: "Mark Bot Evaluation", to: "/dashboard/evaluation/bot-mark" },
-      ],
-    },
-    {
       label: "Reviews & Updates",
-      icon: FaCommentDots,
       subItems: [
         { label: "Daily Updates", to: "/dashboard/reviews/daily" },
         { label: "Reply to Daily Updates", to: "/dashboard/reviews/reply" },
       ],
     },
-    // { label: "Home", icon: FaHome, to: "/" },
   ];
 
   return (
-    <div className="flex min-h-screen bg-white relative">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isSidebarCollapsed ? "w-15" : "w-55"
-        } bg-black text-white flex flex-col p-4 transition-all duration-300 ease-in-out shadow-lg`}
-      >
-        <div className="flex justify-between items-center mb-8">
-          <h2
-            className={`text-2xl font-bold cursor-pointer whitespace-nowrap ${
-              isSidebarCollapsed ? "hidden" : "block"
-            }`}
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      {/* Navbar */}
+      <nav className="bg-black text-white shadow-md fixed w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          {/* Logo */}
+          <div
+            className="text-xl font-bold tracking-wide cursor-pointer"
             onClick={() => navigate("/dashboard")}
           >
             Swissmote
-          </h2>
+          </div>
+
+          {/* Hamburger Icon */}
+          <div className="sm:hidden">
+            <button
+              className="text-white text-2xl focus:outline-none hamburger-btn"
+              onClick={toggleMobileMenu}
+            >
+              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden sm:flex space-x-10">
+            {menuItems.map((item) => (
+              <div
+                key={item.label}
+                className="relative dropdown"
+                onClick={(e) => e.stopPropagation()} // Prevent click from closing the dropdown
+              >
+                <button
+                  className="text-sm hover:text-gray-300 focus:outline-none flex items-center space-x-1"
+                  onClick={() => handleDropdownClick(item.label)}
+                >
+                  <span>{item.label}</span>
+                  {item.subItems && (
+                    <FaAngleDown
+                      className={`transition-transform transform ${
+                        activeDropdown === item.label ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+                {/* Dropdown */}
+                {item.subItems && activeDropdown === item.label && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg z-50">
+                    {item.subItems.map((subItem) => (
+                      <NavLink
+                        key={subItem.label}
+                        to={subItem.to}
+                        className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg"
+                      >
+                        {subItem.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Logout Button */}
           <button
-            className="text-white focus:outline-none"
-            onClick={toggleSidebar}
-            title="Toggle Sidebar"
+            onClick={handleLogout}
+            className="hidden sm:flex text-sm items-center space-x-1 text-red-500 hover:text-red-400"
           >
-            {isSidebarCollapsed ? (
-              <FaAngleDoubleRight className="text-xl hover:text-gray-400" />
-            ) : (
-              <FaAngleDoubleLeft className="text-xl hover:text-gray-400" />
-            )}
+            <FaSignOutAlt className="text-lg" />
+            <span>Logout</span>
           </button>
         </div>
 
-        <nav className="flex flex-col space-y-4 flex-grow">
-          {menuItems.map((item) => (
-            <div key={item.label} className="relative">
-              <div
-                onClick={() => handleCategoryClick(item.label)}
-                className="flex items-center space-x-2 text-gray-300 hover:text-gray-100 transition cursor-pointer"
-              >
-                <item.icon className="text-lg" />
-                {!isSidebarCollapsed && <span>{item.label}</span>}
-              </div>
-
-              {/* Subcategories */}
-              {item.subItems && expandedCategory === item.label && (
-                <div className={`ml-8 mt-2 space-y-2 ${isSidebarCollapsed ? "hidden" : "block"}`}>
-                  {item.subItems.map((subItem) => (
-                    <NavLink
-                      key={subItem.label}
-                      to={subItem.to}
-                      className="block text-sm text-gray-300 hover:text-blue-400"
-                    >
-                      {subItem.label}
-                    </NavLink>
-                  ))}
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div
+            className="sm:hidden mobile-menu bg-black text-white"
+            onClick={(e) => e.stopPropagation()} // Prevents menu from closing when clicking inside
+          >
+            <div className="flex flex-col space-y-4 p-4">
+              {menuItems.map((item) => (
+                <div key={item.label} className="relative dropdown">
+                  <button
+                    className="w-full text-left flex justify-between items-center text-sm"
+                    onClick={() => handleDropdownClick(item.label)}
+                  >
+                    <span>{item.label}</span>
+                    {item.subItems && (
+                      <FaAngleDown
+                        className={`transition-transform transform ${
+                          activeDropdown === item.label ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </button>
+                  {item.subItems && activeDropdown === item.label && (
+                    <div className="mt-2 space-y-2 pl-4">
+                      {item.subItems.map((subItem) => (
+                        <NavLink
+                          key={subItem.label}
+                          to={subItem.to}
+                          className="block text-sm hover:text-blue-300"
+                        >
+                          {subItem.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </nav>
+              ))}
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="mt-8 flex items-center space-x-2 text-red-500 hover:text-red-400 transition ml-2"
-        >
-          <FaSignOutAlt className="text-lg" />
-          {!isSidebarCollapsed && <span>Logout</span>}
-        </button>
-      </aside>
+              <button
+                onClick={handleLogout}
+                className="text-sm flex items-center space-x-1 text-red-500 hover:text-red-400 mt-4"
+              >
+                <FaSignOutAlt className="text-lg" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 bg-white shadow-inner">
+      <main className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 bg-white shadow-inner">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };

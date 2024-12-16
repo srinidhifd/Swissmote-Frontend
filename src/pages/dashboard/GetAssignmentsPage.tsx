@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { TailSpin } from "react-loader-spinner";
-import { FaCheckCircle, FaTimesCircle, FaDownload, FaCopy } from "react-icons/fa";
+import { FaRegCheckCircle, FaRegTimesCircle, FaRegEnvelope, FaRegEdit, FaCopy, FaRegBookmark, FaRegBuilding } from "react-icons/fa";
+import { MdDownload, MdOutlineChatBubbleOutline, MdOutlineWhereToVote, } from "react-icons/md";
+import { AiOutlineFileText } from "react-icons/ai";
+import { HiOutlineBriefcase } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BsDatabase } from "react-icons/bs";
 
 const GetAssignmentsPage: React.FC = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const authToken = import.meta.env.VITE_AUTH_TOKEN;
 
   const location = useLocation();
-  const { listingNumber, source, org } = location.state || {};
+  const { listingNumber, listingName, projectName, source, org } = location.state || {};
 
   const [rowData] = useState<number>(10);
   const [offsetData, setOffsetData] = useState<number>(0);
@@ -27,6 +31,8 @@ const GetAssignmentsPage: React.FC = () => {
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (listingNumber && source) {
@@ -85,6 +91,14 @@ const GetAssignmentsPage: React.FC = () => {
     setCurrentPage(newPage);
     setOffsetData((newPage - 1) * rowData);
   };
+
+  const handleNavigateToChat = (listing: string, candidateId: string, candidateName: string, projectName: string) => {
+    navigate("/dashboard/chat", {
+      state: {
+        listing, candidateId, userName: candidateName, projectName, listingName
+      },
+    });
+  }
 
   const handleMarkAsEvaluated = async (applicantId: number) => {
     setLoadingMark(applicantId);
@@ -266,17 +280,17 @@ const GetAssignmentsPage: React.FC = () => {
     } catch (err: any) {
       toast.error(err.message || "Failed to hire the candidate.");
     } finally {
-      setHireLoading(null)  ;
+      setHireLoading(null);
     }
   };
 
   const renderAttachments = (attachments: any[]) => {
-    const allowedExtensions = [".pdf", ".png", ".jpg", ".jpeg", ".mp4", ".docx", ".zip",".docx",".doc"]; // Add other formats if needed
-  
+    const allowedExtensions = [".pdf", ".png", ".jpg", ".jpeg", ".mp4", ".docx", ".zip", ".docx", ".doc"]; // Add other formats if needed
+
     return attachments.map((attachment: any, index: number) => {
       const fileExtension = attachment[2]?.match(/\.[0-9a-z]+$/i); // Extract file extension
       const isValidExtension = fileExtension && allowedExtensions.includes(fileExtension[0]);
-  
+
       return (
         <div key={index} className="flex items-center space-x-2">
           <a
@@ -288,13 +302,13 @@ const GetAssignmentsPage: React.FC = () => {
             {attachment[1]}
           </a>
           {isValidExtension && (
-            <FaDownload className="text-blue-700 hover:text-blue-800 cursor-pointer" />
+            <MdDownload className="text-blue-700 hover:text-blue-800 cursor-pointer" />
           )}
         </div>
       );
     });
   };
-  
+
 
   const filteredAssignments = assignments.filter((assignment) => {
     if (filter === "evaluated") return assignment.evaluated;
@@ -306,8 +320,53 @@ const GetAssignmentsPage: React.FC = () => {
     <div className="p-5 bg-gray-100 min-h-screen">
       <ToastContainer />
       <div className="max-w-8xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Get Assignments</h1>
-        <p className="text-gray-600 mb-8">View and manage assignment submissions.</p>
+        <div className="mb-6 p-6 bg-white shadow-subtle rounded-lg">
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div>
+              <h1 className="text-3xl font-extrabold text-gray-900">Assignments Dashboard</h1>
+              <p className="text-sm text-gray-600 mt-2">
+                Manage assignments, view submissions, and communicate with candidates.
+              </p>
+            </div>
+          </div>
+
+          {/* Info Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
+  {/* Project Name Card */}
+  <div className="p-5 bg-gray-50 rounded-lg shadow-md border border-gray-200">
+    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      Project Name
+    </p>
+    <h2 className="text-lg font-semibold text-gray-800 mt-2">
+      {projectName || "N/A"}
+    </h2>
+  </div>
+
+  {/* Listing Name Card */}
+  <div className="p-5 bg-indigo-50 rounded-lg shadow-md border border-indigo-200">
+    <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">
+      Listing Name
+    </p>
+    <h2 className="text-lg font-semibold text-gray-800 mt-2">
+      {listingName || "N/A"}
+    </h2>
+  </div>
+
+  {/* Listing Number Card */}
+  <div className="p-5 bg-teal-50 rounded-lg shadow-md border border-teal-200">
+    <p className="text-xs font-semibold text-teal-600 uppercase tracking-wide">
+      Listing Number
+    </p>
+    <h2 className="text-lg font-semibold text-gray-800 mt-2">
+      {listingNumber || "N/A"}
+    </h2>
+  </div>
+</div>
+
+        </div>
+
+
 
         <div className="flex justify-between items-center mb-6">
           <p className="text-gray-600">
@@ -333,147 +392,165 @@ const GetAssignmentsPage: React.FC = () => {
         {error && <p className="text-red-500">{error}</p>}
 
         <div>
-  {filteredAssignments.length > 0 ? (
-    <div className="grid gap-6">
-      {filteredAssignments.map((assignment: any, index: number) => (
-        <div
-          key={index}
-          className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300"
-        >
-          <div className="flex justify-between ">
-            {/* Left Section */}
-            <div className="w-1/2 pr-4">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                {assignment.name}
-              </h2>
-              <p className="text-gray-600 mb-1">
-                <strong>From:</strong> {assignment.from}
-              </p>
-              <p className="text-gray-600 mb-1">
-                <strong>Received On:</strong> {assignment.recieved_on}
-              </p>
-              <p className="text-gray-600 mb-1">
-                <strong>Location:</strong> {assignment.location}
-              </p>
-              <p className="text-gray-600 mb-1">
-                <strong>Experience:</strong> {assignment.job_expreince}
-              </p>
-              <p className="text-gray-600">
-                <strong>Relocation:</strong>{" "}
-                {assignment.relocation ? "Yes" : "No"}
-              </p>
+          {filteredAssignments.length > 0 ? (
+            <div className="space-y-6">
+              {filteredAssignments.map((assignment, index) => (
+                <div
+                  key={index}
+                  className="bg-white shadow-md rounded-md p-4 border border-gray-300"
+                >
+                  {/* Header Section */}
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {assignment.name || "Unnamed Candidate"}
+                    </h2>
+                    <p className="text-sm text-gray-500 flex items-center">
+                      <AiOutlineFileText className="inline text-gray-500 mr-2" />
+                      Received On: {assignment.recieved_on || "N/A"}
+                    </p>
+                  </div>
+
+                  {/* Details Section */}
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-4">
+                    <p className="flex items-center">
+                      <BsDatabase className="text-gray-500 mr-2" />
+                      <span>
+                        <strong>From:</strong> {assignment.from || "Unknown Source"}
+                      </span>
+                    </p>
+                    <p className="flex items-center">
+                      <FaRegBuilding className="text-gray-500 mr-2" />
+                      <span>
+                        <strong>Location:</strong> {assignment.location || "Not Specified"}
+                      </span>
+                    </p>
+                    <p className="flex items-center">
+                      <HiOutlineBriefcase className="text-gray-500 mr-2" />
+                      <span>
+                        <strong>Experience:</strong>{" "}
+                        {assignment.job_expreince || "No Experience Listed"}
+                      </span>
+                    </p>
+                    <p className="flex items-center">
+                      <MdOutlineWhereToVote className="text-gray-500 mr-2" />
+                      <span>
+                        <strong>Relocation:</strong>{" "}
+                        {assignment.relocation ? "Yes" : "No"}
+                      </span>
+                    </p>
+                  </div>
+
+                  {/* Attachments Section */}
+                  <div className="mb-4">
+                    <strong className="text-gray-700">Attachments:</strong>
+                    <div className="mt-2 space-y-2 break-all text-sm">
+                      {assignment.assignment?.length > 0 ? (
+                        renderAttachments(assignment.assignment)
+                      ) : (
+                        <p className="text-gray-500">No attachments</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <hr className="my-4" />
+
+                  {/* Buttons Section */}
+                  <div className="flex justify-around items-center">
+                    <button
+                      onClick={() =>
+                        handleMarkAsEvaluated(assignment.candidate_id)
+                      }
+                      disabled={
+                        assignment.evaluated || loadingMark === assignment.candidate_id
+                      }
+                      className={`px-4 py-2 text-sm flex items-center rounded ${assignment.evaluated
+                          ? "bg-green-100 text-green-700 cursor-not-allowed"
+                          : "bg-yellow-100 hover:bg-yellow-200 text-yellow-700"
+                        }`}
+                    >
+                      {assignment.evaluated ? (
+                        <>
+                          <FaRegCheckCircle className="mr-2" />
+                          Evaluated
+                        </>
+                      ) : (
+                        <>
+                          <FaRegTimesCircle className="mr-2" />
+                          Mark as Evaluated
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleMarkForFuture(assignment.candidate_id)}
+                      disabled={
+                        assignment.future_consideration ||
+                        loadingMark === assignment.candidate_id
+                      }
+                      className={`px-4 py-2 text-sm flex items-center rounded ${assignment.future_consideration
+                          ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                          : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
+                        }`}
+                    >
+                      <FaRegBookmark className="mr-2" />
+                      {assignment.future_consideration
+                        ? "Future Consideration"
+                        : "Mark for Future"}
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleNavigateToChat(
+                          listingNumber,
+                          assignment.candidate_id,
+                          assignment.name,
+                          assignment.project
+                        )
+                      }
+                      className="px-4 py-2 text-sm flex items-center rounded bg-orange-100 hover:bg-orange-200 text-orange-700"
+                    >
+                      <MdOutlineChatBubbleOutline className="mr-2" />
+                      Chat
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleGetCandidateEmail(assignment.candidate_id)
+                      }
+                      className="px-4 py-2 text-sm flex items-center rounded bg-gray-100 hover:bg-gray-200 text-gray-700"
+                    >
+                      <FaRegEnvelope className="mr-2" />
+                      Get Email
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedCandidateId(assignment.candidate_id);
+                        setReplyModalOpen(true);
+                      }}
+                      className="px-4 py-2 text-sm flex items-center rounded bg-purple-100 hover:bg-purple-200 text-purple-700"
+                    >
+                      <FaRegEdit className="mr-2" />
+                      Reply
+                    </button>
+                    <button
+                      onClick={() => handleHireCandidate(assignment.candidate_id)}
+                      disabled={hireLoading === assignment.candidate_id}
+                      className={`px-4 py-2 text-sm flex items-center rounded ${hireLoading === assignment.candidate_id
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-teal-100 hover:bg-teal-200 text-teal-700"
+                        }`}
+                    >
+                      <FaRegCheckCircle className="mr-2" />
+                      Hire
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Right Section */}
-            <div className="w-1/2">
-              <strong className="text-gray-700">Attachments:</strong>
-              <div className="mt-2 space-y-2 break-all">
-                {assignment.assignment?.length > 0 ? (
-                  renderAttachments(assignment.assignment)
-                ) : (
-                  <p className="text-gray-500">No attachments</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end items-center mt-6 space-x-4">
-            <button
-              onClick={() => handleMarkAsEvaluated(assignment.candidate_id)}
-              disabled={assignment.evaluated || loadingMark === assignment.candidate_id}
-              className={`px-4 py-2 text-sm rounded-lg flex items-center justify-center font-medium ${
-                assignment.evaluated
-                  ? "bg-green-500 text-white cursor-not-allowed"
-                  : "bg-yellow-500 hover:bg-yellow-600 text-white"
-              }`}
-            >
-              {loadingMark === assignment.candidate_id && !assignment.evaluated ? (
-                <TailSpin height="16" width="16" color="#fff" />
-              ) : assignment.evaluated ? (
-                <>
-                  <FaCheckCircle className="mr-1" />
-                  Evaluated
-                </>
-              ) : (
-                <>
-                  <FaTimesCircle className="mr-1" />
-                  Mark as Evaluated
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={() => handleMarkForFuture(assignment.candidate_id)}
-              disabled={assignment.future_consideration || loadingMark === assignment.candidate_id}
-              className={`px-4 py-2 text-sm rounded-lg flex items-center justify-center font-medium ${
-                assignment.future_consideration
-                  ? "bg-blue-500 text-white cursor-not-allowed"
-                  : "bg-indigo-500 hover:bg-indigo-600 text-white"
-              }`}
-            >
-              {loadingMark === assignment.candidate_id && !assignment.future_consideration ? (
-                <TailSpin height="16" width="16" color="#fff" />
-              ) : assignment.future_consideration ? (
-                <>
-                  <FaCheckCircle className="mr-1" />
-                  Future Consideration
-                </>
-              ) : (
-                <>
-                  <FaTimesCircle className="mr-1" />
-                  Mark for Future
-                </>
-              )}
-            </button>
-
-            <button className="px-4 py-2 text-sm rounded-lg bg-orange-500 hover:bg-orange-600 text-white flex items-center">
-              Chat
-            </button>
-
-            <button
-              onClick={() => handleGetCandidateEmail(assignment.candidate_id)}
-              className="px-4 py-2 text-sm rounded-lg bg-gray-500 hover:bg-gray-600 text-white flex items-center"
-            >
-              Get Email
-            </button>
-
-            <button
-              onClick={() => {
-                setSelectedCandidateId(assignment.candidate_id);
-                setReplyModalOpen(true);
-              }}
-              className="px-4 py-2 text-sm rounded-lg bg-purple-500 hover:bg-purple-600 text-white flex items-center"
-            >
-              Reply
-            </button>
-
-            <button
-              onClick={() => handleHireCandidate(assignment.candidate_id)}
-              disabled={hireLoading === assignment.candidate_id}
-              className={`px-4 py-2 text-sm rounded-lg flex items-center justify-center font-medium ${
-                hireLoading === assignment.candidate_id
-                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                  : "bg-teal-500 hover:bg-teal-600 text-white"
-              }`}
-            >
-              {hireLoading === assignment.candidate_id ? (
-                <TailSpin height="16" width="16" color="#fff" />
-              ) : (
-                <>
-                  <FaCheckCircle className="mr-1" />
-                  Hire
-                </>
-              )}
-            </button>
-          </div>
+          ) : (
+            !loading && (
+              <p className="text-center text-gray-500">No assignments found.</p>
+            )
+          )}
         </div>
-      ))}
-    </div>
-  ) : (
-    !loading && <p className="text-center text-gray-500">No assignments found.</p>
-  )}
-</div>
+
 
 
         {filteredAssignments.length > 0 && (
@@ -547,39 +624,39 @@ const GetAssignmentsPage: React.FC = () => {
       )}
 
       {/* Email Modal */}
-{emailModalOpen && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="relative bg-white border-2 border-blue-500 p-6 rounded-lg shadow-lg w-96">
-      {/* Close Icon */}
-      <button
-        onClick={() => setEmailModalOpen(false)}
-        className="absolute top-2 right-2 text-red-600 text-xl font-bold hover:text-red-800"
-      >
-        ✖
-      </button>
-      <h2 className="text-xl font-semibold mb-4 text-center text-blue-600">
-        Candidate Email
-      </h2>
-      {email ? (
-        <>
-          <p className="text-gray-800 mb-6 text-center bg-gray-100 border border-blue-300 p-2 rounded-lg ">
-            {email}
-          </p>
-          <div className="flex justify-center space-x-4">
+      {emailModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="relative bg-white border-2 border-blue-500 p-6 rounded-lg shadow-lg w-96">
+            {/* Close Icon */}
             <button
-              onClick={handleCopyToClipboard}
-              className="flex items-center px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600"
+              onClick={() => setEmailModalOpen(false)}
+              className="absolute top-2 right-2 text-red-600 text-xl font-bold hover:text-red-800"
             >
-              <FaCopy className="mr-2" /> Copy Email
+              ✖
             </button>
+            <h2 className="text-xl font-semibold mb-4 text-center text-blue-600">
+              Candidate Email
+            </h2>
+            {email ? (
+              <>
+                <p className="text-gray-800 mb-6 text-center bg-gray-100 border border-blue-300 p-2 rounded-lg ">
+                  {email}
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={handleCopyToClipboard}
+                    className="flex items-center px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600"
+                  >
+                    <FaCopy className="mr-2" /> Copy Email
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-gray-500 text-center">No email available.</p>
+            )}
           </div>
-        </>
-      ) : (
-        <p className="text-gray-500 text-center">No email available.</p>
+        </div>
       )}
-    </div>
-  </div>
-)}
 
 
     </div>

@@ -28,20 +28,53 @@ const Pagination = ({
     }
   };
 
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`px-3 py-2 mx-1 rounded-md font-medium transition ${
+            i === currentPage
+              ? "bg-blue-100 text-blue-600 border border-blue-300"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
   return (
-    <div className="flex justify-center mt-8">
+    <div className="flex justify-center items-center mt-6 space-x-2">
+      {/* Previous Button */}
       <button
         onClick={handlePrevPage}
         disabled={currentPage === 1}
-        className="px-4 py-2 bg-gray-200 rounded-l-lg hover:bg-gray-300 disabled:opacity-50"
+        className={`px-4 py-2 rounded-md font-medium transition ${
+          currentPage === 1
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
       >
         Prev
       </button>
-      <span className="px-4 py-2 bg-white border-t border-b">{currentPage}</span>
+
+      {/* Page Numbers */}
+      <div className="flex space-x-1">{renderPageNumbers()}</div>
+
+      {/* Next Button */}
       <button
         onClick={handleNextPage}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 bg-gray-200 rounded-r-lg hover:bg-gray-300 disabled:opacity-50"
+        className={`px-4 py-2 rounded-md font-medium transition ${
+          currentPage === totalPages
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
       >
         Next
       </button>
