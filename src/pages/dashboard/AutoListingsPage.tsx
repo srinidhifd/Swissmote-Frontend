@@ -62,7 +62,7 @@ const AutoListingsPage = () => {
   const [day4Message, setDay4Message] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState<AutomatedJob | NotAutomatedJob | ClosedAutomatedJob | null>(null);
-
+  
 
   const [automateForm, setAutomateForm] = useState({
     listing: null as string | null,
@@ -79,6 +79,8 @@ const AutoListingsPage = () => {
     followup4: "default", // default value for Day 4 follow-up
     followup2Message: "", // Added property
     followup4Message: "", // Added property
+    assignmentMessage: "default",
+    assignmentMessageContent: "",
     active_status: true,
   });
   const resetForm = () => {
@@ -97,6 +99,8 @@ const AutoListingsPage = () => {
       followup4: "default",
       followup2Message: "",
       followup4Message: "",
+      assignmentMessage: "default",
+      assignmentMessageContent: "",
       active_status: true,
     });
   };
@@ -263,6 +267,9 @@ const AutoListingsPage = () => {
       followup4: "default", // default value for Day 4 follow-up
       followup2Message: "",
       followup4Message: "",
+      assignmentMessage: "default",
+      assignmentMessageContent: "",
+      
     });
     setIsAutomateModalOpen(true);
   };
@@ -1446,72 +1453,72 @@ const AutoListingsPage = () => {
               </div>
 
               {/* Assignment Message */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
-                <select
-                  value={automateForm.followup2}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setAutomateForm((prev) => ({
-                      ...prev,
-                      followup2: value,
-                    }));
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                >
-                  <option value="default">Default</option>
-                  <option value="custom">Custom Message</option>
-                </select>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
+  <select
+    value={automateForm.assignmentMessage}
+    onChange={(e) => {
+      const value = e.target.value;
+      setAutomateForm((prev) => ({
+        ...prev,
+        assignmentMessage: value,
+      }));
+    }}
+    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  >
+    <option value="default">Default</option>
+    <option value="custom">Custom Message</option>
+  </select>
+  {automateForm.assignmentMessage === "custom" && (
+    <input
+      type="text"
+      placeholder="Enter custom assignment message"
+      value={automateForm.assignmentMessageContent || ""}
+      onChange={(e) =>
+        setAutomateForm((prev) => ({
+          ...prev,
+          assignmentMessageContent: e.target.value,
+        }))
+      }
+      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+    />
+  )}
+</div>
 
-                {automateForm.followup2 === "custom" && (
-                  <input
-                    type="text"
-                    placeholder="Enter custom assignment message"
-                    value={automateForm.followup2Message || ""}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        followup2Message: e.target.value,
-                      }))
-                    }
-                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                )}
-              </div>
 
               {/* Day 2 Followup */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Followup</label>
-                <select
-                  value={automateForm.followup2}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setAutomateForm((prev) => ({
-                      ...prev,
-                      followup2: value,
-                    }));
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                >
-                  <option value="default">Default</option>
-                  <option value="custom">Custom Message</option>
-                </select>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Followup</label>
+  <select
+    value={automateForm.followup2}
+    onChange={(e) => {
+      const value = e.target.value;
+      setAutomateForm((prev) => ({
+        ...prev,
+        followup2: value,
+      }));
+    }}
+    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  >
+    <option value="default">Default</option>
+    <option value="custom">Custom Message</option>
+  </select>
+  {automateForm.followup2 === "custom" && (
+    <input
+      type="text"
+      placeholder="Enter Day 2 follow-up message"
+      value={automateForm.followup2Message || ""}
+      onChange={(e) =>
+        setAutomateForm((prev) => ({
+          ...prev,
+          followup2Message: e.target.value,
+        }))
+      }
+      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+    />
+  )}
+</div>
 
-                {automateForm.followup2 === "custom" && (
-                  <input
-                    type="text"
-                    placeholder="Enter Day 2 follow-up message"
-                    value={automateForm.followup2Message || ""}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        followup2Message: e.target.value,
-                      }))
-                    }
-                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                )}
-              </div>
 
               {/* Day 4 Followup */}
               <div>
