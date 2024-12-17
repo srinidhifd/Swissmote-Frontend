@@ -13,7 +13,7 @@ const NavBar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full px-8 py-4 flex justify-between items-center backdrop-blur-md bg-white/4 border-b border-white/20 z-50 shadow-lg">
       <div className="text-2xl font-bold text-white hover:cursor-pointer">
-        <a href="/">Swissmote</a>
+        <a href="/home">Swissmote</a>
       </div>
 
       {/* Desktop Links */}

@@ -68,7 +68,7 @@ const SigninPage = () => {
 
       {/* Back to Home Button */}
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="absolute top-4 left-4 px-4 py-2 bg-gray-700 text-white rounded-md shadow hover:bg-gray-600 transition"
       >
         Back to Home
