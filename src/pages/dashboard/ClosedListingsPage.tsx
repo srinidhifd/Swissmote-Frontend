@@ -165,8 +165,8 @@ const ClosedListingsPage = () => {
                       <BsThreeDotsVertical />
                     </button>
                     {dropdownOpen === index && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                        {["Internshala", "Leader link", "Candidate link", "Assignment link"].map(
+                      <div className="absolute right-0 mt-2 min-w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 text-left">
+                        {["Internshala link", "Leader link", "Candidate link", "Assignment link"].map(
                           (key, idx) => {
                             const links = key === "Assignment link" ? parseLink(listing[key]) : [listing[key]];
                             return (
