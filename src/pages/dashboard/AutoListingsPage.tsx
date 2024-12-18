@@ -159,6 +159,10 @@ const AutoListingsPage = () => {
     }
   }, [apiUrl, authToken, empType, account, dispatch]);
 
+  useEffect(() => {
+    fetchListings(); // Fetch data on initial load
+  }, [fetchListings]);
+
   const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     console.log("Selected listing:", listing);
     setSelectedListing(listing);
