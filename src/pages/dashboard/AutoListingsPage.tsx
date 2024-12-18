@@ -4,9 +4,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { TailSpin } from "react-loader-spinner";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import dayjs from "dayjs";
-import { AiOutlineFileText, AiOutlineLink } from "react-icons/ai";
-import { FaRegHandshake } from "react-icons/fa";
-import { MdOutlineFollowTheSigns } from "react-icons/md";
+import { motion } from "framer-motion";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
+import { HandThumbUpIcon } from "@heroicons/react/24/outline"; // As replacement for Handshake
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
@@ -1203,135 +1204,141 @@ const AutoListingsPage = () => {
         </div>
       )}
 
-      {isDetailModalOpen && selectedRowData && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl h-[90vh] max-w-7xl relative overflow-y-scroll">
-            {/* Close Button */}
-            <button
-              className="absolute top-4 right-4 text-red-400 hover:text-gray-600 focus:outline-none"
-              onClick={() => setIsDetailModalOpen(false)}
-            >
-              ✕
-            </button>
+{isDetailModalOpen && selectedRowData && (
+  <div className="max-w-[100vw] max-h-[100vh] fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className="relative w-[95%] max-w-7xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+    >
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 flex justify-between items-center">
+        <h2 className="text-2xl font-bold flex items-center">
+          <DocumentTextIcon className="mr-3 w-7 h-7" />
+          Listing Details
+          <span className="ml-4 text-lg font-medium text-gray-200 truncate max-w-[300px]">
+            - {"listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A"}
+          </span>
+        </h2>
+        <button 
+          onClick={() => setIsDetailModalOpen(false)}
+          className="group transition-all duration-300 hover:rotate-90 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 rounded-full p-2"
+        >
+          <XMarkIcon className="w-6 h-6" />
+        </button>
+      </div>
 
-            {/* Modal Content */}
-            <div className="flex flex-col space-y-6">
-              <h2 className="text-3xl font-semibold text-blue-800 mb-4 flex items-center">
-                <AiOutlineFileText className="w-6 h-6 mr-2 text-blue-600" />
-                Listing Details
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-gray-600 font-medium">Listing Name:</p>
-                  <p className="text-gray-800">{"listing_name" in selectedRowData ? selectedRowData.listing_name || "N/A" : "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 font-medium">Project Name:</p>
-                  <p className="text-gray-800">{"projectname" in selectedRowData ? selectedRowData.projectname || "N/A" : "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 font-medium">Date:</p>
-                  <p className="text-gray-800">{"date" in selectedRowData ? dayjs(selectedRowData.date).format("DD MMMM YYYY") : "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 font-medium">Conversion Rate:</p>
-                  <p className="text-gray-800">{"conversion_rate" in selectedRowData ? selectedRowData.conversion_rate || "N/A" : "N/A"}</p>
-                </div>
-              </div>
-
-              {/* Intro Message */}
-              <div className="bg-blue-50 p-4 rounded-lg shadow-inner">
-                <p className="text-blue-700 font-medium flex items-center">
-                  <FaRegHandshake className="mr-2 text-blue-600" />
-                  Intro Message:
-                </p>
-                <p className="text-gray-800 whitespace-pre-wrap">
-                  {"messages" in selectedRowData && selectedRowData.messages && 'intro' in selectedRowData.messages ? selectedRowData.messages.intro || "No Intro Message" : "N/A"}
-                </p>
-              </div>
-
-              {/* Assignment Message */}
-              <div className="bg-green-50 p-4 rounded-lg shadow-inner">
-                <p className="text-green-700 font-medium flex items-center">
-                  <AiOutlineFileText className="mr-2 text-green-600" />
-                  Assignment Message:
-                </p>
-                <p className="text-gray-800 whitespace-pre-wrap">
-                  {"messages" in selectedRowData && selectedRowData.messages && 'assignment' in selectedRowData.messages ? selectedRowData.messages.assignment || "No Assignment Message" : "N/A"}
-                </p>
-              </div>
-
-              {/* Assignment Links */}
-              <div>
-                <p className="text-gray-600 font-medium flex items-center">
-                  <AiOutlineLink className="mr-2 text-blue-600" />
-                  Assignment Links:
-                </p>
-                <ul className="list-disc ml-6 text-blue-600">
-                  {"assignment_link" in selectedRowData && Array.isArray(selectedRowData.assignment_link) && selectedRowData.assignment_link.length > 0 ? (
-                    selectedRowData.assignment_link.map((link, index) => (
-                      <li key={index}>
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                          {link.length > 30 ? `${link.substring(0, 30)}...` : link}
-                        </a>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-gray-800">No Assignment Links Added Yet</li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Review Links */}
-              <div>
-                <p className="text-gray-600 font-medium flex items-center">
-                  <AiOutlineLink className="mr-2 text-blue-600" />
-                  Review Links:
-                </p>
-                <ul className="list-disc ml-6 text-blue-600">
-                  {"review_link" in selectedRowData && Array.isArray(selectedRowData.review_link) && selectedRowData.review_link.length > 0 ? (
-                    selectedRowData.review_link.map((link: string, index: number) => (
-                      <li key={index}>
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                          {link.length > 30 ? `${link.substring(0, 30)}...` : link}
-                        </a>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-gray-800">No Review Links Added Yet</li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Follow-Up Messages */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-yellow-50 p-4 rounded-lg shadow-inner">
-                  <p className="text-yellow-700 font-medium flex items-center">
-                    <MdOutlineFollowTheSigns className="mr-2 text-yellow-600" />
-                    Day 2 Followup:
-                  </p>
-                  <p className="text-gray-800">
-                    {"day2followup" in selectedRowData && typeof selectedRowData.day2followup === "object" && "followup" in (selectedRowData.day2followup as unknown as Record<string, unknown>)
-                      ? String((selectedRowData.day2followup as unknown as Record<string, string>).followup)
-                      : "No Message Set"}
-                  </p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg shadow-inner">
-                  <p className="text-red-700 font-medium flex items-center">
-                    <MdOutlineFollowTheSigns className="mr-2 text-red-600" />
-                    Day 4 Followup:
-                  </p>
-                  <p className="text-gray-800">
-                    {"day4followup" in selectedRowData && typeof selectedRowData.day4followup === "object" && "followup" in (selectedRowData.day4followup as unknown as Record<string, unknown>)
-                      ? String((selectedRowData.day4followup as unknown as Record<string, string>).followup)
-                      : "No Message Set"}
-                  </p>
-                </div>
-              </div>
+      {/* Scrollable Content Area */}
+      <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
+        {/* Main Details Grid */}
+        <div className="grid md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-xl">
+          {[
+            { label: "Listing Name", value: "listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A" },
+            { label: "Project Name", value: "projectname" in selectedRowData ? selectedRowData.projectname : "N/A" },
+            { label: "Date", value: "date" in selectedRowData ? dayjs(selectedRowData.date).format("DD MMMM YYYY") : "N/A" },
+            { label: "Conversion Rate", value: "conversion_rate" in selectedRowData ? selectedRowData.conversion_rate : "N/A" }
+          ].map(({ label, value }) => (
+            <div key={label} className="space-y-1">
+              <p className="text-sm font-medium text-gray-500">{label}</p>
+              <p className="text-lg font-semibold text-gray-800 truncate">{value}</p>
             </div>
-          </div>
+          ))}
         </div>
-      )}
+
+        {/* Messages Section */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            { 
+              title: "Intro Message", 
+              icon: HandThumbUpIcon, 
+              content: "messages" in selectedRowData ? selectedRowData.messages?.intro : "N/A", 
+              bgColor: "bg-blue-50" 
+            },
+            { 
+              title: "Assignment Message", 
+              icon: DocumentTextIcon, 
+              content: "messages" in selectedRowData ? selectedRowData.messages?.assignment : "N/A", 
+              bgColor: "bg-green-50" 
+            }
+          ].map(({ title, icon: Icon, content, bgColor }) => (
+            <div key={title} className={`${bgColor} p-4 rounded-xl space-y-3`}>
+              <div className="flex items-center text-blue-700">
+                <Icon className="mr-2 w-5 h-5" />
+                <h3 className="font-semibold">{title}</h3>
+              </div>
+              <p className="text-gray-700 whitespace-pre-line overflow-auto max-h-[150px]">
+                {content || "No message available"}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Links Section */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            { 
+              title: "Assignment Links", 
+              links: "assignment_link" in selectedRowData ? selectedRowData.assignment_link : [], 
+              emptyMessage: "No assignment links" 
+            },
+            { 
+              title: "Review Links", 
+              links: "review_link" in selectedRowData ? selectedRowData.review_link : [], 
+              emptyMessage: "No review links" 
+            }
+          ].map(({ title, links, emptyMessage }) => (
+            <div key={title} className="bg-gray-100 p-4 rounded-xl">
+              <h3 className="font-semibold mb-3 text-gray-700">{title}</h3>
+              {links?.length ? (
+                <ul className="space-y-2">
+                  {links.map((link, index) => (
+                    <li key={index} className="truncate">
+                      <a 
+                        href={link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                      >
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-500">{emptyMessage}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Followup Messages */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            { 
+              title: "Day 2 Followup", 
+              message: "day2followup" in selectedRowData ? selectedRowData.day2followup?.followup : "N/A", 
+              bgColor: "bg-yellow-50" 
+            },
+            { 
+              title: "Day 4 Followup", 
+              message: "day4followup" in selectedRowData ? selectedRowData.day4followup?.followup : "N/A", 
+              bgColor: "bg-red-50" 
+            }
+          ].map(({ title, message, bgColor }) => (
+            <div key={title} className={`${bgColor} p-4 rounded-xl`}>
+              <h3 className="font-semibold mb-2 text-gray-700">{title}</h3>
+              <p className="text-gray-600 whitespace-pre-line overflow-auto max-h-[100px]">
+                {message || "No message set"}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  </div>
+)}
+
 
 
       {isAutomateModalOpen && (
