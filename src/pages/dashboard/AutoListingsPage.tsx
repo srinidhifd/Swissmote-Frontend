@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TailSpin } from "react-loader-spinner";
@@ -32,8 +32,8 @@ const AutoListingsPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const {
-    empType,
-    account,
+    empType = "job", // Default to "job"
+    account = "pv",   // Default to "pv"
     activeTab,
     automatedListings,
     notAutomatedListings,
@@ -63,7 +63,7 @@ const AutoListingsPage = () => {
   const [day4Message, setDay4Message] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState<AutomatedJob | NotAutomatedJob | ClosedAutomatedJob | null>(null);
-  
+
 
   const [automateForm, setAutomateForm] = useState({
     listing: null as string | null,
@@ -123,7 +123,8 @@ const AutoListingsPage = () => {
     setSearchQuery("");
   };
 
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async () => {
+    if (!apiUrl || !authToken) return; // Ensure these are set properly
     setLoading(true);
     setError(null);
 
@@ -150,17 +151,13 @@ const AutoListingsPage = () => {
 
       dispatch(setAutomatedListings(fetchedData.automated || []));
       dispatch(setNotAutomatedListings(fetchedData.not_automated || []));
-      dispatch(
-        setClosedAutomatedListings(
-          fetchedData.cl_automated ? [fetchedData.cl_automated] : []
-        )
-      );
+      dispatch(setClosedAutomatedListings(fetchedData.cl_automated ? [fetchedData.cl_automated] : []));
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl, authToken, empType, account, dispatch]);
 
   const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     console.log("Selected listing:", listing);
@@ -270,7 +267,7 @@ const AutoListingsPage = () => {
       followup4Message: "",
       assignmentMessage: "default",
       assignmentMessageContent: "",
-      
+
     });
     setIsAutomateModalOpen(true);
   };
@@ -622,7 +619,7 @@ const AutoListingsPage = () => {
 
 
             <td className="px-4 py-2 text-center dropdown sticky-column "
-            onClick={(e) => e.stopPropagation()}>
+              onClick={(e) => e.stopPropagation()}>
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() =>
@@ -1204,140 +1201,140 @@ const AutoListingsPage = () => {
         </div>
       )}
 
-{isDetailModalOpen && selectedRowData && (
-  <div className="max-w-[100vw] max-h-[100vh] fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="relative w-[95%] max-w-7xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
-    >
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold flex items-center">
-          <DocumentTextIcon className="mr-3 w-7 h-7" />
-          Listing Details
-          <span className="ml-4 text-lg font-medium text-gray-200 truncate max-w-[300px]">
-            - {"listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A"}
-          </span>
-        </h2>
-        <button 
-          onClick={() => setIsDetailModalOpen(false)}
-          className="group transition-all duration-300 hover:rotate-90 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 rounded-full p-2"
-        >
-          <XMarkIcon className="w-6 h-6" />
-        </button>
-      </div>
-
-      {/* Scrollable Content Area */}
-      <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
-        {/* Main Details Grid */}
-        <div className="grid md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-xl">
-          {[
-            { label: "Listing Name", value: "listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A" },
-            { label: "Project Name", value: "projectname" in selectedRowData ? selectedRowData.projectname : "N/A" },
-            { label: "Date", value: "date" in selectedRowData ? dayjs(selectedRowData.date).format("DD MMMM YYYY") : "N/A" },
-            { label: "Conversion Rate", value: "conversion_rate" in selectedRowData ? selectedRowData.conversion_rate : "N/A" }
-          ].map(({ label, value }) => (
-            <div key={label} className="space-y-1">
-              <p className="text-sm font-medium text-gray-500">{label}</p>
-              <p className="text-lg font-semibold text-gray-800 truncate">{value}</p>
+      {isDetailModalOpen && selectedRowData && (
+        <div className="max-w-[100vw] max-h-[100vh] fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="relative w-[95%] max-w-7xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+          >
+            {/* Header Section */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 flex justify-between items-center">
+              <h2 className="text-2xl font-bold flex items-center">
+                <DocumentTextIcon className="mr-3 w-7 h-7" />
+                Listing Details
+                <span className="ml-4 text-lg font-medium text-gray-200 truncate max-w-[300px]">
+                  - {"listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A"}
+                </span>
+              </h2>
+              <button
+                onClick={() => setIsDetailModalOpen(false)}
+                className="group transition-all duration-300 hover:rotate-90 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 rounded-full p-2"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
             </div>
-          ))}
-        </div>
 
-        {/* Messages Section */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            { 
-              title: "Intro Message", 
-              icon: HandThumbUpIcon, 
-              content: "messages" in selectedRowData ? selectedRowData.messages?.intro : "N/A", 
-              bgColor: "bg-blue-50" 
-            },
-            { 
-              title: "Assignment Message", 
-              icon: DocumentTextIcon, 
-              content: "messages" in selectedRowData ? selectedRowData.messages?.assignment : "N/A", 
-              bgColor: "bg-green-50" 
-            }
-          ].map(({ title, icon: Icon, content, bgColor }) => (
-            <div key={title} className={`${bgColor} p-4 rounded-xl space-y-3`}>
-              <div className="flex items-center text-blue-700">
-                <Icon className="mr-2 w-5 h-5" />
-                <h3 className="font-semibold">{title}</h3>
+            {/* Scrollable Content Area */}
+            <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
+              {/* Main Details Grid */}
+              <div className="grid md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-xl">
+                {[
+                  { label: "Listing Name", value: "listing_name" in selectedRowData ? selectedRowData.listing_name : "N/A" },
+                  { label: "Project Name", value: "projectname" in selectedRowData ? selectedRowData.projectname : "N/A" },
+                  { label: "Date", value: "date" in selectedRowData ? dayjs(selectedRowData.date).format("DD MMMM YYYY") : "N/A" },
+                  { label: "Conversion Rate", value: "conversion_rate" in selectedRowData ? selectedRowData.conversion_rate : "N/A" }
+                ].map(({ label, value }) => (
+                  <div key={label} className="space-y-1">
+                    <p className="text-sm font-medium text-gray-500">{label}</p>
+                    <p className="text-lg font-semibold text-gray-800 truncate">{value}</p>
+                  </div>
+                ))}
               </div>
-              <p className="text-gray-700 whitespace-pre-line overflow-auto max-h-[150px]">
-                {content || "No message available"}
-              </p>
-            </div>
-          ))}
-        </div>
 
-        {/* Links Section */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            { 
-              title: "Assignment Links", 
-              links: "assignment_link" in selectedRowData ? selectedRowData.assignment_link : [], 
-              emptyMessage: "No assignment links" 
-            },
-            { 
-              title: "Review Links", 
-              links: "review_link" in selectedRowData ? selectedRowData.review_link : [], 
-              emptyMessage: "No review links" 
-            }
-          ].map(({ title, links, emptyMessage }) => (
-            <div key={title} className="bg-gray-100 p-4 rounded-xl">
-              <h3 className="font-semibold mb-3 text-gray-700">{title}</h3>
-              {links?.length ? (
-                <ul className="space-y-2">
-                  {links.map((link, index) => (
-                    <li key={index} className="truncate">
-                      <a 
-                        href={link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">{emptyMessage}</p>
-              )}
-            </div>
-          ))}
-        </div>
+              {/* Messages Section */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  {
+                    title: "Intro Message",
+                    icon: HandThumbUpIcon,
+                    content: "messages" in selectedRowData ? selectedRowData.messages?.intro : "N/A",
+                    bgColor: "bg-blue-50"
+                  },
+                  {
+                    title: "Assignment Message",
+                    icon: DocumentTextIcon,
+                    content: "messages" in selectedRowData ? selectedRowData.messages?.assignment : "N/A",
+                    bgColor: "bg-green-50"
+                  }
+                ].map(({ title, icon: Icon, content, bgColor }) => (
+                  <div key={title} className={`${bgColor} p-4 rounded-xl space-y-3`}>
+                    <div className="flex items-center text-blue-700">
+                      <Icon className="mr-2 w-5 h-5" />
+                      <h3 className="font-semibold">{title}</h3>
+                    </div>
+                    <p className="text-gray-700 whitespace-pre-line overflow-auto max-h-[150px]">
+                      {content || "No message available"}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
-        {/* Followup Messages */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            { 
-              title: "Day 2 Followup", 
-              message: "day2followup" in selectedRowData ? selectedRowData.day2followup?.followup : "N/A", 
-              bgColor: "bg-yellow-50" 
-            },
-            { 
-              title: "Day 4 Followup", 
-              message: "day4followup" in selectedRowData ? selectedRowData.day4followup?.followup : "N/A", 
-              bgColor: "bg-red-50" 
-            }
-          ].map(({ title, message, bgColor }) => (
-            <div key={title} className={`${bgColor} p-4 rounded-xl`}>
-              <h3 className="font-semibold mb-2 text-gray-700">{title}</h3>
-              <p className="text-gray-600 whitespace-pre-line overflow-auto max-h-[100px]">
-                {message || "No message set"}
-              </p>
+              {/* Links Section */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  {
+                    title: "Assignment Links",
+                    links: "assignment_link" in selectedRowData ? selectedRowData.assignment_link : [],
+                    emptyMessage: "No assignment links"
+                  },
+                  {
+                    title: "Review Links",
+                    links: "review_link" in selectedRowData ? selectedRowData.review_link : [],
+                    emptyMessage: "No review links"
+                  }
+                ].map(({ title, links, emptyMessage }) => (
+                  <div key={title} className="bg-gray-100 p-4 rounded-xl">
+                    <h3 className="font-semibold mb-3 text-gray-700">{title}</h3>
+                    {links?.length ? (
+                      <ul className="space-y-2">
+                        {links.map((link, index) => (
+                          <li key={index} className="truncate">
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                            >
+                              {link}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500">{emptyMessage}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Followup Messages */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  {
+                    title: "Day 2 Followup",
+                    message: "day2followup" in selectedRowData ? selectedRowData.day2followup?.followup : "N/A",
+                    bgColor: "bg-yellow-50"
+                  },
+                  {
+                    title: "Day 4 Followup",
+                    message: "day4followup" in selectedRowData ? selectedRowData.day4followup?.followup : "N/A",
+                    bgColor: "bg-red-50"
+                  }
+                ].map(({ title, message, bgColor }) => (
+                  <div key={title} className={`${bgColor} p-4 rounded-xl`}>
+                    <h3 className="font-semibold mb-2 text-gray-700">{title}</h3>
+                    <p className="text-gray-600 whitespace-pre-line overflow-auto max-h-[100px]">
+                      {message || "No message set"}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          </motion.div>
         </div>
-      </div>
-    </motion.div>
-  </div>
-)}
+      )}
 
 
 
@@ -1460,71 +1457,71 @@ const AutoListingsPage = () => {
               </div>
 
               {/* Assignment Message */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
-  <select
-    value={automateForm.assignmentMessage}
-    onChange={(e) => {
-      const value = e.target.value;
-      setAutomateForm((prev) => ({
-        ...prev,
-        assignmentMessage: value,
-      }));
-    }}
-    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-  >
-    <option value="default">Default</option>
-    <option value="custom">Custom Message</option>
-  </select>
-  {automateForm.assignmentMessage === "custom" && (
-    <input
-      type="text"
-      placeholder="Enter custom assignment message"
-      value={automateForm.assignmentMessageContent || ""}
-      onChange={(e) =>
-        setAutomateForm((prev) => ({
-          ...prev,
-          assignmentMessageContent: e.target.value,
-        }))
-      }
-      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-    />
-  )}
-</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
+                <select
+                  value={automateForm.assignmentMessage}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setAutomateForm((prev) => ({
+                      ...prev,
+                      assignmentMessage: value,
+                    }));
+                  }}
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                >
+                  <option value="default">Default</option>
+                  <option value="custom">Custom Message</option>
+                </select>
+                {automateForm.assignmentMessage === "custom" && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom assignment message"
+                    value={automateForm.assignmentMessageContent || ""}
+                    onChange={(e) =>
+                      setAutomateForm((prev) => ({
+                        ...prev,
+                        assignmentMessageContent: e.target.value,
+                      }))
+                    }
+                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                  />
+                )}
+              </div>
 
 
               {/* Day 2 Followup */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Followup</label>
-  <select
-    value={automateForm.followup2}
-    onChange={(e) => {
-      const value = e.target.value;
-      setAutomateForm((prev) => ({
-        ...prev,
-        followup2: value,
-      }));
-    }}
-    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-  >
-    <option value="default">Default</option>
-    <option value="custom">Custom Message</option>
-  </select>
-  {automateForm.followup2 === "custom" && (
-    <input
-      type="text"
-      placeholder="Enter Day 2 follow-up message"
-      value={automateForm.followup2Message || ""}
-      onChange={(e) =>
-        setAutomateForm((prev) => ({
-          ...prev,
-          followup2Message: e.target.value,
-        }))
-      }
-      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-    />
-  )}
-</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Followup</label>
+                <select
+                  value={automateForm.followup2}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setAutomateForm((prev) => ({
+                      ...prev,
+                      followup2: value,
+                    }));
+                  }}
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                >
+                  <option value="default">Default</option>
+                  <option value="custom">Custom Message</option>
+                </select>
+                {automateForm.followup2 === "custom" && (
+                  <input
+                    type="text"
+                    placeholder="Enter Day 2 follow-up message"
+                    value={automateForm.followup2Message || ""}
+                    onChange={(e) =>
+                      setAutomateForm((prev) => ({
+                        ...prev,
+                        followup2Message: e.target.value,
+                      }))
+                    }
+                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                  />
+                )}
+              </div>
 
 
               {/* Day 4 Followup */}
