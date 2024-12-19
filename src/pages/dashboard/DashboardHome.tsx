@@ -201,7 +201,7 @@ const DashboardHome = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">Dashboard Overview</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Swissmote Dashboard</h1>
       {/* KPIs Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-white shadow-subtle rounded-lg p-4 flex items-center space-x-4">
