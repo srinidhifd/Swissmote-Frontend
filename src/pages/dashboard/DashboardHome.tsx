@@ -1,109 +1,167 @@
 import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar, Pie, Line } from "react-chartjs-2";
+import {
   FaBriefcase,
-  FaEnvelope,
   FaClipboardList,
   FaTasks,
   FaUserTie,
-  FaChartBar,
+  FaClock,
 } from "react-icons/fa";
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 const DashboardHome = () => {
+  const barChartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "Jobs Posted",
+        data: [12, 19, 14, 20, 25, 18],
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
+      },
+    ],
+  };
+
+  const pieChartData = {
+    labels: ["Automated", "Not Automated", "Closed"],
+    datasets: [
+      {
+        label: "Listings",
+        data: [60, 30, 10],
+        backgroundColor: [
+          "rgba(75, 192, 192, 0.6)",
+          "rgba(255, 206, 86, 0.6)",
+          "rgba(255, 99, 132, 0.6)",
+        ],
+      },
+    ],
+  };
+
+  const lineChartData = {
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    datasets: [
+      {
+        label: "Messages Sent",
+        data: [50, 75, 60, 90, 80, 120, 100],
+        borderColor: "rgba(255, 99, 132, 0.6)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: false,
+      },
+    },
+  };
+
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-extrabold text-gray-900">Welcome to the Swissmote Dashboard</h1>
-      <p className="text-gray-700 mt-4 text-lg">
-        Explore tools to manage jobs, listings, messaging, and more with ease.
-      </p>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">Dashboard Overview</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-        {/* Job Management Widget */}
-        <div
-          className="bg-gradient-to-r from-blue-100 to-blue-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-blue-500 text-white rounded-full p-4">
-            <FaBriefcase className="text-2xl" />
+      {/* KPIs Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+          <div className="bg-blue-500 text-white p-4 rounded-full">
+            <FaBriefcase className="text-3xl" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Job Management</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Post, manage, and oversee job opportunities.
-            </p>
+            <h2 className="text-3xl font-bold">120</h2>
+            <p className="text-gray-600">Total Jobs</p>
+          </div>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+          <div className="bg-yellow-500 text-white p-4 rounded-full">
+            <FaClipboardList className="text-3xl" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">85</h2>
+            <p className="text-gray-600">Active Listings</p>
+          </div>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+          <div className="bg-red-500 text-white p-4 rounded-full">
+            <FaTasks className="text-3xl" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">45</h2>
+            <p className="text-gray-600">Assignments</p>
+          </div>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+          <div className="bg-indigo-500 text-white p-4 rounded-full">
+            <FaUserTie className="text-3xl" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">250</h2>
+            <p className="text-gray-600">Candidates</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white shadow-lg rounded-lg p-4 max-w-[100%]">
+          <div className="flex flex-col justify-center">
+          <h2 className="text-xl font-bold mb-2">Jobs Posted Over Time</h2>
+          <Bar data={barChartData} options={options} />
           </div>
         </div>
 
-        {/* Listings Widget */}
-        <div
-          className="bg-gradient-to-r from-yellow-100 to-yellow-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-yellow-500 text-white rounded-full p-4">
-            <FaClipboardList className="text-2xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Listings</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              View and manage active and automated listings.
-            </p>
-          </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 max-w-[100%]">
+          
+          <h2 className="text-xl font-bold mb-2">Listings Breakdown</h2>
+          <Pie data={pieChartData} options={options} />
         </div>
 
-        {/* Assignments Widget */}
-        <div
-          className="bg-gradient-to-r from-red-100 to-red-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-red-500 text-white rounded-full p-4">
-            <FaTasks className="text-2xl" />
+        <div className="col-span-2 bg-white shadow-lg rounded-lg p-4 max-w-[100%]">
+          <h2 className="text-xl font-bold mb-2">Messages Sent This Week</h2>
+          <Line data={lineChartData} options={options} />
+        </div>
+      </div>
+
+      {/* Additional Insights */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white shadow-lg rounded-lg p-4 flex items-center">
+          <div className="bg-gray-300 text-gray-800 p-4 rounded-full">
+            <FaClock className="text-3xl" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Assignments</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Track and manage assignment processes.
-            </p>
+          <div className="ml-4">
+            <h2 className="text-2xl font-bold">15d</h2>
+            <p className="text-gray-600">Avg. Time to Hire</p>
           </div>
         </div>
-
-        {/* Messaging Widget */}
-        <div
-          className="bg-gradient-to-r from-green-100 to-green-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-green-500 text-white rounded-full p-4">
-            <FaEnvelope className="text-2xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Messaging</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Send and view system messages.
-            </p>
-          </div>
-        </div>
-
-        {/* Evaluation Widget */}
-        <div
-          className="bg-gradient-to-r from-purple-100 to-purple-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-purple-500 text-white rounded-full p-4">
-            <FaChartBar className="text-2xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Evaluation</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Evaluate performance and manage reports.
-            </p>
-          </div>
-        </div>
-
-        {/* Candidate Management Widget */}
-        <div
-          className="bg-gradient-to-r from-indigo-100 to-indigo-200 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
-        >
-          <div className="bg-indigo-500 text-white rounded-full p-4">
-            <FaUserTie className="text-2xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Candidate Management</h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Oversee candidate profiles and automate replies.
-            </p>
-          </div>
+        <div className="bg-white shadow-lg rounded-lg p-4">
+          <h2 className="text-xl font-bold mb-2">Candidate Feedback</h2>
+          <p className="text-gray-600">"Rapid process, very welcoming at every stage."</p>
         </div>
       </div>
     </div>
