@@ -333,36 +333,36 @@ const GetAssignmentsPage: React.FC = () => {
 
           {/* Info Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
-  {/* Project Name Card */}
-  <div className="p-5 bg-gray-50 rounded-lg shadow-md border border-gray-200">
-    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-      Project Name
-    </p>
-    <h2 className="text-lg font-semibold text-gray-800 mt-2">
-      {projectName || "N/A"}
-    </h2>
-  </div>
+            {/* Project Name Card */}
+            <div className="p-5 bg-gray-50 rounded-lg shadow-md border border-gray-200">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Project Name
+              </p>
+              <h2 className="text-lg font-semibold text-gray-800 mt-2">
+                {projectName || "N/A"}
+              </h2>
+            </div>
 
-  {/* Listing Name Card */}
-  <div className="p-5 bg-indigo-50 rounded-lg shadow-md border border-indigo-200">
-    <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">
-      Listing Name
-    </p>
-    <h2 className="text-lg font-semibold text-gray-800 mt-2">
-      {listingName || "N/A"}
-    </h2>
-  </div>
+            {/* Listing Name Card */}
+            <div className="p-5 bg-indigo-50 rounded-lg shadow-md border border-indigo-200">
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">
+                Listing Name
+              </p>
+              <h2 className="text-lg font-semibold text-gray-800 mt-2">
+                {listingName || "N/A"}
+              </h2>
+            </div>
 
-  {/* Listing Number Card */}
-  <div className="p-5 bg-teal-50 rounded-lg shadow-md border border-teal-200">
-    <p className="text-xs font-semibold text-teal-600 uppercase tracking-wide">
-      Listing Number
-    </p>
-    <h2 className="text-lg font-semibold text-gray-800 mt-2">
-      {listingNumber || "N/A"}
-    </h2>
-  </div>
-</div>
+            {/* Listing Number Card */}
+            <div className="p-5 bg-teal-50 rounded-lg shadow-md border border-teal-200">
+              <p className="text-xs font-semibold text-teal-600 uppercase tracking-wide">
+                Listing Number
+              </p>
+              <h2 className="text-lg font-semibold text-gray-800 mt-2">
+                {listingNumber || "N/A"}
+              </h2>
+            </div>
+          </div>
 
         </div>
 
@@ -464,8 +464,8 @@ const GetAssignmentsPage: React.FC = () => {
                         assignment.evaluated || loadingMark === assignment.candidate_id
                       }
                       className={`px-4 py-2 text-sm flex items-center rounded ${assignment.evaluated
-                          ? "bg-green-100 text-green-700 cursor-not-allowed"
-                          : "bg-yellow-100 hover:bg-yellow-200 text-yellow-700"
+                        ? "bg-green-100 text-green-700 cursor-not-allowed"
+                        : "bg-yellow-100 hover:bg-yellow-200 text-yellow-700"
                         }`}
                     >
                       {assignment.evaluated ? (
@@ -487,8 +487,8 @@ const GetAssignmentsPage: React.FC = () => {
                         loadingMark === assignment.candidate_id
                       }
                       className={`px-4 py-2 text-sm flex items-center rounded ${assignment.future_consideration
-                          ? "bg-blue-100 text-blue-700 cursor-not-allowed"
-                          : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
+                        ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                        : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                         }`}
                     >
                       <FaRegBookmark className="mr-2" />
@@ -533,8 +533,8 @@ const GetAssignmentsPage: React.FC = () => {
                       onClick={() => handleHireCandidate(assignment.candidate_id)}
                       disabled={hireLoading === assignment.candidate_id}
                       className={`px-4 py-2 text-sm flex items-center rounded ${hireLoading === assignment.candidate_id
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-teal-100 hover:bg-teal-200 text-teal-700"
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "bg-teal-100 hover:bg-teal-200 text-teal-700"
                         }`}
                     >
                       <FaRegCheckCircle className="mr-2" />
