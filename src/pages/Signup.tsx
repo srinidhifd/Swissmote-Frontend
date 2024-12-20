@@ -32,11 +32,11 @@ const SignupPage = () => {
       if (response.status === 201) {
         toast.success("Signup successfull! Redirecting to Sign-in Page...", {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 2000,
         });
         setTimeout(() => {
           navigate("/signin");
-        }, 3000);
+        }, 2000);
       }
     } catch (error: any) {
       toast.error(

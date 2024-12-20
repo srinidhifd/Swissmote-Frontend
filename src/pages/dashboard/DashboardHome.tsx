@@ -214,7 +214,7 @@ const DashboardHome = () => {
           </div>
         </div>
         <div className="bg-white shadow-subtle rounded-lg p-4 flex items-center space-x-4">
-          <div className="bg-yellow-500 text-white p-4 rounded-full">
+          <div className="bg-green-500 text-white p-4 rounded-full">
             <FaCheck className="text-3xl" />
           </div>
           <div>
@@ -223,7 +223,7 @@ const DashboardHome = () => {
           </div>
         </div>
         <div className="bg-white shadow-subtle rounded-lg p-4 flex items-center space-x-4">
-          <div className="bg-indigo-500 text-white p-4 rounded-full">
+          <div className="bg-yellow-500 text-white p-4 rounded-full">
             <HiOutlineClock className="text-3xl" />
           </div>
           <div>

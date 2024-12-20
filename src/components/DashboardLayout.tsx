@@ -12,10 +12,20 @@ const DashboardLayout = () => {
   useAuth();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string>(""); // State for user's name
   const navigate = useNavigate();
+
+// Fetch user's name from local storage
+useEffect(() => {
+  const storedUserName = localStorage.getItem("userName");
+  if (storedUserName) {
+    setUserName(storedUserName);
+  }
+}, []);
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userName"); // Clear user's name from localStorage
     navigate("/signin");
   };
 
@@ -87,6 +97,8 @@ const DashboardLayout = () => {
             Swissmote
           </div>
 
+          
+
           {/* Hamburger Icon */}
           <div className="sm:hidden">
             <button
@@ -95,6 +107,7 @@ const DashboardLayout = () => {
             >
               {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
             </button>
+
           </div>
 
           {/* Desktop Menu */}
@@ -136,6 +149,11 @@ const DashboardLayout = () => {
             ))}
           </div>
 
+           {/* Welcome Message */}
+           <div className="hidden sm:block text-sm">
+            Welcome, <span className="font-bold">{userName || "User"}</span>
+          </div>
+
           {/* Logout Button */}
           <button
             onClick={handleLogout}
@@ -152,6 +170,7 @@ const DashboardLayout = () => {
             className="sm:hidden mobile-menu bg-black text-white"
             onClick={(e) => e.stopPropagation()} // Prevents menu from closing when clicking inside
           >
+            <p className="px-4 font-serif">Welcome, <span className="font-bold">{userName || "User"}</span></p>
             <div className="flex flex-col space-y-4 p-4">
               {menuItems.map((item) => (
                 <div key={item.label} className="relative dropdown">

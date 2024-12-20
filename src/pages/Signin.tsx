@@ -39,9 +39,11 @@ const SigninPage = () => {
       const response = await axios.post(`${apiUrl}/api/auth/signin`, formData);
       if (response.status === 200) {
         const token = response.data.token;
+        const userName = response.data.user.name;
 
         // Save the token in localStorage
         localStorage.setItem("authToken", token);
+        localStorage.setItem("userName", userName);
 
         // Show success notification
         toast.success("Signin successful!", {
@@ -55,7 +57,7 @@ const SigninPage = () => {
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to sign in. Please try again.", {
         position: "top-right",
-        autoClose: 3000,
+        autoClose: 2000,
       });
     } finally {
       setLoading(false);
