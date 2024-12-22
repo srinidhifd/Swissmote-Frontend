@@ -62,6 +62,11 @@ const AutoListingsPage = () => {
   const [day2Message, setDay2Message] = useState("");
   const [day4Message, setDay4Message] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [messages, setMessages] = useState({
+    intro_message: "",
+    assignment_message: "",
+    assignment_message_startupathon: "",
+  });
   const [selectedRowData, setSelectedRowData] = useState<AutomatedJob | NotAutomatedJob | ClosedAutomatedJob | null>(null);
 
 
@@ -76,6 +81,8 @@ const AutoListingsPage = () => {
     emp_type: empType, // from dropdown
     account: account,  // from dropdown
     ctc: "",
+    introMessage: "default",
+    introMessageContent: "",
     followup2: "default", // default value for Day 2 follow-up
     followup4: "default", // default value for Day 4 follow-up
     followup2Message: "", // Added property
@@ -96,6 +103,8 @@ const AutoListingsPage = () => {
       emp_type: empType,
       account: account,
       ctc: "",
+      introMessage: "default",
+      introMessageContent: "",
       followup2: "default",
       followup4: "default",
       followup2Message: "",
@@ -162,6 +171,56 @@ const AutoListingsPage = () => {
   useEffect(() => {
     fetchListings(); // Fetch data on initial load
   }, [fetchListings]);
+
+  const fetchMessages = useCallback(async () => {
+    try {
+      const inviteRes = await fetch(`${apiUrl}/get_message?message=invite_message`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const assignmentRes = await fetch(`${apiUrl}/get_message?message=assignment_message`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const startupathonRes = await fetch(`${apiUrl}/get_message?message=assignment_message_startupathon`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (inviteRes.ok && assignmentRes.ok && startupathonRes.ok) {
+        const inviteData = await inviteRes.json();
+        const assignmentData = await assignmentRes.json();
+        const startupathonData = await startupathonRes.json();
+
+        setMessages({
+          intro_message: inviteData.content || "Default invite message not available.",
+          assignment_message: assignmentData.content || "Default assignment message not available.",
+          assignment_message_startupathon: startupathonData.content || "Default startupathon message not available.",
+        });
+      } else {
+        console.error("Failed to fetch messages.");
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  }, [apiUrl, authToken]);
+
+
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     console.log("Selected listing:", listing);
@@ -261,17 +320,18 @@ const AutoListingsPage = () => {
       post_over: "normal",
       assignment_link: "",
       designation: "",
-      emp_type: empType, // fetched from dropdown
-      account: account,  // fetched from dropdown
+      emp_type: empType,
+      account: account,
       ctc: "",
-      active_status: true,
-      followup2: "default", // default value for Day 2 follow-up
-      followup4: "default", // default value for Day 4 follow-up
+      introMessage: "default",
+      introMessageContent: "",
+      followup2: "default",
+      followup4: "default",
       followup2Message: "",
       followup4Message: "",
       assignmentMessage: "default",
       assignmentMessageContent: "",
-
+      active_status: true,
     });
     setIsAutomateModalOpen(true);
   };
@@ -381,28 +441,14 @@ const AutoListingsPage = () => {
       setLoading(true);
 
       const payload = {
-        listing: automateForm.listing,
-        listing_name: automateForm.listing_name,
-        name: automateForm.name,
-        process: automateForm.process,
-        post_over: automateForm.post_over,
-        assignment_link: automateForm.assignment_link,
-        followup2:
-          automateForm.followup2 === "custom"
-            ? automateForm.followup2Message
-            : "default",
-        followup4:
-          automateForm.followup4 === "custom"
-            ? automateForm.followup4Message
-            : "default",
-        designation: automateForm.designation || "intern",
-        active_status: automateForm.active_status,
-        emp_type: automateForm.emp_type,
-        ctc: automateForm.ctc,
-        account: automateForm.account,
+        ...automateForm,
+        assignment_message:
+          automateForm.assignmentMessage === "default"
+            ? automateForm.post_over === "startupathon"
+              ? messages.assignment_message_startupathon
+              : messages.assignment_message
+            : automateForm.assignmentMessageContent,
       };
-
-      console.log("Payload to be sent:", payload);
 
       const response = await fetch(`${apiUrl}/automateListing`, {
         method: "POST",
@@ -428,6 +474,8 @@ const AutoListingsPage = () => {
       setLoading(false);
     }
   };
+
+
 
   const handleOpenEditFollowupModal = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     setSelectedListing(listing);
@@ -813,7 +861,7 @@ const AutoListingsPage = () => {
       <ToastContainer />
 
       <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div className="max-w-8xl mx-auto bg-white shadow-md rounded-lg p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-semibold text-gray-900">Auto Listings</h1>
@@ -1457,7 +1505,26 @@ const AutoListingsPage = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 >
                   <option value="default">Default</option>
+                  <option value="custom">Custom Message</option>
                 </select>
+
+                {automateForm.introMessage === "custom" ? (
+                  <textarea
+                    value={automateForm.introMessageContent}
+                    onChange={(e) =>
+                      setAutomateForm((prev) => ({
+                        ...prev,
+                        introMessageContent: e.target.value,
+                      }))
+                    }
+                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                    placeholder="Enter custom intro message"
+                  />
+                ) : (
+                  <p className="w-full mt-2 p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
+                    {messages.intro_message}
+                  </p>
+                )}
               </div>
 
               {/* Assignment Message */}
@@ -1470,6 +1537,11 @@ const AutoListingsPage = () => {
                     setAutomateForm((prev) => ({
                       ...prev,
                       assignmentMessage: value,
+                      assignmentMessageContent: value === "default"
+                        ? automateForm.post_over === "startupathon"
+                          ? messages.assignment_message_startupathon
+                          : messages.assignment_message
+                        : "",
                     }));
                   }}
                   className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
@@ -1477,20 +1549,46 @@ const AutoListingsPage = () => {
                   <option value="default">Default</option>
                   <option value="custom">Custom Message</option>
                 </select>
-                {automateForm.assignmentMessage === "custom" && (
-                  <input
-                    type="text"
-                    placeholder="Enter custom assignment message"
-                    value={automateForm.assignmentMessageContent || ""}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        assignmentMessageContent: e.target.value,
-                      }))
-                    }
-                    className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
+
+                {automateForm.assignmentMessage === "custom" ? (
+                  <div>
+                    <textarea
+                      value={automateForm.assignmentMessageContent}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const linkCount = (value.match(/https?:\/\/[^\s]+/g) || []).length;
+                        setAutomateForm((prev) => ({
+                          ...prev,
+                          assignmentMessageContent: value,
+                        }));
+
+                        // Show warning if less than 2 links
+                        if (linkCount < 2) {
+                          toast.warning("Please include at least 2 links: one for assignment and one for updates");
+                        }
+                      }}
+                      className={`w-full mt-2 p-3 border ${(automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
+                          ? "border-yellow-300"
+                          : "border-gray-300"
+                        } rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
+                      placeholder="Enter custom message with at least 2 links (assignment link and updates link)"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Message should contain at least 2 links:
+                      <br />
+                      1. Assignment link (xx_assignment_xx)
+                      <br />
+                      2. Updates link (xx_bot_xx)
+                    </p>
+                  </div>
+                ) : (
+                  <p className="w-full mt-2 p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
+                    {automateForm.post_over === "startupathon"
+                      ? messages.assignment_message_startupathon
+                      : messages.assignment_message}
+                  </p>
                 )}
+
               </div>
 
 

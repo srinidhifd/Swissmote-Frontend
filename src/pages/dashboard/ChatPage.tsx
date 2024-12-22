@@ -145,8 +145,8 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 h-[100vh] overflow-hidden flex justify-center items-center">
-      <div className="w-full max-w-5xl h-[90%] bg-white shadow-lg rounded-lg flex flex-col">
+    <div className="bg-gray-100 h-[95vh] overflow-hidden flex justify-center items-center">
+      <div className="w-full max-w-7xl h-[90%] bg-white shadow-lg rounded-lg flex flex-col">
         {/* Header */}
         <div className="p-4 border-b bg-gray-50">
           <h1 className="text-xl font-bold text-gray-800">{userName}</h1>

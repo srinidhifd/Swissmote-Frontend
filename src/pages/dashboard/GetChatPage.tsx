@@ -46,7 +46,7 @@ const GetChatPage = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
+      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Chat Messages</h1>
         <p className="text-gray-600 mb-6">View chat messages between listing and candidate.</p>
 

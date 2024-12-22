@@ -253,7 +253,7 @@ const DashboardHome = () => {
           <Pie data={pieChartData} options={options} />
         </div>
         <div className="col-span-2 bg-white shadow-subtle rounded-lg p-4 max-w-[100%]">
-          <h2 className="text-xl font-bold mb-2">Messages Sent This Week</h2>
+          <h2 className="text-xl font-bold mb-2">Messages Sent This Week[Mock Data Used]</h2>
           <Line data={lineChartData} options={options} />
         </div>
       </div>
