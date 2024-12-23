@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar, Pie} from "react-chartjs-2";
+import { Bar} from "react-chartjs-2";
 import {
   FaCheck,
 } from "react-icons/fa";
@@ -202,16 +202,36 @@ const DashboardHome = () => {
     ],
   };
 
-  const pieChartData = {
-    labels: ["Automated", "Not Automated", "Expired"],
+  const getConversionRateStats = (listings: any[]) => {
+    const stats = {
+      '0-25': 0,
+      '26-50': 0,
+      '51-75': 0,
+      '76-100': 0
+    };
+
+    listings.forEach(listing => {
+      const rate = parseFloat(listing.conversion_rate?.replace('%', '') || '0');
+      if (rate <= 25) stats['0-25']++;
+      else if (rate <= 50) stats['26-50']++;
+      else if (rate <= 75) stats['51-75']++;
+      else stats['76-100']++;
+    });
+
+    return stats;
+  };
+
+  const conversionRateData = {
+    labels: ['0-25%', '26-50%', '51-75%', '76-100%'],
     datasets: [
       {
-        label: "Listings",
-        data: [automatedCount, notAutomatedCount, expiredCount], // Dynamic
+        label: 'Number of Listings',
+        data: Object.values(getConversionRateStats(automatedListings)),
         backgroundColor: [
-          "rgba(75, 192, 192, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
-          "rgba(255, 99, 132, 0.6)",
+          'rgba(255, 99, 132, 0.6)',   // Red for lowest
+          'rgba(255, 206, 86, 0.6)',   // Yellow for low-mid
+          'rgba(54, 162, 235, 0.6)',   // Blue for high-mid
+          'rgba(75, 192, 192, 0.6)',   // Green for highest
         ],
       },
     ],
@@ -358,29 +378,50 @@ const DashboardHome = () => {
           </div>
         </div>
 
-        {/* Listings Breakdown Chart */}
+        {/* Conversion Rate Distribution */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Listings Breakdown</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Conversion Rate Distribution</h2>
           <div className="h-[300px] flex items-center justify-center">
-            <Pie 
-              data={pieChartData} 
+            <Bar 
+              data={conversionRateData} 
               options={{
                 ...chartOptions,
                 plugins: {
                   ...chartOptions.plugins,
                   legend: {
-                    position: 'bottom',
-                    labels: {
-                      padding: 20,
-                      usePointStyle: true,
-                      font: {
-                        size: 12
+                    display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const value = context.raw as number;
+                        return `${value} Listings`;
                       }
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Number of Listings'
                     }
                   }
                 }
               }} 
             />
+          </div>
+          
+          {/* Add a summary below the chart */}
+          <div className="mt-4 p-2 bg-gray-50 rounded">
+            <p className="font-medium">Distribution Summary</p>
+            <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+              <p className="text-red-600">0-25%: {getConversionRateStats(automatedListings)['0-25']} listings</p>
+              <p className="text-yellow-600">26-50%: {getConversionRateStats(automatedListings)['26-50']} listings</p>
+              <p className="text-blue-600">51-75%: {getConversionRateStats(automatedListings)['51-75']} listings</p>
+              <p className="text-green-600">76-100%: {getConversionRateStats(automatedListings)['76-100']} listings</p>
+            </div>
           </div>
         </div>
 
