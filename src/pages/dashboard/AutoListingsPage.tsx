@@ -22,6 +22,7 @@ import {
   setCurrentPage,
 } from "../../store/slices/autoListingSlice";
 import '../../App.css';
+import { MdOutlineBusinessCenter } from "react-icons/md";
 
 
 
@@ -1379,281 +1380,292 @@ const AutoListingsPage = () => {
 
 
       {isAutomateModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50 overflow-y-auto">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
           {messagesLoading ? (
             <div className="flex justify-center items-center">
               <TailSpin height="50" width="50" color="#4fa94d" ariaLabel="loading" />
             </div>
           ) : (
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-7xl relative overflow-y-auto max-h-[90vh]">
-              {/* Close Button */}
-              <button
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
-                onClick={() => setIsAutomateModalOpen(false)}
-              >
-                ✕
-              </button>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl relative overflow-hidden">
+              {/* Header Section */}
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
+                  <MdOutlineBusinessCenter className="text-blue-500 mr-3" />
+                  Automate Listing
+                </h2>
+                <button
+                  onClick={() => setIsAutomateModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
 
-              {/* Modal Title */}
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Automate Listing</h2>
-
-              {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Project Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
-                  <input
-                    type="text"
-                    value={automateForm.name}
-                    onChange={(e) => setAutomateForm((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                </div>
-
-                {/* Process */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Process</label>
-                  <select
-                    value={automateForm.process}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        process: e.target.value,
-                        designation: e.target.value === "assignment" ? "intern" : "",
-                      }))
-                    }
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="assignment">Assignment</option>
-                    <option value="offer">Offer</option>
-                  </select>
-                </div>
-
-                {/* Designation (only for "offer" process) */}
-                {automateForm.process === "offer" && (
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Designation</label>
-                    <input
-                      type="text"
-                      value={automateForm.designation}
-                      onChange={(e) =>
-                        setAutomateForm((prev) => ({
-                          ...prev,
-                          designation: e.target.value,
-                        }))
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    />
-                  </div>
-                )}
-
-                {/* Assignment Link */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Link</label>
-                  <input
-                    type="text"
-                    value={automateForm.assignment_link}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        assignment_link: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                </div>
-
-                {/* Post Over */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Post Over</label>
-                  <select
-                    value={automateForm.post_over}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({ ...prev, post_over: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="normal">Normal</option>
-                    <option value="startupathon">Startupathon</option>
-                  </select>
-                </div>
-
-                {/* CTC */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">CTC</label>
-                  <input
-                    type="text"
-                    value={automateForm.ctc}
-                    onChange={(e) =>
-                      setAutomateForm((prev) => ({ ...prev, ctc: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                </div>
-
-                {/* Intro Message */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Intro Message</label>
-                  <select
-                    value="default"
-                    disabled
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="default">Default</option>
-                    <option value="custom">Custom Message</option>
-                  </select>
-
-                  <div className="mt-2 h-32 overflow-y-auto">
-                    <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
-                      {messages.intro_message}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Assignment Message */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
-                  <select
-                    value={automateForm.assignmentMessage}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        assignmentMessage: value,
-                        assignmentMessageContent: automateForm.post_over === "startupathon"
-                          ? messages.assignment_message_startupathon
-                          : messages.assignment_message
-                      }));
-                    }}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="default">Default</option>
-                    <option value="custom">Custom Message</option>
-                  </select>
-
-                  <div className="mt-2">
-                    {automateForm.assignmentMessage === "custom" ? (
+              {/* Content Section */}
+              <div className="p-6 overflow-y-auto max-h-[calc(100vh-12rem)]">
+                <div className="space-y-8">
+                  {/* Basic Information Section */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Basic Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <textarea
-                          value={automateForm.assignmentMessageContent}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            const linkCount = (value.match(/https?:\/\/[^\s]+/g) || []).length;
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                        <input
+                          type="text"
+                          value={automateForm.name}
+                          onChange={(e) => setAutomateForm((prev) => ({ ...prev, name: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter project name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Process</label>
+                        <select
+                          value={automateForm.process}
+                          onChange={(e) =>
                             setAutomateForm((prev) => ({
                               ...prev,
-                              assignmentMessageContent: value,
-                            }));
+                              process: e.target.value,
+                              designation: e.target.value === "assignment" ? "intern" : "",
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="assignment">Assignment</option>
+                          <option value="offer">Offer</option>
+                        </select>
+                      </div>
 
-                            if (linkCount < 2) {
-                              toast.warning("Please include at least 2 links: one for assignment and one for updates");
+                      {automateForm.process === "offer" && (
+                        <div className="col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Designation</label>
+                          <input
+                            type="text"
+                            value={automateForm.designation}
+                            onChange={(e) =>
+                              setAutomateForm((prev) => ({
+                                ...prev,
+                                designation: e.target.value,
+                              }))
                             }
-                          }}
-                          className={`w-full h-32 mt-2 p-3 border ${
-                            (automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
-                              ? "border-yellow-300"
-                              : "border-gray-300"
-                          } rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none`}
-                          placeholder="Enter custom message with at least 2 links (assignment link and updates link)"
-                        />
-                        <p className="mt-1 text-sm text-gray-500">
-                          Message should contain at least 2 links:
-                          <br />
-                          1. Assignment link (xx_assignment_xx)
-                          <br />
-                          2. Updates link (xx_bot_xx)
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="h-32 overflow-y-auto">
-                        <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
-                          {automateForm.post_over === "startupathon"
-                            ? messages.assignment_message_startupathon
-                            : messages.assignment_message}
-                        </p>
-                      </div>
-                    )}
+                            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Enter designation"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
+                  {/* Assignment Details Section */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Assignment Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Link</label>
+                        <input
+                          type="text"
+                          value={automateForm.assignment_link}
+                          onChange={(e) =>
+                            setAutomateForm((prev) => ({
+                              ...prev,
+                              assignment_link: e.target.value,
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter assignment link"
+                        />
+                      </div>
 
-                {/* Day 2 Followup */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Followup</label>
-                  <select
-                    value={automateForm.followup2}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        followup2: value,
-                      }));
-                    }}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="default">Default</option>
-                    <option value="custom">Custom Message</option>
-                  </select>
-                  {automateForm.followup2 === "custom" && (
-                    <input
-                      type="text"
-                      placeholder="Enter Day 2 follow-up message"
-                      value={automateForm.followup2Message || ""}
-                      onChange={(e) =>
-                        setAutomateForm((prev) => ({
-                          ...prev,
-                          followup2Message: e.target.value,
-                        }))
-                      }
-                      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    />
-                  )}
-                </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Post Over</label>
+                        <select
+                          value={automateForm.post_over}
+                          onChange={(e) =>
+                            setAutomateForm((prev) => ({ ...prev, post_over: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="startupathon">Startupathon</option>
+                        </select>
+                      </div>
 
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CTC</label>
+                        <input
+                          type="text"
+                          value={automateForm.ctc}
+                          onChange={(e) =>
+                            setAutomateForm((prev) => ({ ...prev, ctc: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter CTC"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Day 4 Followup */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Day 4 Followup</label>
-                  <select
-                    value={automateForm.followup4}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setAutomateForm((prev) => ({
-                        ...prev,
-                        followup4: value,
-                      }));
-                    }}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  >
-                    <option value="default">Default</option>
-                    <option value="custom">Custom Message</option>
-                  </select>
-                  {automateForm.followup4 === "custom" && (
-                    <input
-                      type="text"
-                      placeholder="Enter Day 4 follow-up message"
-                      value={automateForm.followup4Message || ""}
-                      onChange={(e) =>
-                        setAutomateForm((prev) => ({
-                          ...prev,
-                          followup4Message: e.target.value,
-                        }))
-                      }
-                      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    />
-                  )}
+                  {/* Messages Section */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Messages Configuration</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Intro Message */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Intro Message</label>
+                        <select
+                          value="default"
+                          disabled
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="default">Default</option>
+                        </select>
+                        <div className="mt-2 h-32 overflow-y-auto rounded-lg border border-gray-200">
+                          <div className="p-3 bg-gray-50 text-gray-700 text-sm whitespace-pre-line">
+                            {messages.intro_message}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Assignment Message */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Message</label>
+                        <select
+                          value={automateForm.assignmentMessage}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setAutomateForm((prev) => ({
+                              ...prev,
+                              assignmentMessage: value,
+                              assignmentMessageContent: automateForm.post_over === "startupathon"
+                                ? messages.assignment_message_startupathon
+                                : messages.assignment_message
+                            }));
+                          }}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="default">Default</option>
+                          <option value="custom">Custom Message</option>
+                        </select>
+                        <div className="mt-2">
+                          {automateForm.assignmentMessage === "custom" ? (
+                            <div>
+                              <textarea
+                                value={automateForm.assignmentMessageContent}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  const linkCount = (value.match(/https?:\/\/[^\s]+/g) || []).length;
+                                  setAutomateForm((prev) => ({
+                                    ...prev,
+                                    assignmentMessageContent: value,
+                                  }));
+                                  if (linkCount < 2) {
+                                    toast.warning("Please include at least 2 links: one for assignment and one for updates");
+                                  }
+                                }}
+                                className={`w-full h-32 p-3 border ${
+                                  (automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
+                                    ? "border-yellow-300"
+                                    : "border-gray-300"
+                                } rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none`}
+                                placeholder="Enter custom message with at least 2 links"
+                              />
+                              <p className="mt-1 text-xs text-gray-500">
+                                Message should contain at least 2 links:
+                                <br />
+                                1. Assignment link (xx_assignment_xx)
+                                <br />
+                                2. Updates link (xx_bot_xx)
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="h-32 overflow-y-auto rounded-lg border border-gray-200">
+                              <div className="p-3 bg-gray-50 text-gray-700 text-sm whitespace-pre-line">
+                                {automateForm.post_over === "startupathon"
+                                  ? messages.assignment_message_startupathon
+                                  : messages.assignment_message}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Follow-up Messages */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Day 2 Follow-up</label>
+                        <select
+                          value={automateForm.followup2}
+                          onChange={(e) => {
+                            setAutomateForm((prev) => ({
+                              ...prev,
+                              followup2: e.target.value,
+                            }));
+                          }}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="default">Default</option>
+                          <option value="custom">Custom Message</option>
+                        </select>
+                        {automateForm.followup2 === "custom" && (
+                          <input
+                            type="text"
+                            placeholder="Enter Day 2 follow-up message"
+                            value={automateForm.followup2Message || ""}
+                            onChange={(e) =>
+                              setAutomateForm((prev) => ({
+                                ...prev,
+                                followup2Message: e.target.value,
+                              }))
+                            }
+                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          />
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Day 4 Follow-up</label>
+                        <select
+                          value={automateForm.followup4}
+                          onChange={(e) => {
+                            setAutomateForm((prev) => ({
+                              ...prev,
+                              followup4: e.target.value,
+                            }));
+                          }}
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="default">Default</option>
+                          <option value="custom">Custom Message</option>
+                        </select>
+                        {automateForm.followup4 === "custom" && (
+                          <input
+                            type="text"
+                            placeholder="Enter Day 4 follow-up message"
+                            value={automateForm.followup4Message || ""}
+                            onChange={(e) =>
+                              setAutomateForm((prev) => ({
+                                ...prev,
+                                followup4Message: e.target.value,
+                              }))
+                            }
+                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-4 mt-6">
+              {/* Footer Section */}
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-4">
                 <button
                   onClick={() => setIsAutomateModalOpen(false)}
-                  className="px-4 py-2 bg-gray-100 text-gray-600 font-medium rounded-lg shadow-sm hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
                 >
                   Cancel
                 </button>
-
                 <button
                   onClick={handleAutomateListing}
-                  className="px-4 py-2 bg-blue-100 text-blue-600 font-medium rounded-lg shadow-sm hover:bg-blue-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                 >
                   Automate Listing
                 </button>
