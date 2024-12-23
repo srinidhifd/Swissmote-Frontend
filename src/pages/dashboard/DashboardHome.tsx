@@ -36,6 +36,21 @@ interface Listing {
   [key: string]: any;
 }
 
+interface FollowupStats {
+  day2: {
+    sent: number;
+    pending: number;
+  };
+  day4: {
+    sent: number;
+    pending: number;
+  };
+  reviews: {
+    added: number;
+    pending: number;
+  };
+}
+
 const DashboardHome = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL; // Dynamic: Base API URL from environment variables
   const authToken = import.meta.env.VITE_AUTH_TOKEN; // Dynamic: Auth token from environment variables
@@ -49,6 +64,11 @@ const DashboardHome = () => {
   const [expiredListings, setExpiredListings] = useState<Listing[]>([]);
   const [activeListings, setActiveListings] = useState<Listing[]>([]);
   const [closedListings, setClosedListings] = useState<Listing[]>([]);
+  const [followupStats, setFollowupStats] = useState<FollowupStats>({
+    day2: { sent: 0, pending: 0 },
+    day4: { sent: 0, pending: 0 },
+    reviews: { added: 0, pending: 0 }
+  });
 
   // Default parameters
   const empType = "job";
@@ -78,6 +98,38 @@ const DashboardHome = () => {
         }
 
         const autoData = await autoResponse.json();
+        
+        // Calculate follow-up and review statistics
+        const day2Stats = { sent: 0, pending: 0 };
+        const day4Stats = { sent: 0, pending: 0 };
+        const reviewStats = { added: 0, pending: 0 };
+
+        autoData.automated?.forEach((listing: any) => {
+          if (listing.day2followup?.status === 1) {
+            day2Stats.sent++;
+          } else {
+            day2Stats.pending++;
+          }
+          
+          if (listing.day4followup?.status === 1) {
+            day4Stats.sent++;
+          } else {
+            day4Stats.pending++;
+          }
+
+          if (listing.review_link && listing.review_link.length > 0) {
+            reviewStats.added++;
+          } else {
+            reviewStats.pending++;
+          }
+        });
+
+        setFollowupStats({
+          day2: day2Stats,
+          day4: day4Stats,
+          reviews: reviewStats
+        });
+
         setAutomatedListings(autoData.automated || []);
         setNotAutomatedListings(autoData.not_automated || []);
         setExpiredListings(autoData.cl_automated ? [autoData.cl_automated] : []);
@@ -133,13 +185,19 @@ const DashboardHome = () => {
   const closedCount = closedListings.length;
 
   // Chart Data (Dynamic: Fetched data or calculated based on state)
-  const barChartData = {
-    labels: ["Active", "Closed"],
+  const reviewChartData = {
+    labels: ['Reviews Added', 'Reviews Pending'],
     datasets: [
       {
-        label: "Listings",
-        data: [activeCount, closedCount], // Dynamic
-        backgroundColor: ["rgba(54, 162, 235, 0.6)", "rgba(153, 102, 255, 0.6)"],
+        label: 'Review Links',
+        data: [
+          followupStats.reviews.added,
+          followupStats.reviews.pending
+        ],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.6)',  // Added - Green
+          'rgba(255, 99, 132, 0.6)',   // Pending - Red
+        ],
       },
     ],
   };
@@ -159,16 +217,25 @@ const DashboardHome = () => {
     ],
   };
 
-  const automationRateData = {
-    labels: ["Automated", "Not Automated"],
-    datasets: [{
-      label: "Automation Rate",
-      data: [automatedCount, notAutomatedCount],
-      backgroundColor: [
-        "rgba(75, 192, 192, 0.6)",
-        "rgba(255, 206, 86, 0.6)",
-      ],
-    }],
+  const followupChartData = {
+    labels: ['Day 2 Sent', 'Day 2 Pending', 'Day 4 Sent', 'Day 4 Pending'],
+    datasets: [
+      {
+        label: 'Follow-ups',
+        data: [
+          followupStats.day2.sent,
+          followupStats.day2.pending,
+          followupStats.day4.sent,
+          followupStats.day4.pending
+        ],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.6)',  // Day 2 Sent - Green
+          'rgba(255, 206, 86, 0.6)',  // Day 2 Pending - Yellow
+          'rgba(54, 162, 235, 0.6)',  // Day 4 Sent - Blue
+          'rgba(255, 99, 132, 0.6)',  // Day 4 Pending - Red
+        ],
+      },
+    ],
   };
 
   // First, let's update the chart options for better presentation
@@ -246,29 +313,48 @@ const DashboardHome = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-        {/* Active vs Closed Chart */}
+        {/* Review Links Status Chart */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Active vs Closed</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Review Links Status</h2>
           <div className="h-[300px] flex items-center justify-center">
             <Bar 
-              data={barChartData} 
+              data={reviewChartData} 
               options={{
                 ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  legend: {
+                    display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const value = context.raw as number;
+                        return `Count: ${value}`;
+                      }
+                    }
+                  }
+                },
                 scales: {
                   y: {
                     beginAtZero: true,
-                    grid: {
-                      display: false
-                    }
-                  },
-                  x: {
-                    grid: {
-                      display: false
+                    title: {
+                      display: true,
+                      text: 'Number of Listings'
                     }
                   }
                 }
               }} 
             />
+          </div>
+          
+          {/* Add a summary below the chart */}
+          <div className="mt-4 p-2 bg-gray-50 rounded">
+            <p className="font-medium">Review Links</p>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <p className="text-green-600">Added: {followupStats.reviews.added}</p>
+              <p className="text-red-600">Pending: {followupStats.reviews.pending}</p>
+            </div>
           </div>
         </div>
 
@@ -298,36 +384,53 @@ const DashboardHome = () => {
           </div>
         </div>
 
-        {/* Automation Status Chart */}
+        {/* Follow-up Status Chart */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Automation Status</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Follow-up Status</h2>
           <div className="h-[300px] flex items-center justify-center">
             <Bar 
-              data={automationRateData} 
+              data={followupChartData} 
               options={{
                 ...chartOptions,
-                indexAxis: 'y',
                 plugins: {
                   ...chartOptions.plugins,
                   legend: {
                     display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const value = context.raw as number;
+                        return `Count: ${value}`;
+                      }
+                    }
                   }
                 },
                 scales: {
-                  x: {
-                    beginAtZero: true,
-                    grid: {
-                      display: false
-                    }
-                  },
                   y: {
-                    grid: {
-                      display: false
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Number of Listings'
                     }
                   }
                 }
               }} 
             />
+          </div>
+          
+          {/* Add a summary below the chart */}
+          <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+            <div className="p-2 bg-gray-50 rounded">
+              <p className="font-medium">Day 2 Follow-ups</p>
+              <p className="text-green-600">Sent: {followupStats.day2.sent}</p>
+              <p className="text-yellow-600">Pending: {followupStats.day2.pending}</p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded">
+              <p className="font-medium">Day 4 Follow-ups</p>
+              <p className="text-blue-600">Sent: {followupStats.day4.sent}</p>
+              <p className="text-red-600">Pending: {followupStats.day4.pending}</p>
+            </div>
           </div>
         </div>
       </div>
