@@ -1501,23 +1501,11 @@ const AutoListingsPage = () => {
                     <option value="custom">Custom Message</option>
                   </select>
 
-                  {automateForm.introMessage === "custom" ? (
-                    <textarea
-                      value={automateForm.introMessageContent}
-                      onChange={(e) =>
-                        setAutomateForm((prev) => ({
-                          ...prev,
-                          introMessageContent: e.target.value,
-                        }))
-                      }
-                      className="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                      placeholder="Enter custom intro message"
-                    />
-                  ) : (
-                    <p className="w-full mt-2 p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
+                  <div className="mt-2 h-32 overflow-y-auto">
+                    <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
                       {messages.intro_message}
                     </p>
-                  )}
+                  </div>
                 </div>
 
                 {/* Assignment Message */}
@@ -1530,11 +1518,9 @@ const AutoListingsPage = () => {
                       setAutomateForm((prev) => ({
                         ...prev,
                         assignmentMessage: value,
-                        assignmentMessageContent: value === "default"
-                          ? automateForm.post_over === "startupathon"
-                            ? messages.assignment_message_startupathon
-                            : messages.assignment_message
-                          : "",
+                        assignmentMessageContent: automateForm.post_over === "startupathon"
+                          ? messages.assignment_message_startupathon
+                          : messages.assignment_message
                       }));
                     }}
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
@@ -1543,45 +1529,48 @@ const AutoListingsPage = () => {
                     <option value="custom">Custom Message</option>
                   </select>
 
-                  {automateForm.assignmentMessage === "custom" ? (
-                    <div>
-                      <textarea
-                        value={automateForm.assignmentMessageContent}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const linkCount = (value.match(/https?:\/\/[^\s]+/g) || []).length;
-                          setAutomateForm((prev) => ({
-                            ...prev,
-                            assignmentMessageContent: value,
-                          }));
+                  <div className="mt-2">
+                    {automateForm.assignmentMessage === "custom" ? (
+                      <div>
+                        <textarea
+                          value={automateForm.assignmentMessageContent}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const linkCount = (value.match(/https?:\/\/[^\s]+/g) || []).length;
+                            setAutomateForm((prev) => ({
+                              ...prev,
+                              assignmentMessageContent: value,
+                            }));
 
-                          // Show warning if less than 2 links
-                          if (linkCount < 2) {
-                            toast.warning("Please include at least 2 links: one for assignment and one for updates");
-                          }
-                        }}
-                        className={`w-full mt-2 p-3 border ${(automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
-                            ? "border-yellow-300"
-                            : "border-gray-300"
-                          } rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
-                        placeholder="Enter custom message with at least 2 links (assignment link and updates link)"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        Message should contain at least 2 links:
-                        <br />
-                        1. Assignment link (xx_assignment_xx)
-                        <br />
-                        2. Updates link (xx_bot_xx)
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="w-full mt-2 p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
-                      {automateForm.post_over === "startupathon"
-                        ? messages.assignment_message_startupathon
-                        : messages.assignment_message}
-                    </p>
-                  )}
-
+                            if (linkCount < 2) {
+                              toast.warning("Please include at least 2 links: one for assignment and one for updates");
+                            }
+                          }}
+                          className={`w-full h-32 mt-2 p-3 border ${
+                            (automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
+                              ? "border-yellow-300"
+                              : "border-gray-300"
+                          } rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none`}
+                          placeholder="Enter custom message with at least 2 links (assignment link and updates link)"
+                        />
+                        <p className="mt-1 text-sm text-gray-500">
+                          Message should contain at least 2 links:
+                          <br />
+                          1. Assignment link (xx_assignment_xx)
+                          <br />
+                          2. Updates link (xx_bot_xx)
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="h-32 overflow-y-auto">
+                        <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm text-gray-800 whitespace-pre-line">
+                          {automateForm.post_over === "startupathon"
+                            ? messages.assignment_message_startupathon
+                            : messages.assignment_message}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
 

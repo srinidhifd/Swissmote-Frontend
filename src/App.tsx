@@ -8,13 +8,13 @@ import PrivateRoute from "./components/PrivateRoute"; // Private Route to protec
 import PostFullTimeJobPage from "./pages/dashboard/PostFullTimeJobPage";
 import PostInternshipPage from "./pages/dashboard/PostInternshipPage";
 import PostUnpaidInternshipPage from "./pages/dashboard/PostUnpaidInternshipPage";
-import AssignmentsPage from "./pages/dashboard/AssignmentsPage";
-import AddAssignmentPage from "./pages/dashboard/AddAssignmentPage";
+
+
 import GetAssignmentsPage from "./pages/dashboard/GetAssignmentsPage";
-import AnnouncementsPage from "./pages/dashboard/AnnouncementsPage";
+
 import MessagesPage from "./pages/dashboard/MessagesPage";
-import SettingsPage from "./pages/dashboard/SettingsPage";
-import CandidateEmailPage from "./pages/dashboard/CandidateEmailPage";
+
+
 import GetUpdatesPage from "./pages/dashboard/GetUpdatesPage";
 import GetQuestionsPage from "./pages/dashboard/GetQuestionsPage";
 import ReplyToQuestionsPage from "./pages/dashboard/ReplyToQuestionsPage";
@@ -24,7 +24,6 @@ import HireCandidatePage from "./pages/dashboard/HireCandidatePage";
 import MarkEvaluationPage from "./pages/dashboard/MarkEvaluationPage";
 import MarkBotEvaluationPage from "./pages/dashboard/MarkBotEvaluationPage";
 import MarkFutureEvaluationPage from "./pages/dashboard/MarkFutureEvaluationPage";
-import AddReviewPage from "./pages/dashboard/AddReviewPage";
 import DailyUpdatesPage from "./pages/dashboard/DailyUpdatesPage";
 import ReplyToDailyUpdatePage from "./pages/dashboard/ReplyToDailyUpdatePage";
 import AutoListingsPage from "./pages/dashboard/AutoListingsPage";
@@ -55,11 +54,11 @@ function App() {
           <Route path="listings/active" element={<ActiveListingsPage />} />
           <Route path="listings/closed" element={<ClosedListingsPage />} />
           {/* Assignments */}
-          <Route path="assignments" element={<AssignmentsPage />} />
-          <Route path="assignments/add" element={<AddAssignmentPage />} />
+          
+          
           <Route path="assignments/get" element={<GetAssignmentsPage />} />
           {/* Messaging */}
-          <Route path="announcements" element={<AnnouncementsPage />} />
+          
           <Route path="get-messages" element={<MessagesPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="send-message" element={<SendMessagePage />} />
@@ -67,7 +66,7 @@ function App() {
           <Route path="candidate-management/reply" element={<ReplyToCandidatePage />} />
           <Route path="candidate-management/bot-reply" element={<ReplyViaBotPage />} />
           <Route path="candidate-management/hire" element={<HireCandidatePage />} />
-          <Route path="candidate-management/email" element={<CandidateEmailPage />} />
+         
           {/* Evaluation */}
           <Route path="evaluation/mark" element={<MarkEvaluationPage />} />
           <Route path="evaluation/bot-mark" element={<MarkBotEvaluationPage />} />
@@ -76,11 +75,11 @@ function App() {
           <Route path="questions/get" element={<GetQuestionsPage />} />
           <Route path="questions/reply" element={<ReplyToQuestionsPage />} />
           {/* Reviews */}
-          <Route path="reviews/add" element={<AddReviewPage />} />
+         
           <Route path="reviews/daily" element={<DailyUpdatesPage />} />
           <Route path="reviews/reply" element={<ReplyToDailyUpdatePage />} />
           {/* Settings */}
-          <Route path="settings" element={<SettingsPage />} />
+          
           {/* Updates */}
           <Route path="get-updates" element={<GetUpdatesPage />} />
         </Route>
