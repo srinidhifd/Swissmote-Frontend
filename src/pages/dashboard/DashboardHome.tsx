@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar} from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   FaCheck,
 } from "react-icons/fa";
@@ -98,7 +98,7 @@ const DashboardHome = () => {
         }
 
         const autoData = await autoResponse.json();
-        
+
         // Calculate follow-up and review statistics
         const day2Stats = { sent: 0, pending: 0 };
         const day4Stats = { sent: 0, pending: 0 };
@@ -110,7 +110,7 @@ const DashboardHome = () => {
           } else {
             day2Stats.pending++;
           }
-          
+
           if (listing.day4followup?.status === 1) {
             day4Stats.sent++;
           } else {
@@ -333,12 +333,12 @@ const DashboardHome = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-        {/* Review Links Status Chart */}
+        {/* Follow-up Status Chart */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Review Links Status</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Follow-up Status</h2>
           <div className="h-[300px] flex items-center justify-center">
-            <Bar 
-              data={reviewChartData} 
+            <Bar
+              data={followupChartData}
               options={{
                 ...chartOptions,
                 plugins: {
@@ -348,7 +348,7 @@ const DashboardHome = () => {
                   },
                   tooltip: {
                     callbacks: {
-                      label: function(context) {
+                      label: function (context) {
                         const value = context.raw as number;
                         return `Count: ${value}`;
                       }
@@ -364,26 +364,34 @@ const DashboardHome = () => {
                     }
                   }
                 }
-              }} 
+              }}
             />
           </div>
-          
+
           {/* Add a summary below the chart */}
-          <div className="mt-4 p-2 bg-gray-50 rounded">
-            <p className="font-medium">Review Links</p>
-            <div className="grid grid-cols-2 gap-4 mt-2">
-              <p className="text-green-600">Added: {followupStats.reviews.added}</p>
-              <p className="text-red-600">Pending: {followupStats.reviews.pending}</p>
+          <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+            <div className="p-2 bg-gray-50 rounded">
+              <p className="font-medium">Day 2 Follow-ups</p>
+              <p className="text-green-600">Sent: {followupStats.day2.sent}</p>
+              <p className="text-yellow-600">Pending: {followupStats.day2.pending}</p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded">
+              <p className="font-medium">Day 4 Follow-ups</p>
+              <p className="text-blue-600">Sent: {followupStats.day4.sent}</p>
+              <p className="text-red-600">Pending: {followupStats.day4.pending}</p>
             </div>
           </div>
         </div>
+
+
+
 
         {/* Conversion Rate Distribution */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
           <h2 className="text-xl font-bold mb-4 text-gray-800">Conversion Rate Distribution</h2>
           <div className="h-[300px] flex items-center justify-center">
-            <Bar 
-              data={conversionRateData} 
+            <Bar
+              data={conversionRateData}
               options={{
                 ...chartOptions,
                 plugins: {
@@ -393,7 +401,7 @@ const DashboardHome = () => {
                   },
                   tooltip: {
                     callbacks: {
-                      label: function(context) {
+                      label: function (context) {
                         const value = context.raw as number;
                         return `${value} Listings`;
                       }
@@ -409,10 +417,10 @@ const DashboardHome = () => {
                     }
                   }
                 }
-              }} 
+              }}
             />
           </div>
-          
+
           {/* Add a summary below the chart */}
           <div className="mt-4 p-2 bg-gray-50 rounded">
             <p className="font-medium">Distribution Summary</p>
@@ -425,12 +433,13 @@ const DashboardHome = () => {
           </div>
         </div>
 
-        {/* Follow-up Status Chart */}
+
+        {/* Review Links Status Chart */}
         <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Follow-up Status</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Review Links Status</h2>
           <div className="h-[300px] flex items-center justify-center">
-            <Bar 
-              data={followupChartData} 
+            <Bar
+              data={reviewChartData}
               options={{
                 ...chartOptions,
                 plugins: {
@@ -440,7 +449,7 @@ const DashboardHome = () => {
                   },
                   tooltip: {
                     callbacks: {
-                      label: function(context) {
+                      label: function (context) {
                         const value = context.raw as number;
                         return `Count: ${value}`;
                       }
@@ -456,21 +465,16 @@ const DashboardHome = () => {
                     }
                   }
                 }
-              }} 
+              }}
             />
           </div>
-          
+
           {/* Add a summary below the chart */}
-          <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-            <div className="p-2 bg-gray-50 rounded">
-              <p className="font-medium">Day 2 Follow-ups</p>
-              <p className="text-green-600">Sent: {followupStats.day2.sent}</p>
-              <p className="text-yellow-600">Pending: {followupStats.day2.pending}</p>
-            </div>
-            <div className="p-2 bg-gray-50 rounded">
-              <p className="font-medium">Day 4 Follow-ups</p>
-              <p className="text-blue-600">Sent: {followupStats.day4.sent}</p>
-              <p className="text-red-600">Pending: {followupStats.day4.pending}</p>
+          <div className="mt-4 p-2 bg-gray-50 rounded">
+            <p className="font-medium">Review Links</p>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <p className="text-green-600">Added: {followupStats.reviews.added}</p>
+              <p className="text-red-600">Pending: {followupStats.reviews.pending}</p>
             </div>
           </div>
         </div>
@@ -478,13 +482,6 @@ const DashboardHome = () => {
 
       {/* Additional Insights Section */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white shadow-subtle rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-2">Automation Rate</h2>
-          <div className="text-3xl font-bold text-green-600">
-            {((automatedCount / totalJobs) * 100).toFixed(1)}%
-          </div>
-          <p className="text-gray-600">of total listings automated</p>
-        </div>
         <div className="bg-white shadow-subtle rounded-lg p-4">
           <h2 className="text-xl font-bold mb-2">Active vs Closed</h2>
           <div className="text-3xl font-bold text-blue-600">
