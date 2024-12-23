@@ -137,7 +137,7 @@ const ClosedListingsPage = () => {
                 <th className="px-4 py-3 text-left">Organization</th>
                 <th className="px-4 py-3 text-center">Listing No</th>
                 <th className="px-4 py-3 text-center">Process</th>
-                <th className="px-4 py-3 text-center">Designation</th>
+                <th className="px-4 py-3 text-center">Type</th>
                 <th className="px-4 py-3 text-center">Date</th>
                 <th className="px-4 py-3 text-center">Conversion Rate</th>
                 <th className="px-4 py-3 text-center">Links</th>

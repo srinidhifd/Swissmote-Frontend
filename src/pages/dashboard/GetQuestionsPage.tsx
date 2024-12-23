@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { TailSpin } from "react-loader-spinner";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { BsReply } from "react-icons/bs";
+import { BsReply, BsArrowLeft } from "react-icons/bs";
 import { AiOutlineClockCircle } from "react-icons/ai";
 
 interface Question {
@@ -30,7 +29,14 @@ const GetQuestionsPage = () => {
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
   const [replyLoading, setReplyLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (!listingNumber) {
+      toast.error("No listing number provided");
+      navigate("/dashboard/listings/auto");
+      return;
+    }
     fetchQuestions();
   }, [listingNumber]);
 
@@ -42,13 +48,19 @@ const GetQuestionsPage = () => {
         params: { listing: listingNumber },
         headers: { Authorization: `Bearer ${authToken}` },
       });
+      
       if (response.data.success) {
         setQuestions(response.data.questions || []);
+        if (response.data.questions?.length === 0) {
+          toast.info("No questions found for this listing");
+        }
       } else {
-        setError("Failed to fetch questions.");
+        throw new Error(response.data.message || "Failed to fetch questions.");
       }
-    } catch (err) {
-      setError("Failed to fetch questions. Please try again.");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch questions";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -56,23 +68,29 @@ const GetQuestionsPage = () => {
 
   const handleReply = async (chatId: number, messageId: number | null) => {
     if (!replyMessage.trim()) {
-      toast.error("Reply message cannot be empty.");
+      toast.error("Reply message cannot be empty");
       return;
     }
 
     setReplyLoading(true);
     try {
-      await axios.post(
+      const response = await axios.post(
         `${apiUrl}/reply_question?listing=${listingNumber}`,
         { chat_id: chatId, message_id: messageId, message: replyMessage },
         { headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" } }
       );
-      toast.success("Reply sent successfully.");
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to send reply");
+      }
+
+      toast.success("Reply sent successfully");
       setReplyMessage("");
       setSelectedMessageId(null);
-      fetchQuestions();
-    } catch {
-      toast.error("Failed to send reply. Please try again.");
+      await fetchQuestions(); // Refresh questions after reply
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to send reply";
+      toast.error(errorMessage);
     } finally {
       setReplyLoading(false);
     }
@@ -80,83 +98,132 @@ const GetQuestionsPage = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <ToastContainer />
-      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-4xl font-semibold mb-6 text-gray-800">Manage Questions</h1>
-        <p className="text-gray-500 mb-4">
-          View and reply to questions for listing <span className="font-semibold">#{listingNumber}</span>
-        </p>
-
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <TailSpin height="50" width="50" color="#4fa94d" />
+      <ToastContainer position="top-right" />
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
+            >
+              <BsArrowLeft className="mr-2" /> Back
+            </button>
+            <h1 className="text-4xl font-semibold text-gray-800">Manage Questions</h1>
+            <p className="text-gray-600 mt-2">
+              Listing <span className="font-semibold">#{listingNumber}</span>
+            </p>
           </div>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
-          <div className="space-y-6">
-            {questions.map((q) => (
-              <div key={q.message_id || q.chat_id} className="border p-4 rounded-lg shadow-md bg-gray-50">
-                {/* Question Section */}
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h2 className="text-lg font-medium text-gray-700">{q.question}</h2>
-                    <div className="flex items-center text-gray-500 text-sm mt-2">
-                      <AiOutlineClockCircle className="mr-1" />
-                      {new Date(q.time_stamp).toLocaleString()}
-                    </div>
-                    {q.links?.map((link, idx) =>
-                      /\.(jpg|jpeg|png|gif)$/.test(link) ? (
-                        <img
-                          key={idx}
-                          src={link}
-                          alt="Attachment"
-                          className="mt-4 w-40 h-40 object-cover rounded-md shadow"
-                        />
-                      ) : (
-                        <a
-                          key={idx}
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline block mt-2"
-                        >
-                          View Attachment
-                        </a>
-                      )
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setSelectedMessageId(q.message_id)}
-                    className="text-blue-500 hover:text-blue-700 flex items-center"
-                  >
-                    <BsReply className="mr-1" /> Reply
-                  </button>
-                </div>
+          <button
+            onClick={fetchQuestions}
+            className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+          >
+            Refresh Questions
+          </button>
+        </div>
 
-                {/* Reply Section */}
-                {selectedMessageId === q.message_id && (
-                  <div className="mt-4">
-                    <textarea
-                      rows={3}
-                      placeholder="Type your reply here..."
-                      value={replyMessage}
-                      onChange={(e) => setReplyMessage(e.target.value)}
-                      className="w-full p-2 border rounded-md shadow-inner focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    ></textarea>
+        {/* Content Section */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <TailSpin height="50" width="50" color="#4fa94d" ariaLabel="loading" />
+            </div>
+          ) : error ? (
+            <div className="text-center py-10">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button
+                onClick={fetchQuestions}
+                className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : questions.length === 0 ? (
+            <p className="text-center text-gray-500 py-10">No questions found for this listing</p>
+          ) : (
+            <div className="space-y-6">
+              {questions.map((q) => (
+                <div key={q.message_id || q.chat_id} className="border p-6 rounded-lg shadow-sm hover:shadow-md transition bg-gray-50">
+                  {/* Question Section */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h2 className="text-lg font-medium text-gray-800">{q.question}</h2>
+                      <div className="flex items-center text-gray-500 text-sm mt-2">
+                        <AiOutlineClockCircle className="mr-1" />
+                        {new Date(q.time_stamp).toLocaleString()}
+                      </div>
+                      
+                      {/* Attachments */}
+                      {(q.links?.length ?? 0) > 0 && (
+                        <div className="mt-4 space-y-2">
+                          {q.links?.map((link, idx) => (
+                            /\.(jpg|jpeg|png|gif)$/.test(link) ? (
+                              <img
+                                key={idx}
+                                src={link}
+                                alt="Attachment"
+                                className="max-w-xs rounded-lg shadow-sm hover:shadow-md transition cursor-pointer"
+                                onClick={() => window.open(link, '_blank')}
+                              />
+                            ) : (
+                              <a
+                                key={idx}
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-blue-600 hover:text-blue-800 hover:underline transition"
+                              >
+                                View Attachment {idx + 1}
+                              </a>
+                            )
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
                     <button
-                      onClick={() => handleReply(q.chat_id, q.message_id)}
-                      disabled={replyLoading}
-                      className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 disabled:bg-blue-300"
+                      onClick={() => setSelectedMessageId(q.message_id)}
+                      className="flex items-center px-4 py-2 text-blue-600 hover:text-blue-800 transition"
                     >
-                      {replyLoading ? "Sending..." : "Send Reply"}
+                      <BsReply className="mr-2" /> Reply
                     </button>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+
+                  {/* Reply Section */}
+                  {selectedMessageId === q.message_id && (
+                    <div className="mt-4 bg-white p-4 rounded-lg border">
+                      <textarea
+                        rows={3}
+                        placeholder="Type your reply here..."
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                        className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none"
+                      />
+                      <div className="flex justify-end mt-3 space-x-3">
+                        <button
+                          onClick={() => {
+                            setSelectedMessageId(null);
+                            setReplyMessage("");
+                          }}
+                          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => handleReply(q.chat_id, q.message_id)}
+                          disabled={replyLoading}
+                          className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {replyLoading ? "Sending..." : "Send Reply"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
