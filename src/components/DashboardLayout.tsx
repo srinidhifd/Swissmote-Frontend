@@ -94,7 +94,7 @@ useEffect(() => {
             className="text-xl font-bold tracking-wide cursor-pointer"
             onClick={() => navigate("/dashboard")}
           >
-            Swissmote
+            Swissmote Dashboard
           </div>
 
           

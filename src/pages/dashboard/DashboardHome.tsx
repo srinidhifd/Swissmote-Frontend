@@ -11,9 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Bar, Pie} from "react-chartjs-2";
 import {
-  FaClock,
   FaCheck,
 } from "react-icons/fa";
 import { TailSpin } from "react-loader-spinner";
@@ -41,7 +40,7 @@ const DashboardHome = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL; // Dynamic: Base API URL from environment variables
   const authToken = import.meta.env.VITE_AUTH_TOKEN; // Dynamic: Auth token from environment variables
 
-  const [loading, setLoading] = useState(true);
+  const [listingsLoading, setListingsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Dynamic: State variables for API data
@@ -51,10 +50,6 @@ const DashboardHome = () => {
   const [activeListings, setActiveListings] = useState<Listing[]>([]);
   const [closedListings, setClosedListings] = useState<Listing[]>([]);
 
-  // Mock Data
-  const avgTimeToHire = "15d"; // Mock Data: Average time to hire
-  const candidateFeedback = `"Rapid process, very welcoming at every stage."`; // Mock Data: Feedback
-
   // Default parameters
   const empType = "job";
   const account = "pv";
@@ -63,7 +58,7 @@ const DashboardHome = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        setLoading(true);
+        setListingsLoading(true);
 
         // Fetch Automated, Not Automated, and Expired Listings
         const autoResponse = await fetch(
@@ -119,7 +114,7 @@ const DashboardHome = () => {
       } catch (err: any) {
         setError(err.message || "Failed to fetch data.");
       } finally {
-        setLoading(false);
+        setListingsLoading(false);
       }
     };
 
@@ -164,24 +159,31 @@ const DashboardHome = () => {
     ],
   };
 
-  const lineChartData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], // Mock Data
-    datasets: [
-      {
-        label: "Messages Sent",
-        data: [50, 75, 60, 90, 80, 120, 100], // Mock Data
-        borderColor: "rgba(255, 99, 132, 0.6)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        fill: true,
-      },
-    ],
+  const automationRateData = {
+    labels: ["Automated", "Not Automated"],
+    datasets: [{
+      label: "Automation Rate",
+      data: [automatedCount, notAutomatedCount],
+      backgroundColor: [
+        "rgba(75, 192, 192, 0.6)",
+        "rgba(255, 206, 86, 0.6)",
+      ],
+    }],
   };
 
-  const options = {
+  // First, let's update the chart options for better presentation
+  const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false, // This helps with consistent sizing
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'bottom' as const,
+        labels: {
+          padding: 20,
+          font: {
+            size: 12
+          }
+        }
       },
       title: {
         display: false,
@@ -189,7 +191,7 @@ const DashboardHome = () => {
     },
   };
 
-  if (loading) {
+  if (listingsLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <TailSpin height="80" width="80" color="#4caf50" ariaLabel="loading" />
@@ -243,37 +245,108 @@ const DashboardHome = () => {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white shadow-subtle rounded-lg p-4 max-w-[100%]">
-          <h2 className="text-xl font-bold mb-2">Active vs Closed</h2>
-          <Bar data={barChartData} options={options} />
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+        {/* Active vs Closed Chart */}
+        <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Active vs Closed</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <Bar 
+              data={barChartData} 
+              options={{
+                ...chartOptions,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      display: false
+                    }
+                  },
+                  x: {
+                    grid: {
+                      display: false
+                    }
+                  }
+                }
+              }} 
+            />
+          </div>
         </div>
-        <div className="bg-white shadow-subtle rounded-lg p-4 max-w-[100%]">
-          <h2 className="text-xl font-bold mb-2">Listings Breakdown</h2>
-          <Pie data={pieChartData} options={options} />
+
+        {/* Listings Breakdown Chart */}
+        <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Listings Breakdown</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <Pie 
+              data={pieChartData} 
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      padding: 20,
+                      usePointStyle: true,
+                      font: {
+                        size: 12
+                      }
+                    }
+                  }
+                }
+              }} 
+            />
+          </div>
         </div>
-        <div className="col-span-2 bg-white shadow-subtle rounded-lg p-4 max-w-[100%]">
-          <h2 className="text-xl font-bold mb-2">Messages Sent This Week[Mock Data Used]</h2>
-          <Line data={lineChartData} options={options} />
+
+        {/* Automation Status Chart */}
+        <div className="md:col-span-4 bg-white shadow-subtle rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Automation Status</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <Bar 
+              data={automationRateData} 
+              options={{
+                ...chartOptions,
+                indexAxis: 'y',
+                plugins: {
+                  ...chartOptions.plugins,
+                  legend: {
+                    display: false
+                  }
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                    grid: {
+                      display: false
+                    }
+                  },
+                  y: {
+                    grid: {
+                      display: false
+                    }
+                  }
+                }
+              }} 
+            />
+          </div>
         </div>
       </div>
 
       {/* Additional Insights Section */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Avg. Time to Hire */}
-        <div className="bg-white shadow-subtle rounded-lg p-4 flex items-center">
-          <div className="bg-gray-300 text-gray-800 p-4 rounded-full">
-            <FaClock className="text-3xl" />
-          </div>
-          <div className="ml-4">
-            <h2 className="text-2xl font-bold">{avgTimeToHire}</h2>
-            <p className="text-gray-600">Avg. Time to Hire</p>
-          </div>
-        </div>
-        {/* Candidate Feedback */}
         <div className="bg-white shadow-subtle rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-2">Candidate Feedback</h2>
-          <p className="text-gray-600">{candidateFeedback}</p>
+          <h2 className="text-xl font-bold mb-2">Automation Rate</h2>
+          <div className="text-3xl font-bold text-green-600">
+            {((automatedCount / totalJobs) * 100).toFixed(1)}%
+          </div>
+          <p className="text-gray-600">of total listings automated</p>
+        </div>
+        <div className="bg-white shadow-subtle rounded-lg p-4">
+          <h2 className="text-xl font-bold mb-2">Active vs Closed</h2>
+          <div className="text-3xl font-bold text-blue-600">
+            {activeCount} / {closedCount}
+          </div>
+          <p className="text-gray-600">current active to closed ratio</p>
         </div>
       </div>
     </div>
