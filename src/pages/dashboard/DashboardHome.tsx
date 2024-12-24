@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../store/store";
+import { setDashboardData } from "../../store/slices/dashboardSlice";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,12 +15,10 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import {
-  FaCheck,
-} from "react-icons/fa";
-import { TailSpin } from "react-loader-spinner";
+import { FaCheck } from "react-icons/fa";
 import { HiOutlineBriefcase, HiOutlineClock } from "react-icons/hi";
 import { MdOutlineErrorOutline } from "react-icons/md";
+import { TailSpin } from "react-loader-spinner";
 
 ChartJS.register(
   CategoryScale,
@@ -31,175 +32,138 @@ ChartJS.register(
   Legend
 );
 
-interface Listing {
-  listing_number: string;
-  [key: string]: any;
-}
-
-interface FollowupStats {
-  day2: {
-    sent: number;
-    pending: number;
-  };
-  day4: {
-    sent: number;
-    pending: number;
-  };
-  reviews: {
-    added: number;
-    pending: number;
-  };
-}
-
 const DashboardHome = () => {
-  const apiUrl = import.meta.env.VITE_API_BASE_URL; // Dynamic: Base API URL from environment variables
-  const authToken = import.meta.env.VITE_AUTH_TOKEN; // Dynamic: Auth token from environment variables
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const authToken = import.meta.env.VITE_AUTH_TOKEN;
 
-  const [listingsLoading, setListingsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // Dynamic: State variables for API data
-  const [automatedListings, setAutomatedListings] = useState<Listing[]>([]);
-  const [notAutomatedListings, setNotAutomatedListings] = useState<Listing[]>([]);
-  const [expiredListings, setExpiredListings] = useState<Listing[]>([]);
-  const [activeListings, setActiveListings] = useState<Listing[]>([]);
-  const [closedListings, setClosedListings] = useState<Listing[]>([]);
-  const [followupStats, setFollowupStats] = useState<FollowupStats>({
-    day2: { sent: 0, pending: 0 },
-    day4: { sent: 0, pending: 0 },
-    reviews: { added: 0, pending: 0 }
-  });
+  const {
+    automatedListings,
+    notAutomatedListings,
+    expiredListings,
+    activeListings,
+    closedListings,
+    followupStats,
+    isFetched,
+  } = useSelector((state: RootState) => state.dashboard);
 
-  // Default parameters
-  const empType = "job";
-  const account = "pv";
+  const [loading, setLoading] = useState(!isFetched);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch Data (Dynamic: Fetches data from API)
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      const autoResponse = await fetch(
+        `${apiUrl}/get_auto_listings?emp_type=job&account=pv`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (!autoResponse.ok) throw new Error("Failed to fetch automated listings.");
+      const autoData = await autoResponse.json();
+
+      const activeResponse = await fetch(`${apiUrl}/active_listing`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      if (!activeResponse.ok) throw new Error("Failed to fetch active listings.");
+      const activeData = await activeResponse.json();
+
+      const closedResponse = await fetch(`${apiUrl}/closed_listings`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      if (!closedResponse.ok) throw new Error("Failed to fetch closed listings.");
+      const closedData = await closedResponse.json();
+
+      // Calculate follow-up stats
+      const day2Stats = { sent: 0, pending: 0 };
+      const day4Stats = { sent: 0, pending: 0 };
+      const reviewStats = { added: 0, pending: 0 };
+
+      autoData.automated?.forEach((listing: any) => {
+        if (listing.day2followup?.status === 1) day2Stats.sent++;
+        else day2Stats.pending++;
+
+        if (listing.day4followup?.status === 1) day4Stats.sent++;
+        else day4Stats.pending++;
+
+        if (listing.review_link?.length > 0) reviewStats.added++;
+        else reviewStats.pending++;
+      });
+
+      dispatch(
+        setDashboardData({
+          automatedListings: autoData.automated || [],
+          notAutomatedListings: autoData.not_automated || [],
+          expiredListings: autoData.cl_automated ? [autoData.cl_automated] : [],
+          activeListings: activeData,
+          closedListings: closedData,
+          followupStats: {
+            day2: day2Stats,
+            day4: day4Stats,
+            reviews: reviewStats,
+          },
+          isFetched: true,
+        })
+      );
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        setListingsLoading(true);
+    if (!isFetched) fetchDashboardData();
+  }, [isFetched]);
 
-        // Fetch Automated, Not Automated, and Expired Listings
-        const autoResponse = await fetch(
-          `${apiUrl}/get_auto_listings?emp_type=${empType}&account=${account}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-
-        if (!autoResponse.ok) {
-          throw new Error("Failed to fetch automated listings.");
-        }
-
-        const autoData = await autoResponse.json();
-
-        // Calculate follow-up and review statistics
-        const day2Stats = { sent: 0, pending: 0 };
-        const day4Stats = { sent: 0, pending: 0 };
-        const reviewStats = { added: 0, pending: 0 };
-
-        autoData.automated?.forEach((listing: any) => {
-          if (listing.day2followup?.status === 1) {
-            day2Stats.sent++;
-          } else {
-            day2Stats.pending++;
-          }
-
-          if (listing.day4followup?.status === 1) {
-            day4Stats.sent++;
-          } else {
-            day4Stats.pending++;
-          }
-
-          if (listing.review_link && listing.review_link.length > 0) {
-            reviewStats.added++;
-          } else {
-            reviewStats.pending++;
-          }
-        });
-
-        setFollowupStats({
-          day2: day2Stats,
-          day4: day4Stats,
-          reviews: reviewStats
-        });
-
-        setAutomatedListings(autoData.automated || []);
-        setNotAutomatedListings(autoData.not_automated || []);
-        setExpiredListings(autoData.cl_automated ? [autoData.cl_automated] : []);
-
-        // Fetch Active Listings
-        const activeResponse = await fetch(`${apiUrl}/active_listing`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        if (!activeResponse.ok) {
-          throw new Error("Failed to fetch active listings.");
-        }
-
-        const activeData = await activeResponse.json();
-        setActiveListings(activeData);
-
-        // Fetch Closed Listings
-        const closedResponse = await fetch(`${apiUrl}/closed_listings`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        if (!closedResponse.ok) {
-          throw new Error("Failed to fetch closed listings.");
-        }
-
-        const closedData = await closedResponse.json();
-        setClosedListings(closedData);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch data.");
-      } finally {
-        setListingsLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, [apiUrl, authToken]);
-
-  // Totals Calculation (Dynamic: Calculated based on fetched data)
-  const totalJobs =
-    automatedListings.length +
-    notAutomatedListings.length +
-    expiredListings.length;
+  // Calculate totals
+  const totalJobs = automatedListings.length + notAutomatedListings.length + expiredListings.length;
   const automatedCount = automatedListings.length;
   const notAutomatedCount = notAutomatedListings.length;
   const expiredCount = expiredListings.length;
   const activeCount = activeListings.length;
   const closedCount = closedListings.length;
 
-  // Chart Data (Dynamic: Fetched data or calculated based on state)
-  const reviewChartData = {
-    labels: ['Reviews Added', 'Reviews Pending'],
-    datasets: [
-      {
-        label: 'Review Links',
-        data: [
-          followupStats.reviews.added,
-          followupStats.reviews.pending
-        ],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',  // Added - Green
-          'rgba(255, 99, 132, 0.6)',   // Pending - Red
-        ],
-      },
-    ],
+  // Chart configurations
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      }
+    }
+  };
+
+  // Chart data
+  const followupChartData = {
+    labels: ['Day 2 Sent', 'Day 2 Pending', 'Day 4 Sent', 'Day 4 Pending'],
+    datasets: [{
+      data: [
+        followupStats?.day2?.sent || 0,
+        followupStats?.day2?.pending || 0,
+        followupStats?.day4?.sent || 0,
+        followupStats?.day4?.pending || 0
+      ],
+      backgroundColor: [
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+      ],
+    }],
   };
 
   const getConversionRateStats = (listings: any[]) => {
@@ -223,62 +187,32 @@ const DashboardHome = () => {
 
   const conversionRateData = {
     labels: ['0-25%', '26-50%', '51-75%', '76-100%'],
-    datasets: [
-      {
-        label: 'Number of Listings',
-        data: Object.values(getConversionRateStats(automatedListings)),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',   // Red for lowest
-          'rgba(255, 206, 86, 0.6)',   // Yellow for low-mid
-          'rgba(54, 162, 235, 0.6)',   // Blue for high-mid
-          'rgba(75, 192, 192, 0.6)',   // Green for highest
-        ],
-      },
-    ],
+    datasets: [{
+      data: Object.values(getConversionRateStats(automatedListings)),
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+      ],
+    }],
   };
 
-  const followupChartData = {
-    labels: ['Day 2 Sent', 'Day 2 Pending', 'Day 4 Sent', 'Day 4 Pending'],
-    datasets: [
-      {
-        label: 'Follow-ups',
-        data: [
-          followupStats.day2.sent,
-          followupStats.day2.pending,
-          followupStats.day4.sent,
-          followupStats.day4.pending
-        ],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',  // Day 2 Sent - Green
-          'rgba(255, 206, 86, 0.6)',  // Day 2 Pending - Yellow
-          'rgba(54, 162, 235, 0.6)',  // Day 4 Sent - Blue
-          'rgba(255, 99, 132, 0.6)',  // Day 4 Pending - Red
-        ],
-      },
-    ],
+  const reviewChartData = {
+    labels: ['Reviews Added', 'Reviews Pending'],
+    datasets: [{
+      data: [
+        followupStats?.reviews?.added || 0,
+        followupStats?.reviews?.pending || 0
+      ],
+      backgroundColor: [
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+      ],
+    }],
   };
 
-  // First, let's update the chart options for better presentation
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false, // This helps with consistent sizing
-    plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          padding: 20,
-          font: {
-            size: 12
-          }
-        }
-      },
-      title: {
-        display: false,
-      },
-    },
-  };
-
-  if (listingsLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <TailSpin height="80" width="80" color="#4caf50" ariaLabel="loading" />

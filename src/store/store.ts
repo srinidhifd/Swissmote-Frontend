@@ -4,6 +4,7 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Using localStorage
 import autoListingReducer from "./slices/autoListingSlice";
 import themeReducer from "./themeSlice";
+import dashboardReducer from "./slices/dashboardSlice";
 
 // Persist Configuration
 const persistConfig = {
@@ -19,6 +20,7 @@ export const store = configureStore({
   reducer: {
     theme: themeReducer, // Non-persistent reducer
     autoListing: persistedReducer, // Persistent reducer
+    dashboard: dashboardReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
