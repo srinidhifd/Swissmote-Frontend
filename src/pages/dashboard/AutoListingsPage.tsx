@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TailSpin } from "react-loader-spinner";
@@ -30,6 +30,9 @@ import { MdOutlineBusinessCenter } from "react-icons/md";
 const AutoListingsPage = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const authToken = import.meta.env.VITE_AUTH_TOKEN;
+
+  const isFetched = useRef(false); // Added useRef
+
 
   const dispatch = useDispatch<AppDispatch>();
   const {
@@ -137,6 +140,17 @@ const AutoListingsPage = () => {
 
   const fetchListings = useCallback(async () => {
     if (!apiUrl || !authToken) return;
+
+    // Check if data already exists for the active tab
+  if (
+    (activeTab === "automated" && automatedListings.length > 0) ||
+    (activeTab === "not_automated" && notAutomatedListings.length > 0) ||
+    (activeTab === "closed_automated" && closedAutomatedListings.length > 0)
+  ) {
+    return; 
+  }
+    // Skip fetching if data is already available
+  
     setListingsLoading(true);
 
     try {
@@ -167,11 +181,8 @@ const AutoListingsPage = () => {
     } finally {
       setListingsLoading(false);
     }
-  }, [apiUrl, authToken, empType, account]);
+  }, [apiUrl, authToken, empType, account,activeTab, automatedListings, notAutomatedListings, closedAutomatedListings]);
 
-  useEffect(() => {
-    fetchListings(); // Fetch data on initial load
-  }, [fetchListings]);
 
   const fetchMessages = useCallback(async () => {
     setMessagesLoading(true);
@@ -206,10 +217,13 @@ const AutoListingsPage = () => {
   }, [apiUrl, authToken]);
 
 
-
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    if (!isFetched.current) {
+      fetchMessages(); // Call fetchMessages only once
+      fetchListings(); // Call fetchListings only once
+      isFetched.current = true; // Mark as fetched
+    }
+  }, [fetchMessages, fetchListings]);
 
   const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
     console.log("Selected listing:", listing);
@@ -431,6 +445,10 @@ const AutoListingsPage = () => {
 
       const payload = {
         ...automateForm,
+        invite_message:
+  automateForm.introMessage === "default"
+    ? messages.intro_message // Use the displayed intro message
+    : automateForm.introMessageContent, // Use the custom message (if provided)
         assignment_message:
           automateForm.assignmentMessage === "default"
             ? automateForm.post_over === "startupathon"
@@ -1506,7 +1524,7 @@ const AutoListingsPage = () => {
 
                   {/* Messages Section */}
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Messages Configuration</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Messages</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Intro Message */}
                       <div>
