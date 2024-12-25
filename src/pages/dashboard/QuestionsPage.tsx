@@ -30,10 +30,12 @@ const QuestionsPage = () => {
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const [replyLoading, setReplyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [listingsLoading, setListingsLoading] = useState(false);
 
   // Fetch listings
   useEffect(() => {
     const fetchListings = async () => {
+      setListingsLoading(true);
       try {
         const response = await fetch(
           `${apiUrl}/get_auto_listings?emp_type=job&account=pv`,
@@ -49,7 +51,6 @@ const QuestionsPage = () => {
         );
         if (!response.ok) throw new Error("Failed to fetch listings");
         const data = await response.json();
-        // Only set listings that have questions
         const automatedListings = data.automated || [];
         const listingsWithQuestions = await Promise.all(
           automatedListings.map(async (listing: any) => {
@@ -57,9 +58,17 @@ const QuestionsPage = () => {
             return hasQuestions ? listing : null;
           })
         );
-        setListings(listingsWithQuestions.filter(Boolean));
+        const filteredListings = listingsWithQuestions.filter(Boolean);
+        setListings(filteredListings);
+        
+        // Auto-select first listing
+        if (filteredListings.length > 0 && !selectedListing) {
+          setSelectedListing(filteredListings[0].listing_number);
+        }
       } catch (err: any) {
         toast.error(err.message);
+      } finally {
+        setListingsLoading(false);
       }
     };
     fetchListings();
@@ -209,30 +218,49 @@ const QuestionsPage = () => {
           <div className="w-1/5 bg-white rounded-lg shadow-sm p-4">
             <h2 className="text-lg font-semibold mb-4 text-gray-700 px-2">Active Listings</h2>
             <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar">
-              {listings.map((listing) => (
-                <button
-                  key={listing.listing_number}
-                  onClick={() => setSelectedListing(listing.listing_number)}
-                  className={`w-full p-4 rounded-lg text-left transition-all ${
-                    selectedListing === listing.listing_number
-                      ? 'bg-blue-50 border-blue-200 border-2 text-blue-700 shadow-sm'
-                      : 'hover:bg-gray-50 border border-gray-200 hover:border-blue-200'
-                  }`}
-                >
-                  <div className="font-medium text-base line-clamp-1">{listing.listing_name}</div>
-                  <div className="inline-block text-xs px-2 py-1 mt-2 bg-gray-100 text-gray-600 rounded-md">
-                    #{listing.listing_number}
-                  </div>
-                </button>
-              ))}
+              {listingsLoading ? (
+                <div className="flex justify-center py-8">
+                  <TailSpin color="#22C55E" height={40} width={40} />
+                </div>
+              ) : listings.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No listings with questions found
+                </div>
+              ) : (
+                listings.map((listing) => (
+                  <button
+                    key={listing.listing_number}
+                    onClick={() => setSelectedListing(listing.listing_number)}
+                    className={`w-full p-4 rounded-lg text-left transition-all ${
+                      selectedListing === listing.listing_number
+                        ? 'bg-blue-50 border-blue-200 border-2 text-blue-700 shadow-sm'
+                        : 'hover:bg-gray-50 border border-gray-200 hover:border-blue-200'
+                    }`}
+                  >
+                    <div className="font-medium text-base line-clamp-1">{listing.listing_name}</div>
+                    <div className="inline-block text-xs px-2 py-1 mt-2 bg-gray-100 text-gray-600 rounded-md">
+                      #{listing.listing_number}
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
           {/* Main Content */}
           <div className="w-4/5">
-            {loading ? (
-              <div className="flex justify-center items-center min-h-[400px] bg-white rounded-lg shadow-sm">
-                <TailSpin color="#3B82F6" height={80} width={80} />
+            {!selectedListing ? (
+              <div className="bg-white rounded-lg shadow-sm p-16 text-center">
+                <div className="text-gray-400 mb-4">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </div>
+                <p className="text-gray-500">Select a listing to view questions</p>
+              </div>
+            ) : loading ? (
+              <div className="flex justify-center items-center min-h-[200px] bg-white rounded-lg shadow-sm">
+                <TailSpin color="#22C55E" height={50} width={50} />
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm">
