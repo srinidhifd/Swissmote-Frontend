@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { FaSignOutAlt, FaAngleDown, FaAngleRight, FaBriefcase, FaListAlt, FaClipboardList, FaRegComments } from "react-icons/fa";
+import { FaSignOutAlt, FaAngleDown, FaAngleRight, FaBriefcase, FaListAlt, FaClipboardList } from "react-icons/fa";
 
 const DashboardLayout = () => {
   useAuth();
@@ -61,13 +61,6 @@ const DashboardLayout = () => {
       ],
     },
     {
-      label: "Reviews & Updates",
-      subItems: [
-        { label: "Daily Updates", to: "/dashboard/reviews/daily" },
-        { label: "Reply to Daily Updates", to: "/dashboard/reviews/reply" },
-      ],
-    },
-    {
       label: "Assignments",
       subItems: [
         { label: "Assignments", to: "/dashboard/assignments" },
@@ -78,7 +71,6 @@ const DashboardLayout = () => {
   const menuIcons = {
     "Job Management": <FaBriefcase />,
     "Listings": <FaListAlt />,
-    "Reviews & Updates": <FaRegComments />,
     "Assignments": <FaClipboardList />
   };
 

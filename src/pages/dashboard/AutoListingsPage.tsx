@@ -223,18 +223,6 @@ const AutoListingsPage = () => {
     }
   }, [fetchMessages, fetchListings]);
 
-  const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
-    navigate("/dashboard/assignments/get", {
-      state: {
-        listingNumber: listing.listing_number,
-        listingName: "listing_name" in listing ? listing.listing_name || "N/A" : "N/A",
-        projectName: "projectname" in listing ? listing.projectname || "N/A" : "N/A",
-        source: "itn",
-        org: account,
-      },
-    });
-  };
-
   const handlePostAssignment = (listing: any) => {
     setSelectedListing(listing);
     setIsPostModalOpen(true);
@@ -673,12 +661,6 @@ const AutoListingsPage = () => {
               {dropdownOpen === item.listing_number && (
                 <div className="dropdown-menu"
                 >
-                  <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => handleGetAssignment(item)}
-                  >
-                    Get Assignment
-                  </button>
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => handlePostAssignment(item)}
