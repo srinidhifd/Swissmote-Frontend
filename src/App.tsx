@@ -31,6 +31,7 @@ import ActiveListingsPage from "./pages/dashboard/ActiveListingsPage";
 import ClosedListingsPage from "./pages/dashboard/ClosedListingsPage";
 import SendMessagePage from "./pages/dashboard/SendMessagePage";
 import ChatPage from "./pages/dashboard/ChatPage";
+import QuestionsPage from "./pages/dashboard/QuestionsPage";
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
           
           {/* Updates */}
           <Route path="get-updates" element={<GetUpdatesPage />} />
+          <Route path="questions" element={<QuestionsPage />} />
         </Route>
       </Routes>
     </Router>

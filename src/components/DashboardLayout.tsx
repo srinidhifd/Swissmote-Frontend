@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { FaSignOutAlt, FaAngleLeft, FaAngleRight, FaBriefcase, FaBuilding, FaUserTie, FaGraduationCap, FaClipboardList, FaListAlt, FaRegClock, FaArchive, FaTasks, FaFileAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaAngleLeft, FaAngleRight, FaBriefcase, FaBuilding, FaUserTie, FaGraduationCap, FaClipboardList, FaListAlt, FaRegClock, FaArchive, FaTasks, FaFileAlt, FaQuestionCircle, FaComments } from "react-icons/fa";
 
 const DashboardLayout = () => {
   useAuth();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
   const navigate = useNavigate();
@@ -66,6 +66,12 @@ const DashboardLayout = () => {
         { label: "Get Assignments", to: "/dashboard/assignments" },
       ],
     },
+    {
+      label: "Questions",
+      subItems: [
+        { label: "View Questions", to: "/dashboard/questions" },
+      ],
+    },
   ];
 
   const menuIcons = {
@@ -78,7 +84,9 @@ const DashboardLayout = () => {
     "Auto Listings": <FaRegClock />,
     "Active Listings": <FaTasks />,
     "Closed Listings": <FaArchive />,
-    "Get Assignments": <FaFileAlt />
+    "Get Assignments": <FaFileAlt />,
+    "Questions": <FaQuestionCircle />,
+    "View Questions": <FaComments />
   };
 
   return (
@@ -189,7 +197,7 @@ const DashboardLayout = () => {
       <div className={`flex-1 transition-all duration-300 ${
         isSidebarOpen ? 'ml-[80%] md:ml-[20%]' : 'ml-[10%] md:ml-[5%]'
       }`}>
-        <main className="max-w-[95vw]">
+        <main className="max-w-[94vw]">
           <Outlet />
         </main>
       </div>
