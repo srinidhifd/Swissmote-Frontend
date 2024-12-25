@@ -50,8 +50,6 @@ const AutoListingsPage = () => {
   const itemsPerPage = 10;
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [isEditFollowupModalOpen, setIsEditFollowupModalOpen] = useState(false);
-  const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
-  const [source, setSource] = useState<string>("");
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [postURL, setPostURL] = useState("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -226,33 +224,15 @@ const AutoListingsPage = () => {
   }, [fetchMessages, fetchListings]);
 
   const handleGetAssignment = (listing: AutomatedJob | NotAutomatedJob | ClosedAutomatedJob) => {
-    console.log("Selected listing:", listing);
-    setSelectedListing(listing);
-    setIsSourceModalOpen(true);
-  };
-
-  const confirmGetAssignment = () => {
-    if (!selectedListing) {
-      toast.error("No listing selected.");
-      return;
-    }
-    if (!source) {
-      toast.error("Please select a valid source.");
-      return;
-    }
     navigate("/dashboard/assignments/get", {
       state: {
-        listingNumber: selectedListing.listing_number,
-        listingName: "listing_name" in selectedListing ? selectedListing.listing_name || "N/A" : "N/A",
-        projectName: "projectname" in selectedListing ? selectedListing.projectname || "N/A" : "N/A",
-        source,
+        listingNumber: listing.listing_number,
+        listingName: "listing_name" in listing ? listing.listing_name || "N/A" : "N/A",
+        projectName: "projectname" in listing ? listing.projectname || "N/A" : "N/A",
+        source: "itn",
         org: account,
       },
     });
-
-    console.log("Selected listing in confirmGetAssignment:", selectedListing);
-    setIsSourceModalOpen(false);
-    setSource("");
   };
 
   const handlePostAssignment = (listing: any) => {
@@ -982,64 +962,6 @@ const AutoListingsPage = () => {
           {renderTable()}
         </div>
       </div>
-      {/* Source Selection Modal */}
-      {isSourceModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="relative bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            {/* Close Button */}
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
-              onClick={() => setIsSourceModalOpen(false)}
-            >
-              ✕
-            </button>
-
-            {/* Modal Title */}
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Source</h2>
-
-            {/* Source Label and Select */}
-            <label
-              htmlFor="source"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Source
-            </label>
-            <select
-              id="source"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            >
-              <option value="">Select Source</option>
-              <option value="itn">Internshala</option>
-              <option value="db">Database</option>
-            </select>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end mt-6 space-x-4">
-              {/* Cancel Button */}
-              <button
-                className="px-4 py-2 bg-gray-100 text-gray-600 font-medium rounded-lg shadow-sm hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
-                onClick={() => setIsSourceModalOpen(false)}
-              >
-                Cancel
-              </button>
-
-              {/* Get Assignment Button */}
-              <button
-                className={`px-4 py-2 font-medium rounded-lg shadow-sm transition focus:outline-none focus:ring-2 ${source
-                  ? "bg-blue-100 text-blue-600 hover:bg-blue-200 focus:ring-blue-400"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  }`}
-                onClick={confirmGetAssignment}
-                disabled={!source}
-              >
-                Get Assignment
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Make Announcement Modal */}
       {isAnnouncementModalOpen && (

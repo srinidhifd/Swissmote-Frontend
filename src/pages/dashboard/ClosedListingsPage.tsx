@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,6 +18,8 @@ const ClosedListingsPage = () => {
   const itemsPerPage = 10;
 
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -46,6 +48,19 @@ const ClosedListingsPage = () => {
     };
 
     fetchListings();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const handleSearch = (keyword: string) => {
@@ -93,6 +108,10 @@ const ClosedListingsPage = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleLinkClick = () => {
+    setDropdownOpen(null);
+  };
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen relative">
@@ -165,26 +184,35 @@ const ClosedListingsPage = () => {
                       <BsThreeDotsVertical />
                     </button>
                     {dropdownOpen === index && (
-                      <div className="absolute right-0 mt-2 min-w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 text-left">
-                        {["Internshala link", "Leader link", "Candidate link", "Assignment link"].map(
-                          (key, idx) => {
-                            const links = key === "Assignment link" ? parseLink(listing[key]) : [listing[key]];
-                            return (
-                              links &&
-                              links.map((link: string, i: number) => (
-                                <a
-                                  key={`${idx}-${i}`}
-                                  href={link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  {key.replace(/_/g, " ")} {links.length > 1 ? `(${i + 1})` : ""}
-                                </a>
-                              ))
-                            );
-                          }
-                        )}
+                      <div 
+                        ref={dropdownRef}
+                        className="absolute right-0 mt-2 min-w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 text-left"
+                      >
+                        {[
+                          { key: "Internshala", display: "Internshala link" },
+                          { key: "Leader link", display: "Leader link" },
+                          { key: "Candidate link", display: "Candidate link" },
+                          { key: "Assignment link", display: "Assignment link" }
+                        ].map((linkType, idx) => {
+                          const links = linkType.key === "Assignment link" 
+                            ? parseLink(listing[linkType.key]) 
+                            : [listing[linkType.key] || listing[linkType.display]];
+                          return (
+                            links &&
+                            links.map((link: string, i: number) => (
+                              <a
+                                key={`${idx}-${i}`}
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={handleLinkClick}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                {linkType.display} {links.length > 1 ? `(${i + 1})` : ""}
+                              </a>
+                            ))
+                          );
+                        })}
                       </div>
                     )}
                   </td>
