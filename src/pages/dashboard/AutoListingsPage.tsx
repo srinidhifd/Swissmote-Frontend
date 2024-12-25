@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { HandThumbUpIcon } from "@heroicons/react/24/outline"; // As replacement for Handshake
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { AutomatedJob, NotAutomatedJob, ClosedAutomatedJob } from "../../types/index";
@@ -118,7 +117,6 @@ const AutoListingsPage = () => {
   };
 
 
-  const navigate = useNavigate();
 
   const handleEmpTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     dispatch(setEmpType(e.target.value));
@@ -277,11 +275,6 @@ const AutoListingsPage = () => {
   };
 
 
-  const handleGetQuestions = (listing: any) => {
-    navigate("/dashboard/questions/get", {
-      state: { listingNumber: listing.listing_number },
-    });
-  };
   const handleOpenAutomateModal = (listing: NotAutomatedJob) => {
     setAutomateForm({
       listing: listing.listing_number,
@@ -667,12 +660,7 @@ const AutoListingsPage = () => {
                   >
                     Post Assignment
                   </button>
-                  <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => handleGetQuestions(item)}
-                  >
-                    Get Questions
-                  </button>
+                  
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => {

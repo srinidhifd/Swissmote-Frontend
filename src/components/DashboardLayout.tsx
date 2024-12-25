@@ -63,7 +63,7 @@ const DashboardLayout = () => {
     {
       label: "Assignments",
       subItems: [
-        { label: "Get Assignments", to: "/dashboard/assignments" },
+        { label: "View Assignments", to: "/dashboard/assignments" },
       ],
     },
     {
@@ -84,7 +84,7 @@ const DashboardLayout = () => {
     "Auto Listings": <FaRegClock />,
     "Active Listings": <FaTasks />,
     "Closed Listings": <FaArchive />,
-    "Get Assignments": <FaFileAlt />,
+    "View Assignments": <FaFileAlt />,
     "Questions": <FaQuestionCircle />,
     "View Questions": <FaComments />
   };
