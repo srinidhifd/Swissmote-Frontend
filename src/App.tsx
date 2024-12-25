@@ -16,7 +16,6 @@ import MessagesPage from "./pages/dashboard/MessagesPage";
 
 
 import GetUpdatesPage from "./pages/dashboard/GetUpdatesPage";
-import GetQuestionsPage from "./pages/dashboard/GetQuestionsPage";
 import ReplyToQuestionsPage from "./pages/dashboard/ReplyToQuestionsPage";
 import ReplyToCandidatePage from "./pages/dashboard/ReplyToCandidatePage";
 import ReplyViaBotPage from "./pages/dashboard/ReplyViaBotPage";
@@ -73,7 +72,7 @@ function App() {
           <Route path="evaluation/bot-mark" element={<MarkBotEvaluationPage />} />
           <Route path="evaluation/future-mark" element={<MarkFutureEvaluationPage />} />
           {/* Questions */}
-          <Route path="questions/get" element={<GetQuestionsPage />} />
+          
           <Route path="questions/reply" element={<ReplyToQuestionsPage />} />
           {/* Reviews */}
          

@@ -531,7 +531,7 @@ const AssignmentsPage = () => {
           <div className="w-4/5">
             {loading ? (
               <div className="flex justify-center items-center min-h-[400px] bg-white rounded-lg shadow-sm">
-                <TailSpin color="#3B82F6" height={80} width={80} />
+                <TailSpin color="#22C55E" height={80} width={80} />
               </div>
             ) : error ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-700 text-center">

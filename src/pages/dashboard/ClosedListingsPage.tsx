@@ -114,7 +114,7 @@ const ClosedListingsPage = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen relative">
+    <div className="p-3 bg-gray-50 min-h-screen relative">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
@@ -122,7 +122,7 @@ const ClosedListingsPage = () => {
       )}
       <ToastContainer />
 
-      <div className="max-w-7xl mx-auto bg-white shadow-xl rounded-lg p-6">
+      <div className="p-6 max-w-7xl mx-auto bg-white shadow-xl rounded-lg">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
           <h1 className="text-4xl font-semibold text-gray-900">Closed Listings</h1>

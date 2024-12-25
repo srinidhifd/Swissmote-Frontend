@@ -90,7 +90,7 @@ const PostInternshipPage = () => {
   };
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl">
@@ -102,7 +102,7 @@ const PostInternshipPage = () => {
 
       <ToastContainer />
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h1 className="text-3xl font-bold text-gray-800 flex items-center">
