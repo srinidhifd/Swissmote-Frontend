@@ -10,7 +10,7 @@ import PostInternshipPage from "./pages/dashboard/PostInternshipPage";
 import PostUnpaidInternshipPage from "./pages/dashboard/PostUnpaidInternshipPage";
 
 
-import GetAssignmentsPage from "./pages/dashboard/GetAssignmentsPage";
+import AssignmentsPage from "./pages/dashboard/AssignmentsPage";
 
 import MessagesPage from "./pages/dashboard/MessagesPage";
 
@@ -56,7 +56,7 @@ function App() {
           {/* Assignments */}
           
           
-          <Route path="assignments/get" element={<GetAssignmentsPage />} />
+          <Route path="assignments" element={<AssignmentsPage />} />
           {/* Messaging */}
           
           <Route path="get-messages" element={<MessagesPage />} />

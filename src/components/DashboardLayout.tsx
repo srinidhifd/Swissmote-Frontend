@@ -1,64 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { FaSignOutAlt, FaBars, FaTimes, FaAngleDown } from "react-icons/fa";
-
-interface MenuItem {
-  label: string;
-  subItems?: { label: string; to: string }[];
-}
+import { FaSignOutAlt, FaAngleDown, FaAngleRight, FaBriefcase, FaListAlt, FaClipboardList, FaRegComments } from "react-icons/fa";
 
 const DashboardLayout = () => {
   useAuth();
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userName, setUserName] = useState<string>(""); // State for user's name
+  const [userName, setUserName] = useState<string>("");
   const navigate = useNavigate();
-
-// Fetch user's name from local storage
-useEffect(() => {
-  const storedUserName = localStorage.getItem("userName");
-  if (storedUserName) {
-    setUserName(storedUserName);
-  }
-}, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userName"); // Clear user's name from localStorage
-    navigate("/signin");
-  };
-
-  const handleDropdownClick = (category: string) => {
-    setActiveDropdown((prev) => (prev === category ? null : category));
-  };
-
-  const closeDropdown = () => {
-    setActiveDropdown(null);
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen((prev) => !prev);
-  };
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const isInsideMenu = target.closest(".mobile-menu, .dropdown, .hamburger-btn");
-      
-      if (!isInsideMenu) {
-        closeDropdown();
-        setIsMobileMenuOpen(false);
+    const storedUserName = localStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const menuItems: MenuItem[] = [
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userName");
+    navigate("/signin");
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleDropdownClick = (category: string) => {
+    setActiveDropdown(prev => prev === category ? null : category);
+  };
+
+  const menuItems = [
     {
       label: "Job Management",
       subItems: [
@@ -82,143 +67,133 @@ useEffect(() => {
         { label: "Reply to Daily Updates", to: "/dashboard/reviews/reply" },
       ],
     },
+    {
+      label: "Assignments",
+      subItems: [
+        { label: "Assignments", to: "/dashboard/assignments" },
+      ],
+    },
   ];
 
+  const menuIcons = {
+    "Job Management": <FaBriefcase />,
+    "Listings": <FaListAlt />,
+    "Reviews & Updates": <FaRegComments />,
+    "Assignments": <FaClipboardList />
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Navbar */}
-      <nav className="bg-black text-white shadow-md fixed w-full z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          {/* Logo */}
-          <div
-            className="text-xl font-bold tracking-wide cursor-pointer"
-            onClick={() => navigate("/dashboard")}
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar */}
+      <div 
+        ref={sidebarRef}
+        className={`fixed inset-y-0 left-0 z-30 bg-black text-white transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? 'w-[30%] md:w-[20%]' : 'w-[10%] md:w-[5%]'
+        }`}
+      >
+        {/* Sidebar Header */}
+        <div 
+          className="flex items-center justify-between h-16 px-4 border-b border-gray-700 cursor-pointer"
+          onClick={() => navigate('/dashboard')}
+        >
+          {isSidebarOpen ? (
+            <div className="text-xl font-bold">Swissmote</div>
+          ) : (
+            <div className="text-sm font-bold">SM</div>
+          )}
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSidebar();
+            }}
+            className="p-2 rounded-lg hover:bg-gray-700 focus:outline-none"
           >
-            Swissmote Dashboard
-          </div>
-
-          
-
-          {/* Hamburger Icon */}
-          <div className="sm:hidden">
-            <button
-              className="text-white text-2xl focus:outline-none hamburger-btn"
-              onClick={toggleMobileMenu}
-            >
-              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden sm:flex space-x-10">
-            {menuItems.map((item) => (
-              <div
-                key={item.label}
-                className="relative dropdown"
-                onClick={(e) => e.stopPropagation()} // Prevent click from closing the dropdown
-              >
-                <button
-                  className="text-sm hover:text-gray-300 focus:outline-none flex items-center space-x-1"
-                  onClick={() => handleDropdownClick(item.label)}
-                >
-                  <span>{item.label}</span>
-                  {item.subItems && (
-                    <FaAngleDown
-                      className={`transition-transform transform ${
-                        activeDropdown === item.label ? "rotate-180" : ""
-                      }`}
-                    />
-                  )}
-                </button>
-                {/* Dropdown */}
-                {item.subItems && activeDropdown === item.label && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg z-50">
-                    {item.subItems.map((subItem) => (
-                      <NavLink
-                        key={subItem.label}
-                        to={subItem.to}
-                        className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg"
-                      >
-                        {subItem.label}
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-           {/* Welcome Message */}
-           <div className="hidden sm:block text-sm">
-            Welcome, <span className="font-bold">{userName || "User"}</span>
-          </div>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="hidden sm:flex text-sm items-center space-x-1 text-red-500 hover:text-red-400"
-          >
-            <FaSignOutAlt className="text-lg" />
-            <span>Logout</span>
+            <FaAngleRight className={`transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div
-            className="sm:hidden mobile-menu bg-black text-white"
-            onClick={(e) => e.stopPropagation()} // Prevents menu from closing when clicking inside
-          >
-            <p className="px-4 font-serif">Welcome, <span className="font-bold">{userName || "User"}</span></p>
-            <div className="flex flex-col space-y-4 p-4">
-              {menuItems.map((item) => (
-                <div key={item.label} className="relative dropdown">
-                  <button
-                    className="w-full text-left flex justify-between items-center text-sm"
-                    onClick={() => handleDropdownClick(item.label)}
-                  >
-                    <span>{item.label}</span>
-                    {item.subItems && (
-                      <FaAngleDown
-                        className={`transition-transform transform ${
-                          activeDropdown === item.label ? "rotate-180" : ""
-                        }`}
-                      />
-                    )}
-                  </button>
-                  {item.subItems && activeDropdown === item.label && (
-                    <div className="mt-2 space-y-2 pl-4">
-                      {item.subItems.map((subItem) => (
-                        <NavLink
-                          key={subItem.label}
-                          to={subItem.to}
-                          className="block text-sm hover:text-blue-300"
-                        >
-                          {subItem.label}
-                        </NavLink>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
+        {/* Sidebar Content */}
+        <div className="py-4 overflow-y-auto">
+          {menuItems.map((item) => (
+            <div key={item.label} className="px-4 py-2 relative group">
               <button
-                onClick={handleLogout}
-                className="text-sm flex items-center space-x-1 text-red-500 hover:text-red-400 mt-4"
+                data-label={item.label}
+                onClick={() => handleDropdownClick(item.label)}
+                className="flex items-center justify-between w-full text-left hover:bg-gray-700 rounded-lg px-3 py-2"
               >
-                <FaSignOutAlt className="text-lg" />
-                <span>Logout</span>
+                <span className="flex items-center gap-3">
+                  {menuIcons[item.label as keyof typeof menuIcons]}
+                  {isSidebarOpen && item.label}
+                </span>
+                {isSidebarOpen && item.subItems && (
+                  <FaAngleDown
+                    className={`transition-transform ${
+                      activeDropdown === item.label ? 'rotate-180' : ''
+                    }`}
+                  />
+                )}
               </button>
+              {activeDropdown === item.label && (
+                <div 
+                  className={`${
+                    isSidebarOpen 
+                      ? 'mt-2 ml-4 space-y-2' 
+                      : 'fixed left-[10%] md:left-[5%] min-w-[200px] bg-black rounded-lg p-2 shadow-lg z-50'
+                  }`}
+                  style={{ 
+                    top: !isSidebarOpen ? 
+                      (sidebarRef.current?.querySelector(`[data-label="${item.label}"]`)?.getBoundingClientRect().top || 0) + 'px'
+                      : 'auto'
+                  }}
+                >
+                  {item.subItems?.map((subItem) => (
+                    <NavLink
+                      key={subItem.label}
+                      to={subItem.to}
+                      onClick={() => setActiveDropdown(null)}
+                      className={({ isActive }) =>
+                        `block px-3 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap ${
+                          isActive
+                            ? 'bg-blue-600 text-white'
+                            : 'hover:bg-gray-700'
+                        }`
+                      }
+                    >
+                      {!isSidebarOpen && menuIcons[item.label as keyof typeof menuIcons]}
+                      <span>{subItem.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </nav>
+          ))}
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className="absolute bottom-0 w-full border-t border-gray-700 p-4">
+          {isSidebarOpen && (
+            <div className="mb-2 text-sm">
+              Welcome, <span className="font-bold">{userName}</span>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 text-red-400 hover:text-red-300 w-full"
+          >
+            <FaSignOutAlt />
+            {isSidebarOpen && <span>Logout</span>}
+          </button>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 bg-white shadow-inner">
-        <Outlet />
-      </main>
+      <div className={`flex-1 transition-all duration-300 ${
+        isSidebarOpen ? 'ml-[30%] md:ml-[20%]' : 'ml-[10%] md:ml-[5%]'
+      }`}>
+        <main className="p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
