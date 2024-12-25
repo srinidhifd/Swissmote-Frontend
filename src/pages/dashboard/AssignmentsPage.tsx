@@ -5,7 +5,6 @@ import { TailSpin } from "react-loader-spinner";
 import { FaRegCheckCircle, FaRegEnvelope, FaRegBookmark, FaSearch, FaRegFolder  } from "react-icons/fa";
 import { MdOutlineChatBubbleOutline, MdRefresh, MdDownload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { HiOutlineBriefcase } from "react-icons/hi";
 import { AiOutlineFileText } from "react-icons/ai";
 import Pagination from "../../components/Pagination";
 import { BsCheckCircle } from 'react-icons/bs';
@@ -40,7 +39,6 @@ const AssignmentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [loadingMark, setLoadingMark] = useState<number | null>(null);
-  const [hireLoading, setHireLoading] = useState<number | null>(null);
 
   const [listings, setListings] = useState<ListingInfo[]>([]);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
@@ -214,34 +212,6 @@ const AssignmentsPage = () => {
     }
   };
 
-  const handleHire = async (listing: string, applicantId: number) => {
-    setHireLoading(applicantId);
-    try {
-      const response = await fetch(`${apiUrl}/hire_candidate?listing=${listing}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          applicants: [String(applicantId)],
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to hire candidate.");
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("Candidate hired successfully!");
-      } else {
-        throw new Error(result.message || "Unknown error occurred.");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Failed to hire candidate.");
-    } finally {
-      setHireLoading(null);
-    }
-  };
 
   const handleReply = async () => {
     if (!selectedCandidateId || !replyMessage.trim()) {
@@ -442,24 +412,7 @@ const AssignmentsPage = () => {
           )}
         </button>
 
-        <button
-          onClick={() => handleHire(listing, assignment.candidate_id)}
-          disabled={hireLoading === assignment.candidate_id}
-          className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg transition-colors ${
-            hireLoading === assignment.candidate_id
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-purple-50 text-purple-600 hover:bg-purple-100"
-          }`}
-        >
-          {hireLoading === assignment.candidate_id ? (
-            <TailSpin color="#9333EA" height={20} width={20} />
-          ) : (
-            <>
-              <HiOutlineBriefcase className="mr-2" />
-              Hire
-            </>
-          )}
-        </button>
+        
 
         <button
           onClick={() => {

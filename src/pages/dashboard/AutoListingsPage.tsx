@@ -821,7 +821,7 @@ const AutoListingsPage = () => {
 
 
   return (
-    <div className="p-5 bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 min-h-screen max-w-[100vw]">
       {listingsLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
@@ -829,7 +829,7 @@ const AutoListingsPage = () => {
       )}
       <ToastContainer />
 
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="bg-gray-50 min-h-screen max-w-[100vw]">
         <div className="max-w-8xl mx-auto bg-white shadow-md rounded-lg p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>

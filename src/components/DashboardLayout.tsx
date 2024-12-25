@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { FaSignOutAlt, FaAngleDown, FaAngleRight, FaBriefcase, FaListAlt, FaClipboardList } from "react-icons/fa";
+import { FaSignOutAlt, FaAngleLeft, FaAngleRight, FaBriefcase, FaBuilding, FaUserTie, FaGraduationCap, FaClipboardList, FaListAlt, FaRegClock, FaArchive, FaTasks, FaFileAlt } from "react-icons/fa";
 
 const DashboardLayout = () => {
   useAuth();
@@ -45,7 +45,7 @@ const DashboardLayout = () => {
 
   const menuItems = [
     {
-      label: "Job Management",
+      label: "Post Jobs",
       subItems: [
         { label: "Post Full-time Job", to: "/dashboard/job-management/full-time" },
         { label: "Post Internship", to: "/dashboard/job-management/internship" },
@@ -53,7 +53,7 @@ const DashboardLayout = () => {
       ],
     },
     {
-      label: "Listings",
+      label: "Job Listings",
       subItems: [
         { label: "Auto Listings", to: "/dashboard/listings/auto" },
         { label: "Active Listings", to: "/dashboard/listings/active" },
@@ -63,15 +63,22 @@ const DashboardLayout = () => {
     {
       label: "Assignments",
       subItems: [
-        { label: "Assignments", to: "/dashboard/assignments" },
+        { label: "Get Assignments", to: "/dashboard/assignments" },
       ],
     },
   ];
 
   const menuIcons = {
-    "Job Management": <FaBriefcase />,
-    "Listings": <FaListAlt />,
-    "Assignments": <FaClipboardList />
+    "Post Jobs": <FaBriefcase />,
+    "Job Listings": <FaListAlt />,
+    "Assignments": <FaClipboardList />,
+    "Post Full-time Job": <FaBuilding />,
+    "Post Internship": <FaGraduationCap />,
+    "Post Unpaid Internship": <FaUserTie />,
+    "Auto Listings": <FaRegClock />,
+    "Active Listings": <FaTasks />,
+    "Closed Listings": <FaArchive />,
+    "Get Assignments": <FaFileAlt />
   };
 
   return (
@@ -80,7 +87,7 @@ const DashboardLayout = () => {
       <div 
         ref={sidebarRef}
         className={`fixed inset-y-0 left-0 z-30 bg-black text-white transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? 'w-[30%] md:w-[20%]' : 'w-[10%] md:w-[5%]'
+          isSidebarOpen ? 'w-[20%] md:w-[20%]' : 'w-[10%] md:w-[5%]'
         }`}
       >
         {/* Sidebar Header */}
@@ -89,7 +96,7 @@ const DashboardLayout = () => {
           onClick={() => navigate('/dashboard')}
         >
           {isSidebarOpen ? (
-            <div className="text-xl font-bold">Swissmote</div>
+            <div className="text-xl font-bold">Swissmote Dashboard</div>
           ) : (
             <div className="text-sm font-bold">SM</div>
           )}
@@ -100,7 +107,7 @@ const DashboardLayout = () => {
             }}
             className="p-2 rounded-lg hover:bg-gray-700 focus:outline-none"
           >
-            <FaAngleRight className={`transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+            <FaAngleLeft className={`transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
@@ -118,9 +125,9 @@ const DashboardLayout = () => {
                   {isSidebarOpen && item.label}
                 </span>
                 {isSidebarOpen && item.subItems && (
-                  <FaAngleDown
+                  <FaAngleRight
                     className={`transition-transform ${
-                      activeDropdown === item.label ? 'rotate-180' : ''
+                      activeDropdown === item.label ? 'rotate-90' : ''
                     }`}
                   />
                 )}
@@ -151,7 +158,7 @@ const DashboardLayout = () => {
                         }`
                       }
                     >
-                      {!isSidebarOpen && menuIcons[item.label as keyof typeof menuIcons]}
+                      {menuIcons[subItem.label as keyof typeof menuIcons]}
                       <span>{subItem.label}</span>
                     </NavLink>
                   ))}
@@ -180,9 +187,9 @@ const DashboardLayout = () => {
 
       {/* Main Content */}
       <div className={`flex-1 transition-all duration-300 ${
-        isSidebarOpen ? 'ml-[30%] md:ml-[20%]' : 'ml-[10%] md:ml-[5%]'
+        isSidebarOpen ? 'ml-[80%] md:ml-[20%]' : 'ml-[10%] md:ml-[5%]'
       }`}>
-        <main className="p-6">
+        <main className="max-w-[95vw]">
           <Outlet />
         </main>
       </div>
