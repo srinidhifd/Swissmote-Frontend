@@ -384,7 +384,7 @@ const AssignmentsPage = () => {
       </div>
 
       {/* Actions Grid */}
-      <div className="grid grid-cols-3 gap-2 mt-4">
+      <div className="grid grid-cols-3 gap-2 mt-4 max-[600px]:grid-cols-2">
         <button
           onClick={() => handleNavigateToChat(listing, assignment.candidate_id.toString(), assignment.name)}
           className="flex items-center justify-center px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
@@ -452,7 +452,7 @@ const AssignmentsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 max-[600px]:w-[100%]">
       <div className="max-w-[1920px] mx-auto">
         {/* Enhanced Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -463,7 +463,7 @@ const AssignmentsPage = () => {
                   Assignments Dashboard
                 </h1>
                 {selectedListing && assignmentsData[selectedListing] && (
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium">
                     {filterAssignments(assignmentsData[selectedListing]).length} Assignments
                   </span>
                 )}
@@ -484,12 +484,12 @@ const AssignmentsPage = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex gap-4">
+            <div className="flex items-center gap-4 max-[600px]:flex-col max-[600px]:items-center">
+              <div className="flex gap-4 max-[600px]:flex-col max-[600px]:items-center">
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as 'all' | 'evaluated' | 'future')}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm w-full max-[600px]:w-[90%]"
                 >
                   <option value="all">All Assignments</option>
                   <option value="evaluated">Evaluated</option>
@@ -508,7 +508,7 @@ const AssignmentsPage = () => {
               </div>
               <button
                 onClick={fetchAutoListings}
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-center transition-colors max-[600px]:w-[90%]"
               >
                 <MdRefresh className="mr-2" />
                 Refresh
@@ -518,19 +518,19 @@ const AssignmentsPage = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex gap-6">
+        <div className="flex gap-6 max-[600px]:flex-col max-[600px]:items-center ">
           {/* Sidebar - Make it more compact and polished */}
-          <div className="w-1/5 bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold mb-4 text-gray-700 px-2">Active Listings</h2>
-            <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar">
+          <div className="w-1/5 bg-white rounded-lg shadow-sm p-4 max-[600px]:w-[90%] ">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700 px-2 max-[600px]:text-sm">Active Listings</h2>
+            <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar max-[600px]:flex max-[600px]:gap-2 ">
               {listings.map((listing) => renderListingCard(listing))}
             </div>
           </div>
 
           {/* Main Content - Remove filters section and update layout */}
-          <div className="w-4/5">
+          <div className="w-4/5 max-[600px]:w-full">
             {loading ? (
-              <div className="flex justify-center items-center min-h-[400px] bg-white rounded-lg shadow-sm">
+              <div className="flex justify-center items-center min-h-[400px] bg-white rounded-lg shadow-sm ">
                 <TailSpin color="#22C55E" height={80} width={80} />
               </div>
             ) : error ? (
@@ -544,8 +544,8 @@ const AssignmentsPage = () => {
                 </button>
               </div>
             ) : selectedListing && assignmentsData[selectedListing] ? (
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="p-6">
+              <div className="bg-white rounded-lg shadow-sm ">
+                <div className="p-6 max-[600px]:p-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filterAssignments(assignmentsData[selectedListing])
                       .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
