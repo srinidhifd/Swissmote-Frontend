@@ -162,10 +162,10 @@ const QuestionsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-5 sm:p-6 max-[600px]:w-[100%]">
       <div className="max-w-[1920px] mx-auto">
         {/* Enhanced Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
@@ -173,7 +173,7 @@ const QuestionsPage = () => {
                   Questions Dashboard
                 </h1>
                 {selectedListing && questions.length > 0 && (
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium">
                     {filteredQuestions.length} Questions
                   </span>
                 )}
@@ -190,20 +190,20 @@ const QuestionsPage = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="relative">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search questions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <button
                 onClick={() => fetchQuestions()}
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors w-full sm:w-auto justify-center"
               >
                 <MdRefresh className="mr-2" />
                 Refresh
@@ -213,11 +213,13 @@ const QuestionsPage = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex gap-6">
+        <div className="flex gap-6 max-[600px]:flex-col max-[600px]:items-center">
           {/* Sidebar */}
-          <div className="w-1/5 bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold mb-4 text-gray-700 px-2">Active Listings</h2>
-            <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar">
+          <div className="w-1/5 bg-white rounded-lg shadow-sm p-4 max-[600px]:w-[90%]">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700 px-2 max-[600px]:text-sm">
+              Active Listings
+            </h2>
+            <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar max-[600px]:flex max-[600px]:gap-2">
               {listingsLoading ? (
                 <div className="flex justify-center py-8">
                   <TailSpin color="#22C55E" height={40} width={40} />
@@ -248,7 +250,7 @@ const QuestionsPage = () => {
           </div>
 
           {/* Main Content */}
-          <div className="w-4/5">
+          <div className="w-4/5 max-[600px]:w-full">
             {!selectedListing ? (
               <div className="bg-white rounded-lg shadow-sm p-16 text-center">
                 <div className="text-gray-400 mb-4">
@@ -265,14 +267,14 @@ const QuestionsPage = () => {
             ) : (
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="p-6">
-                  <div className="grid grid-cols-1 gap-6">
+                  <div className="grid grid-cols-1 gap-6 ">
                     {filteredQuestions.map((q) => (
                       <div 
                         key={q.message_id || q.chat_id} 
                         className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200"
                       >
                         {/* Header Section */}
-                        <div className="px-6 py-4 border-b border-gray-100">
+                        <div className="px-6 py-4 border-b border-gray-100 ">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
@@ -300,7 +302,7 @@ const QuestionsPage = () => {
                         </div>
 
                         {/* Question Content */}
-                        <div className="p-6">
+                        <div className="p-6 max-[600px]:p-2">
                           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                             <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
                               {q.question}
