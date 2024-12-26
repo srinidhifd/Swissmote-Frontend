@@ -809,7 +809,7 @@ const AutoListingsPage = () => {
 
 
   return (
-    <div className="bg-gray-100 min-h-screen max-w-[100vw]">
+    <div className="bg-gray-100 min-h-screen max-w-[100vw] ">
       {listingsLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
@@ -821,23 +821,27 @@ const AutoListingsPage = () => {
         <div className="max-w-8xl mx-auto bg-white shadow-md rounded-lg p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-semibold text-gray-900">Auto Listings</h1>
-              <p className="text-gray-500 mt-1">
+              <h1 className="text-4xl font-semibold text-gray-900  text-center sm:text-left">Auto Listings</h1>
+              <p className="text-gray-500 mt-1 text-center sm:text-left mb-2">
                 Manage and automate your job and internship listings efficiently.
               </p>
             </div>
-            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 items-center">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 items-center ">
               <input
                 type="text"
                 placeholder="Type to Start Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                max-[600px]:w-[90%]
+                "
               />
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="w-full md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
+                max-[600px]:w-[90%]
+                "
               >
                 <option value="reset">Default</option>
                 <option value="listing_name">Listing Name</option>
@@ -848,7 +852,7 @@ const AutoListingsPage = () => {
 
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 text-center sm:text-left">
             {/* Employment Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -857,7 +861,7 @@ const AutoListingsPage = () => {
               <select
                 value={empType}
                 onChange={handleEmpTypeChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition max-[600px]:w-[90%] "
               >
                 <option value="job">Job</option>
                 <option value="internship">Internship</option>
@@ -872,7 +876,7 @@ const AutoListingsPage = () => {
               <select
                 value={account}
                 onChange={handleAccountChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition max-[600px]:w-[90%]"
               >
                 <option value="pv">PV</option>
                 <option value="sa">SA</option>
@@ -880,10 +884,10 @@ const AutoListingsPage = () => {
             </div>
 
             {/* Fetch Listings Button */}
-            <div className="flex items-end">
+            <div className="flex items-end justify-center">
               <button
                 onClick={fetchListings}
-                className="w-full md:w-auto px-6 py-3 bg-blue-100 text-blue-600 font-medium rounded-lg shadow-sm hover:bg-blue-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 transition border border-blue-300"
+                className="w-full md:w-auto px-6 py-3 bg-blue-100 text-blue-600 font-medium rounded-lg shadow-sm hover:bg-blue-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 transition border border-blue-300 max-[600px]:w-[90%]"
               >
                 Fetch Listings
               </button>
@@ -892,11 +896,11 @@ const AutoListingsPage = () => {
 
 
 
-          <div className="flex space-x-4 mb-6">
+          <div className="flex space-x-4 mb-6 max-[600px]:flex-col max-[600px]:items-center">
             {/* Automated Listings Button */}
             <button
               onClick={() => handleActiveTabChange("automated")}
-              className={`px-4 py-2 rounded-lg shadow-md transition ${activeTab === "automated"
+              className={`w-[75%] mb-2 md:w-auto px-4 py-2 rounded-lg shadow-md transition ${activeTab === "automated"
                 ? "bg-yellow-50 text-yellow-600 font-semibold border border-yellow-300"
                 : "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100"
                 } focus:outline-none focus:ring-2 focus:ring-yellow-400`}
@@ -907,7 +911,7 @@ const AutoListingsPage = () => {
             {/* Not Automated Listings Button */}
             <button
               onClick={() => handleActiveTabChange("not_automated")}
-              className={`px-4 py-2 rounded-lg shadow-md transition ${activeTab === "not_automated"
+              className={`w-[75%] mb-2 md:w-auto px-4 py-2 rounded-lg shadow-md transition ${activeTab === "not_automated"
                 ? "bg-green-50 text-green-600 font-semibold border border-green-300"
                 : "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100"
                 } focus:outline-none focus:ring-2 focus:ring-green-400`}
@@ -918,7 +922,7 @@ const AutoListingsPage = () => {
             {/* Closed Listings Button */}
             <button
               onClick={() => handleActiveTabChange("closed_automated")}
-              className={`px-4 py-2 rounded-lg shadow-md transition ${activeTab === "closed_automated"
+              className={`w-[75%] mb-2 md:w-auto px-4 py-2 rounded-lg shadow-md transition ${activeTab === "closed_automated"
                 ? "bg-red-50 text-red-600 font-semibold border border-red-300"
                 : "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100"
                 } focus:outline-none focus:ring-2 focus:ring-red-400`}

@@ -95,7 +95,9 @@ const DashboardLayout = () => {
       <div 
         ref={sidebarRef}
         className={`fixed inset-y-0 left-0 z-30 bg-black text-white transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? 'w-[20%] md:w-[20%]' : 'w-[10%] md:w-[5%]'
+          isSidebarOpen 
+            ? 'w-[40%] sm:w-[40%] md:w-[30%] lg:w-[20%]' 
+            : 'w-[70px]'
         }`}
       >
         {/* Sidebar Header */}
@@ -104,7 +106,7 @@ const DashboardLayout = () => {
           onClick={() => navigate('/dashboard')}
         >
           {isSidebarOpen ? (
-            <div className="text-xl font-bold">Swissmote Dashboard</div>
+            <div className="text-lg sm:text-xl font-bold truncate">Swissmote Dashboard</div>
           ) : (
             <div className="text-sm font-bold">SM</div>
           )}
@@ -113,7 +115,7 @@ const DashboardLayout = () => {
               e.stopPropagation();
               toggleSidebar();
             }}
-            className="p-2 rounded-lg hover:bg-gray-700 focus:outline-none"
+            className="p-2 rounded-lg hover:bg-gray-700 focus:outline-none flex-shrink-0"
           >
             <FaAngleLeft className={`transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
