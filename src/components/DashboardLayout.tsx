@@ -97,7 +97,7 @@ const DashboardLayout = () => {
         className={`fixed inset-y-0 left-0 z-30 bg-black text-white transition-all duration-300 ease-in-out ${
           isSidebarOpen 
             ? 'w-[40%] sm:w-[40%] md:w-[30%] lg:w-[20%]' 
-            : 'w-[70px]'
+            : 'w-[90px]'
         }`}
       >
         {/* Sidebar Header */}
