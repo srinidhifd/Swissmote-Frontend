@@ -138,15 +138,15 @@ const AutoListingsPage = () => {
     if (!apiUrl || !authToken) return;
 
     // Check if data already exists for the active tab
-  if (
-    (activeTab === "automated" && automatedListings.length > 0) ||
-    (activeTab === "not_automated" && notAutomatedListings.length > 0) ||
-    (activeTab === "closed_automated" && closedAutomatedListings.length > 0)
-  ) {
-    return; 
-  }
+    if (
+      (activeTab === "automated" && automatedListings.length > 0) ||
+      (activeTab === "not_automated" && notAutomatedListings.length > 0) ||
+      (activeTab === "closed_automated" && closedAutomatedListings.length > 0)
+    ) {
+      return;
+    }
     // Skip fetching if data is already available
-  
+
     setListingsLoading(true);
 
     try {
@@ -166,7 +166,7 @@ const AutoListingsPage = () => {
       if (!response.ok) throw new Error("Failed to fetch listings");
 
       const fetchedData = await response.json();
-      
+
       dispatch((dispatch) => {
         dispatch(setAutomatedListings(fetchedData.automated || []));
         dispatch(setNotAutomatedListings(fetchedData.not_automated || []));
@@ -177,7 +177,7 @@ const AutoListingsPage = () => {
     } finally {
       setListingsLoading(false);
     }
-  }, [apiUrl, authToken, empType, account,activeTab, automatedListings, notAutomatedListings, closedAutomatedListings]);
+  }, [apiUrl, authToken, empType, account, activeTab, automatedListings, notAutomatedListings, closedAutomatedListings]);
 
 
   const fetchMessages = useCallback(async () => {
@@ -187,7 +187,7 @@ const AutoListingsPage = () => {
         'invite_message',
         'assignment_message',
         'assignment_message_startupathon'
-      ].map(msg => 
+      ].map(msg =>
         fetch(`${apiUrl}/get_message?message=${msg}`, {
           headers: {
             "Content-Type": "application/json",
@@ -407,9 +407,9 @@ const AutoListingsPage = () => {
       const payload = {
         ...automateForm,
         invite_message:
-  automateForm.introMessage === "default"
-    ? messages.intro_message // Use the displayed intro message
-    : automateForm.introMessageContent, // Use the custom message (if provided)
+          automateForm.introMessage === "default"
+            ? messages.intro_message // Use the displayed intro message
+            : automateForm.introMessageContent, // Use the custom message (if provided)
         assignment_message:
           automateForm.assignmentMessage === "default"
             ? automateForm.post_over === "startupathon"
@@ -660,7 +660,7 @@ const AutoListingsPage = () => {
                   >
                     Post Assignment
                   </button>
-                  
+
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => {
@@ -1475,11 +1475,10 @@ const AutoListingsPage = () => {
                                     toast.warning("Please include at least 2 links: one for assignment and one for updates");
                                   }
                                 }}
-                                className={`w-full h-32 p-3 border ${
-                                  (automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
-                                    ? "border-yellow-300"
-                                    : "border-gray-300"
-                                } rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none`}
+                                className={`w-full h-32 p-3 border ${(automateForm.assignmentMessageContent.match(/https?:\/\/[^\s]+/g) || []).length < 2
+                                  ? "border-yellow-300"
+                                  : "border-gray-300"
+                                  } rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none`}
                                 placeholder="Enter custom message with at least 2 links"
                               />
                               <p className="mt-1 text-xs text-gray-500">
