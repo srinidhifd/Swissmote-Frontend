@@ -786,7 +786,7 @@ const AutoListingsPage = () => {
                     <th className="px-4 py-2 text-left">Conversion Rate</th>
                     <th className="px-4 py-2 text-left">Assignments Received</th>
                     <th className="px-4 py-2 text-left">Assignments Sent</th>
-                    <th className="px-4 py-2 text-left">Total New</th>
+                    <th className="px-4 py-2 text-left">New Applicants</th>
                     <th className="px-4 py-2 text-left">Total Applications</th>
                     <th className="px-4 py-2 text-left">Assignment Links</th>
                     <th className="px-4 py-2 text-left">Review Links</th>
@@ -818,7 +818,7 @@ const AutoListingsPage = () => {
 
 
   return (
-    <div className="bg-gray-100 min-h-screen max-w-[100vw] ">
+    <div className="p-2 bg-gray-100 min-h-screen max-w-[100vw] ">
       {listingsLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
@@ -1294,6 +1294,36 @@ const AutoListingsPage = () => {
                     </p>
                   </div>
                 ))}
+              </div>
+
+              {/* Add after existing sections but before the modal footer */}
+              <div className="mt-6 space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Posting Details</h3>
+                  <div className="text-sm text-gray-600">
+                    Posted Over: <span className="font-medium text-gray-800">{('posted_over' in selectedRowData) ? selectedRowData.posted_over : 'N/A'}</span>
+                  </div>
+                </div>
+
+                {'metrics' in selectedRowData && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Metrics Overview</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-sm text-gray-600">
+                        Assignments Received: <span className="font-medium text-gray-800">{selectedRowData.metrics.assignments_received_count || 0}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Assignments Sent: <span className="font-medium text-gray-800">{selectedRowData.metrics.assignments_sent_count || 0}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        New Applicants: <span className="font-medium text-gray-800">{selectedRowData.metrics.total_new_count || 0}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Total Applications: <span className="font-medium text-gray-800">{selectedRowData.metrics.total_applications_count || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
