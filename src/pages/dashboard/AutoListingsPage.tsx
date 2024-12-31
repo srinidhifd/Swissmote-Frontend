@@ -536,169 +536,173 @@ const AutoListingsPage = () => {
         {/* Automated Listings */}
         {activeTab === "automated" && (
           <>
-            <td className="px-4 py-2">{"listing_name" in item ? item.listing_name : "N/A"}</td>
-            <td className="px-4 py-2">{"projectname" in item ? item.projectname : "N/A"}</td>
-            <td className="px-4 py-2">{"date" in item ? dayjs(item.date).format("DD MMMM YYYY") : "N/A"}</td>
-            <td className="px-4 py-2">{"conversion_rate" in item ? item.conversion_rate || "N/A" : "N/A"}</td>
-            <td className="px-4 py-2 text-blue-600">
-              {"assignment_link" in item && Array.isArray(item.assignment_link) && item.assignment_link.length > 0 ? (
-                item.assignment_link.map((link: string, idx: number) => (
-                  <a
-                    key={idx}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-sm hover:underline"
-                  >
-                    {link.length > 20 ? `${link.substring(0, 20)}...` : link}
-                  </a>
-                ))
-              ) : (
-                "No Assignment Links Added Yet"
-              )}
-            </td>
+            {((item): item is AutomatedJob => 'metrics' in item)(item) && (
+              <>
+                <td className="px-4 py-2">{item.listing_name || 'N/A'}</td>
+                <td className="px-4 py-2">{item.projectname || 'N/A'}</td>
+                <td className="px-4 py-2">
+                  {item.date ? dayjs(item.date).format("DD MMMM YYYY") : 'N/A'}
+                </td>
+                <td className="px-4 py-2">{item.posted_over || 'N/A'}</td>
+                <td className="px-4 py-2">{item.conversion_rate || 'N/A'}</td>
+                
+                {/* Metrics Columns */}
+                <td className="px-4 py-2 text-center">
+                  {'metrics' in item ? (item as AutomatedJob).metrics.assignments_received_count : 'N/A'}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {'metrics' in item ? (item as AutomatedJob).metrics.assignments_sent_count : 'N/A'}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {'metrics' in item ? (item as AutomatedJob).metrics.total_new_count : 'N/A'}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {'metrics' in item ? (item as AutomatedJob).metrics.total_applications_count : 'N/A'}
+                </td>
+
+                {/* Assignment Links Column */}
+                <td className="px-4 py-2 text-blue-600">
+                  {Array.isArray(item.assignment_link) && item.assignment_link.length > 0 ? (
+                    item.assignment_link.map((link: string, idx: number) => (
+                      <a
+                        key={idx}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm hover:underline"
+                      >
+                        {link.length > 20 ? `${link.substring(0, 20)}...` : link}
+                      </a>
+                    ))
+                  ) : (
+                    "No Assignment Links"
+                  )}
+                </td>
+
+                {/* Review Links Column */}
+                <td className="px-4 py-2 text-blue-600">
+                  {Array.isArray(item.review_link) && item.review_link.length > 0 ? (
+                    item.review_link.map((link: string, idx: number) => (
+                      <a
+                        key={idx}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm hover:underline"
+                      >
+                        {link.length > 20 ? `${link.substring(0, 20)}...` : link}
+                      </a>
+                    ))
+                  ) : (
+                    "No Review Links"
+                  )}
+                </td>
+
+                {/* Messages Column */}
+                <td className="px-4 py-2">
+                  <div className="truncate-text max-w-xs">
+                    {item.messages?.intro || "No Intro Message"}
+                  </div>
+                </td>
+
+                {/* Assignment Message Column */}
+                <td className="px-4 py-2">
+                  <div className="truncate-text max-w-xs">
+                    {item.messages?.assignment || "No Assignment Message"}
+                  </div>
+                </td>
+
+                <td className="px-4 py-2">
+                  {'day2followup' in item && item.day2followup ? (
+                    <>
+                      <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                        item.day2followup.status === 1 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {item.day2followup.status === 1 ? "Completed" : "Pending"}
+                      </span>
+                      <p className="truncate-text mt-1">{item.day2followup.followup || "No Message Set"}</p>
+                    </>
+                  ) : "N/A"}
+                </td>
+                <td className="px-4 py-2">
+                  {'day4followup' in item && item.day4followup ? (
+                    <>
+                      <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                        item.day4followup.status === 1 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {item.day4followup.status === 1 ? "Completed" : "Pending"}
+                      </span>
+                      <p className="truncate-text mt-1">{item.day4followup.followup || "No Message Set"}</p>
+                    </>
+                  ) : "N/A"}
+                </td>
 
 
-            <td className="px-4 py-2 text-blue-600">
-              {"review_link" in item && Array.isArray(item.review_link) && item.review_link.length > 0 ? (
-                item.review_link.map((link, idx) => (
-                  <a
-                    key={idx}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-sm hover:underline"
-                  >
-                    {link.length > 20 ? `${link.substring(0, 20)}...` : link}
-                  </a>
-                ))
-              ) : (
-                "No Review Links Added Yet"
-              )}
-            </td>
-            <td className="px-4 py-2">
-              <div className="truncate-text">
-                {"messages" in item && typeof item.messages === "object" && "intro" in (item.messages as Record<string, unknown>)
-                  ? String((item.messages as Record<string, string>).intro)
-                  : "No Intro Message"
-                }
-              </div>
-            </td>
-            <td className="px-4 py-2">
-              <div className="truncate-text">
-                {"messages" in item && typeof item.messages === "object" && "assignment" in (item.messages as Record<string, unknown>)
-                  ? String((item.messages as Record<string, string>).assignment)
-                  : "No Assignment Message"
-                }
-              </div>
-            </td>
 
-            <td className="px-4 py-2">
-              {"day2followup" in item && typeof item.day2followup === "object" && item.day2followup ? (
-                <>
-                  <span
-                    className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${"status" in item.day2followup && item.day2followup.status === 1
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                      }`}
-                  >
-                    {"status" in item.day2followup && item.day2followup.status === 1 ? "Completed" : "Pending"}
-                  </span>
-                  <p className="truncate-text mt-1">
-                    {"day2followup" in item && typeof item.day2followup === "object" && "followup" in (item.day2followup as Record<string, unknown>)
-                      ? String((item.day2followup as Record<string, string>).followup)
-                      : "No Message Set"}
-                  </p>
-                </>
-              ) : (
-                "N/A"
-              )}
-            </td>
-            <td className="px-4 py-2">
-              {"day4followup" in item && typeof item.day4followup === "object" && item.day4followup ? (
-                <>
-                  <span
-                    className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${"status" in item.day4followup && item.day4followup.status === 1
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                      }`}
-                  >
-                    {"status" in item.day4followup && item.day4followup.status === 1 ? "Completed" : "Pending"}
-                  </span>
-                  <p className="truncate-text mt-1">
-                    {"day4followup" in item && typeof item.day4followup === "object" && "followup" in (item.day4followup as Record<string, unknown>)
-                      ? String((item.day4followup as Record<string, string>).followup)
-                      : "No Message Set"}
-                  </p>
-                </>
-              ) : (
-                "N/A"
-              )}
-            </td>
-
-
-
-            <td className="px-4 py-2 text-center dropdown sticky-column "
-              onClick={(e) => e.stopPropagation()}>
-              <button
-                className="text-gray-600 hover:text-gray-800"
-                onClick={() =>
-                  dropdownOpen === item.listing_number
-                    ? setDropdownOpen(null)
-                    : setDropdownOpen(item.listing_number || null)
-                }
-              >
-                <BsThreeDotsVertical />
-              </button>
-
-              {dropdownOpen === item.listing_number && (
-                <div className="dropdown-menu"
-                >
+                <td className="px-4 py-2 text-center dropdown sticky-column "
+                  onClick={(e) => e.stopPropagation()}>
                   <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => handlePostAssignment(item)}
+                    className="text-gray-600 hover:text-gray-800"
+                    onClick={() =>
+                      dropdownOpen === item.listing_number
+                        ? setDropdownOpen(null)
+                        : setDropdownOpen(item.listing_number || null)
+                    }
                   >
-                    Post Assignment
+                    <BsThreeDotsVertical />
                   </button>
 
-                  <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => {
-                      setSelectedListingNumber(parseInt(item.listing_number, 10));
-                      setIsAnnouncementModalOpen(true);
-                    }}
-                  >
-                    Make Announcement
-                  </button>
-                  <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => {
-                      setSelectedListingNumber(parseInt(item.listing_number, 10));
-                      setIsReviewModalOpen(true);
-                    }}
-                  >
-                    Add Review
-                  </button>
-                  <button
-                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                    onClick={() => handleOpenEditFollowupModal(item)}
-                  >
-                    Edit Follow-Up Message
-                  </button>
-                </div>
-              )}
-            </td>
+                  {dropdownOpen === item.listing_number && (
+                    <div className="dropdown-menu"
+                    >
+                      <button
+                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                        onClick={() => handlePostAssignment(item)}
+                      >
+                        Post Assignment
+                      </button>
+
+                      <button
+                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedListingNumber(parseInt(item.listing_number, 10));
+                          setIsAnnouncementModalOpen(true);
+                        }}
+                      >
+                        Make Announcement
+                      </button>
+                      <button
+                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedListingNumber(parseInt(item.listing_number, 10));
+                          setIsReviewModalOpen(true);
+                        }}
+                      >
+                        Add Review
+                      </button>
+                      <button
+                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleOpenEditFollowupModal(item)}
+                      >
+                        Edit Follow-Up Message
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </>
+            )}
           </>
         )}
         {activeTab === "closed_automated" && (
           <>
-
-            <td className="px-4 py-2">{item.listing_number}</td>
-            <td className="px-4 py-2">{'projectname' in item ? item.projectname : "N/A"}</td>
-            <td className="px-4 py-2">{'date' in item ? dayjs(item.date).format("DD MMMM YYYY") : "N/A"}</td>
-            <td className="px-4 py-2">{'conversion_rate' in item ? item.conversion_rate : "N/A"}</td>
-
-
+            {((item): item is ClosedAutomatedJob => 'listing_number' in item)(item) && (
+              <>
+                <td className="px-4 py-2">{item.listing_number}</td>
+                <td className="px-4 py-2">{item.projectname || 'N/A'}</td>
+                <td className="px-4 py-2">{item.date ? dayjs(item.date).format("DD MMMM YYYY") : 'N/A'}</td>
+                <td className="px-4 py-2">{item.conversion_rate || 'N/A'}</td>
+              </>
+            )}
           </>
         )}
       </tr>
@@ -778,11 +782,16 @@ const AutoListingsPage = () => {
                     <th className="px-4 py-2 text-left">Listing Name</th>
                     <th className="px-4 py-2 text-left">Project Name</th>
                     <th className="px-4 py-2 text-left">Date</th>
+                    <th className="px-4 py-2 text-left">Posted Over</th>
                     <th className="px-4 py-2 text-left">Conversion Rate</th>
+                    <th className="px-4 py-2 text-left">Assignments Received</th>
+                    <th className="px-4 py-2 text-left">Assignments Sent</th>
+                    <th className="px-4 py-2 text-left">Total New</th>
+                    <th className="px-4 py-2 text-left">Total Applications</th>
                     <th className="px-4 py-2 text-left">Assignment Links</th>
                     <th className="px-4 py-2 text-left">Review Links</th>
-                    <th className="px-4 py-2 text-left">Intro - Message</th>
-                    <th className="px-4 py-2 text-left">Assignment - Message</th>
+                    <th className="px-4 py-2 text-left">Intro Message</th>
+                    <th className="px-4 py-2 text-left">Assignment Message</th>
                     <th className="px-4 py-2 text-left">Day-2 Followup</th>
                     <th className="px-4 py-2 text-left">Day-4 Followup</th>
                     <th className="sticky right-0 bg-gray-200 px-4 py-2 text-left">Actions</th>

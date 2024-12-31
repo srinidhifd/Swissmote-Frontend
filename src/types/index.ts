@@ -15,11 +15,18 @@ export interface AutomatedJob extends BaseEntity {
   conversion_rate?: string; // Optional: Conversion rate (string)
   assignment_link?: string[]; // Optional: Array of assignment links
   review_link?: string[]; // Optional: Array of review links
+  posted_over?: string; // Added field
   day2followup?: FollowupDetail; // Optional: Day 2 follow-up details
   day4followup?: FollowupDetail; // Optional: Day 4 follow-up details
   messages?: {
     intro?: string; 
     assignment?: string;
+  };
+  metrics: {
+    assignments_received_count: number;
+    assignments_sent_count: number;
+    total_new_count: number;
+    total_applications_count: number;
   };
   followup2Message?: string; // Added property
   followup4Message?: string; // Added property
@@ -33,12 +40,13 @@ export interface NotAutomatedJob extends BaseEntity {
 
 // Interface for closed automated job listings
 export interface ClosedAutomatedJob extends BaseEntity {
-  listing_number: string; // Required: Unique identifier for the listing
-  projectname?: string; // Optional: Project name
-  date?: string; // Optional: Date associated with the listing
-  conversion_rate?: string; // Optional: Conversion rate (string)
-  assignment_link?: string[]; // Optional: Array of assignment links
-  review_link?: string[]; // Optional: Array of review links
+  listing_name: string;
+  listing_number: string;
+  projectname?: string;
+  date?: string;
+  conversion_rate?: string;
+  assignment_link?: string[];
+  review_link?: string[];
 }
 
 // Shared interface for follow-up details
