@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TailSpin } from "react-loader-spinner";
-import { BsThreeDotsVertical } from "react-icons/bs";
 
 const ClosedListingsPage = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -17,9 +16,25 @@ const ClosedListingsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const getDisplayValue = (value: any, type: string = 'text') => {
+    if (!value || value === 'N/A') {
+      switch (type) {
+        case 'date':
+          return 'Date not specified';
+        case 'person':
+          return 'Not assigned';
+        case 'platform':
+          return 'Platform not specified';
+        case 'rate':
+          return 'No data available';
+        case 'link':
+          return 'Link not available';
+        default:
+          return 'Not specified';
+      }
+    }
+    return value;
+  };
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -37,8 +52,12 @@ const ClosedListingsPage = () => {
           throw new Error("Failed to fetch closed listings. Please try again.");
         }
         const data = await response.json();
-        setListings(data || []);
-        setFilteredListings(data || []);
+        // Sort by date (latest first) by default
+        const sortedData = data.sort((a: any, b: any) => 
+          new Date(b.Date).getTime() - new Date(a.Date).getTime()
+        );
+        setListings(sortedData || []);
+        setFilteredListings(sortedData || []);
       } catch (err: any) {
         setError(err.message || "Something went wrong.");
         toast.error(err.message || "Something went wrong.");
@@ -48,73 +67,60 @@ const ClosedListingsPage = () => {
     };
 
     fetchListings();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  }, [apiUrl, authToken]);
 
   const handleSearch = (keyword: string) => {
-    setCurrentPage(1);
-    if (keyword) {
-      setFilteredListings(
-        listings.filter((listing) =>
-          listing["Project Name"].toLowerCase().includes(keyword.toLowerCase())
-        )
-      );
-    } else {
+    if (!keyword.trim()) {
       setFilteredListings(listings);
+      return;
     }
+
+    const filtered = listings.filter((listing) => {
+      const searchStr = keyword.toLowerCase();
+      return (
+        listing["Project Name"]?.toLowerCase().includes(searchStr) ||
+        listing["Organisation"]?.toLowerCase().includes(searchStr) ||
+        listing["Process"]?.toLowerCase().includes(searchStr) ||
+        listing["Designation"]?.toLowerCase().includes(searchStr) ||
+        listing["Listing No"]?.toString().includes(searchStr)
+      );
+    });
+    
+    setFilteredListings(filtered);
+    setCurrentPage(1);
   };
 
   const handleSort = (sortBy: string) => {
-    let sortedListings = [...filteredListings];
-    if (sortBy === "date_asc") {
-      sortedListings.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
-    } else if (sortBy === "date_desc") {
-      sortedListings.sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime());
-    } else if (sortBy === "name_asc") {
-      sortedListings.sort((a, b) => a["Project Name"].localeCompare(b["Project Name"]));
-    } else if (sortBy === "name_desc") {
-      sortedListings.sort((a, b) => b["Project Name"].localeCompare(a["Project Name"]));
+    const sorted = [...filteredListings];
+    
+    switch (sortBy) {
+      case "date_asc":
+        sorted.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+        break;
+      case "date_desc":
+        sorted.sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime());
+        break;
+      case "name_asc":
+        sorted.sort((a, b) => a["Project Name"].localeCompare(b["Project Name"]));
+        break;
+      case "name_desc":
+        sorted.sort((a, b) => b["Project Name"].localeCompare(a["Project Name"]));
+        break;
+      default:
+        sorted.sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime());
     }
-    setFilteredListings(sortedListings);
+    
+    setFilteredListings(sorted);
     setCurrentPage(1);
   };
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
-  // Extract and parse the Assignment link
-  const parseLink = (link: string) => {
-    try {
-      const parsedLinks = JSON.parse(link);
-      if (Array.isArray(parsedLinks)) {
-        return parsedLinks;
-      }
-      return [parsedLinks];
-    } catch {
-      return link ? [link] : [];
-    }
-  };
-
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleLinkClick = () => {
-    setDropdownOpen(null);
-  };
-
   return (
-    <div className="p-3 bg-gray-50 min-h-screen relative">
+    <div className="p-3 bg-gray-50 min-h-screen relative max-h-[100vh]">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <TailSpin height="80" width="80" color="#4fa94d" ariaLabel="loading" />
@@ -123,9 +129,9 @@ const ClosedListingsPage = () => {
       <ToastContainer />
 
       <div className="p-6 max-w-7xl mx-auto bg-white shadow-xl rounded-lg">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
           <h1 className="text-4xl font-semibold text-gray-900">Closed Listings</h1>
+
           <div className="flex items-center space-x-4 mt-4 lg:mt-0 w-full lg:w-auto">
             <input
               type="text"
@@ -145,76 +151,121 @@ const ClosedListingsPage = () => {
             </select>
           </div>
         </div>
-         {/* Error Message */}
-         {error && <p className="text-red-500 text-center my-4">{error}</p>}
-        {/* Table */}
-        <div className="overflow-x-auto border border-gray-200 rounded-lg shadow">
-          <table className="w-full bg-white">
-            <thead className="bg-gray-100 text-gray-700 font-medium">
+
+        {error && <p className="text-red-500 text-center my-4">{error}</p>}
+
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border bg-white border-gray-300 rounded-lg shadow-lg">
+            <thead className="bg-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left">Project Name</th>
-                <th className="px-4 py-3 text-left">Organization</th>
-                <th className="px-4 py-3 text-center">Listing No</th>
-                <th className="px-4 py-3 text-center">Process</th>
-                <th className="px-4 py-3 text-center">Type</th>
-                <th className="px-4 py-3 text-center">Date</th>
-                <th className="px-4 py-3 text-center">Conversion Rate</th>
-                <th className="px-4 py-3 text-center">Links</th>
+                <th className="px-4 py-2 text-left">Project Name</th>
+                <th className="px-4 py-2 text-left">Organisation</th>
+                <th className="px-4 py-2 text-left">Listing No</th>
+                <th className="px-4 py-2 text-left">Process</th>
+                <th className="px-4 py-2 text-left">Designation</th>
+                <th className="px-4 py-2 text-left">Date</th>
+                <th className="px-4 py-2 text-left">Created By</th>
+                <th className="px-4 py-2 text-left">Created Platform</th>
+                <th className="px-4 py-2 text-left">Automated By</th>
+                <th className="px-4 py-2 text-left">Automated Platform</th>
+                <th className="px-4 py-2 text-left">Expiry Date</th>
+                <th className="px-4 py-2 text-left">Conversion Rate</th>
+                <th className="px-4 py-2 text-left">Internshala Link</th>
+                <th className="px-4 py-2 text-left">Leader Link</th>
+                <th className="px-4 py-2 text-left">Candidate Link</th>
+                <th className="px-4 py-2 text-left">Assignment Links</th>
               </tr>
             </thead>
             <tbody>
-              {currentListings.map((listing, index) => (
-                <tr key={index} className="hover:bg-gray-50 border-b transition">
-                  <td className="px-4 py-3">{listing["Project Name"]}</td>
-                  <td className="px-4 py-3">{listing.Organisation}</td>
-                  <td className="px-4 py-3 text-center">{listing["Listing No"]}</td>
-                  <td className="px-4 py-3 text-center">{listing.Process}</td>
-                  <td className="px-4 py-3 text-center">{listing.Designation}</td>
-                  <td className="px-4 py-3 text-center">
-                    {dayjs(listing.Date).format("DD MMM YYYY")}
+              {currentListings.map((item) => (
+                <tr key={item.listing_no} className="hover:bg-gray-100 border-b border-gray-300">
+                  <td className="px-4 py-2">{getDisplayValue(item["Project Name"])}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.Organisation)}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item["Listing No"])}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.Process)}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.Designation)}</td>
+                  <td className="px-4 py-2">
+                    {item.Date ? dayjs(item.Date).format("DD MMMM YYYY") : getDisplayValue(null, 'date')}
                   </td>
-                  <td className="px-4 py-3 text-center">{listing["Conversion Rate"]}</td>
-                  <td className="px-4 py-3 text-center relative">
-                    <button
-                      onClick={() =>
-                        setDropdownOpen(dropdownOpen === index ? null : index)
-                      }
-                      className="text-gray-600 hover:text-gray-900"
-                    >
-                      <BsThreeDotsVertical />
-                    </button>
-                    {dropdownOpen === index && (
-                      <div 
-                        ref={dropdownRef}
-                        className="absolute right-0 mt-2 min-w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 text-left"
-                      >
-                        {[
-                          { key: "Internshala", display: "Internshala link" },
-                          { key: "Leader link", display: "Leader link" },
-                          { key: "Candidate link", display: "Candidate link" },
-                          { key: "Assignment link", display: "Assignment link" }
-                        ].map((linkType, idx) => {
-                          const links = linkType.key === "Assignment link" 
-                            ? parseLink(listing[linkType.key]) 
-                            : [listing[linkType.key] || listing[linkType.display]];
-                          return (
-                            links &&
-                            links.map((link: string, i: number) => (
-                              <a
-                                key={`${idx}-${i}`}
-                                href={link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={handleLinkClick}
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  <td className="px-4 py-2">{getDisplayValue(item.platform_data?.created_by, 'person')}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.platform_data?.created_by_platform, 'platform')}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.platform_data?.automated_by, 'person')}</td>
+                  <td className="px-4 py-2">{getDisplayValue(item.platform_data?.automated_by_platform, 'platform')}</td>
+                  <td className="px-4 py-2">
+                    {item.expiry_at ? dayjs(item.expiry_at).format("DD MMMM YYYY") : getDisplayValue(null, 'date')}
+                  </td>
+                  <td className="px-4 py-2">{getDisplayValue(item["Conversion Rate"], 'rate')}</td>
+                  <td className="px-4 py-2">
+                    {item.Internshala ? (
+                      <a href={item.Internshala} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        View Applications
+                      </a>
+                    ) : getDisplayValue(null, 'link')}
+                  </td>
+                  <td className="px-4 py-2">
+                    {item["Leader link"] ? (
+                      <a href={item["Leader link"]} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        Leader Bot
+                      </a>
+                    ) : getDisplayValue(null, 'link')}
+                  </td>
+                  <td className="px-4 py-2">
+                    {item["Candidate link"] ? (
+                      <a href={item["Candidate link"]} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        Candidate Bot
+                      </a>
+                    ) : getDisplayValue(null, 'link')}
+                  </td>
+                  <td className="px-4 py-2">
+                    {(() => {
+                      try {
+                        let links = [];
+                        if (item["Assignment link"]) {
+                          if (typeof item["Assignment link"] === 'string') {
+                            try {
+                              links = JSON.parse(item["Assignment link"]);
+                            } catch {
+                              links = item["Assignment link"]
+                                .split('\n')
+                                .map(link => link.trim())
+                                .filter(link => {
+                                  try {
+                                    return link.startsWith('http') || 
+                                           link.startsWith('https') || 
+                                           link.includes('loom.com') || 
+                                           link.includes('drive.google.com');
+                                  } catch {
+                                    return false;
+                                  }
+                                });
+                            }
+                          } else if (Array.isArray(item["Assignment link"])) {
+                            links = item["Assignment link"];
+                          }
+                        }
+
+                        return links.length > 0 ? (
+                          <div className="space-y-2">
+                            {links.map((link: string, idx: number) => (
+                              <a 
+                                key={idx} 
+                                href={link.trim()} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="block text-blue-600 hover:underline"
                               >
-                                {linkType.display} {links.length > 1 ? `(${i + 1})` : ""}
+                                {link.includes('loom.com') ? 'Loom Recording' : 
+                                 link.includes('drive.google.com') ? 'Google Drive' : 
+                                 `Assignment Link`} {links.length > 1 ? `#${idx + 1}` : ''}
                               </a>
-                            ))
-                          );
-                        })}
-                      </div>
-                    )}
+                            ))}
+                          </div>
+                        ) : getDisplayValue(null, 'link');
+                      } catch (error) {
+                        console.error("Error parsing assignment links:", error);
+                        return "Error loading links";
+                      }
+                    })()}
                   </td>
                 </tr>
               ))}
@@ -222,7 +273,6 @@ const ClosedListingsPage = () => {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="mt-6 flex justify-center">
           <Pagination
             totalItems={filteredListings.length}
