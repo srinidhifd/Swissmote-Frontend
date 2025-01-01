@@ -519,6 +519,8 @@ const AutoListingsPage = () => {
           <>
             <td className="px-4 py-2">{item.listing_name}</td>
             <td className="px-4 py-2">{item.listing_number}</td>
+            <td className="px-4 py-2">{item.expiry_date || 'N/A'}</td>
+            <td className="px-4 py-2">{item.platform_data?.created_by || 'Manually Created'}</td>
             <td className="px-4 py-2 text-center">
               <button
                 onClick={(e) => {
@@ -637,7 +639,9 @@ const AutoListingsPage = () => {
                   ) : "N/A"}
                 </td>
 
-
+                <td className="px-4 py-2">{item.expiry_date || 'N/A'}</td>
+                <td className="px-4 py-2">{item.platform_data?.created_by || 'N/A'}</td>
+                <td className="px-4 py-2">{item.platform_data?.automated_by || 'N/A'}</td>
 
                 <td className="px-4 py-2 text-center dropdown sticky-column "
                   onClick={(e) => e.stopPropagation()}>
@@ -695,14 +699,34 @@ const AutoListingsPage = () => {
         )}
         {activeTab === "closed_automated" && (
           <>
-            {((item): item is ClosedAutomatedJob => 'listing_number' in item)(item) && (
-              <>
-                <td className="px-4 py-2">{item.listing_number}</td>
-                <td className="px-4 py-2">{item.projectname || 'N/A'}</td>
-                <td className="px-4 py-2">{item.date ? dayjs(item.date).format("DD MMMM YYYY") : 'N/A'}</td>
-                <td className="px-4 py-2">{item.conversion_rate || 'N/A'}</td>
-              </>
-            )}
+            <td className="px-4 py-2">{item.listing_number}</td>
+            <td className="px-4 py-2">{item.projectname || 'N/A'}</td>
+            <td className="px-4 py-2">{item.date ? dayjs(item.date).format("DD MMMM YYYY") : 'N/A'}</td>
+            <td className="px-4 py-2">{item.posted_over || 'N/A'}</td>
+            <td className="px-4 py-2">{item.platform_data?.created_by || 'N/A'}</td>
+            <td className="px-4 py-2">{item.platform_data?.automated_by || 'N/A'}</td>
+            <td className="px-4 py-2">{item.conversion_rate || 'N/A'}</td>
+            <td className="px-4 py-2">{item.metrics?.assignments_received_count || 0}</td>
+            <td className="px-4 py-2">{item.metrics?.assignments_sent_count || 0}</td>
+            <td className="px-4 py-2">{item.metrics?.total_applications_count || 0}</td>
+            <td className="px-4 py-2 text-blue-600">
+              {Array.isArray(item.assignment_link) && item.assignment_link.length > 0 ? (
+                item.assignment_link.map((link, idx) => (
+                  <a key={idx} href={link} target="_blank" rel="noopener noreferrer" className="block text-sm hover:underline">
+                    {link.length > 20 ? `${link.substring(0, 20)}...` : link}
+                  </a>
+                ))
+              ) : "No Links"}
+            </td>
+            <td className="px-4 py-2 text-blue-600">
+              {Array.isArray(item.review_link) && item.review_link.length > 0 ? (
+                item.review_link.map((link, idx) => (
+                  <a key={idx} href={link} target="_blank" rel="noopener noreferrer" className="block text-sm hover:underline">
+                    {link.length > 20 ? `${link.substring(0, 20)}...` : link}
+                  </a>
+                ))
+              ) : "No Links"}
+            </td>
           </>
         )}
       </tr>
@@ -773,10 +797,11 @@ const AutoListingsPage = () => {
                   <>
                     <th className="px-4 py-2 text-left">Listing Name</th>
                     <th className="px-4 py-2 text-left">Listing Number</th>
+                    <th className="px-4 py-2 text-left">Expiry Date</th>
+                    <th className="px-4 py-2 text-left">Created By</th>
                     <th className="px-4 py-2 text-center">Actions</th>
                   </>
-                )
-                }
+                )}
                 {activeTab === "automated" && (
                   <>
                     <th className="px-4 py-2 text-left">Listing Name</th>
@@ -794,6 +819,9 @@ const AutoListingsPage = () => {
                     <th className="px-4 py-2 text-left">Assignment Message</th>
                     <th className="px-4 py-2 text-left">Day-2 Followup</th>
                     <th className="px-4 py-2 text-left">Day-4 Followup</th>
+                    <th className="px-4 py-2 text-left">Expiry Date</th>
+                    <th className="px-4 py-2 text-left">Created By</th>
+                    <th className="px-4 py-2 text-left">Automated By</th>
                     <th className="sticky right-0 bg-gray-200 px-4 py-2 text-left">Actions</th>
                   </>
                 )}
@@ -802,10 +830,17 @@ const AutoListingsPage = () => {
                     <th className="px-4 py-2 text-left">Listing Number</th>
                     <th className="px-4 py-2 text-left">Project Name</th>
                     <th className="px-4 py-2 text-left">Posted Date</th>
+                    <th className="px-4 py-2 text-left">Posted Over</th>
+                    <th className="px-4 py-2 text-left">Created By</th>
+                    <th className="px-4 py-2 text-left">Automated By</th>
                     <th className="px-4 py-2 text-left">Conversion Rate</th>
+                    <th className="px-4 py-2 text-left">Assignments Received</th>
+                    <th className="px-4 py-2 text-left">Assignments Sent</th>
+                    <th className="px-4 py-2 text-left">Total Applications</th>
+                    <th className="px-4 py-2 text-left">Assignment Links</th>
+                    <th className="px-4 py-2 text-left">Review Links</th>
                   </>
-                )
-                }
+                )}
               </tr>
             </thead>
             <tbody>{renderTableRows(filteredListings)}</tbody>
@@ -1310,20 +1345,35 @@ const AutoListingsPage = () => {
                     <h3 className="text-sm font-semibold text-gray-700 mb-3">Metrics Overview</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-sm text-gray-600">
-                        Assignments Received: <span className="font-medium text-gray-800">{selectedRowData.metrics.assignments_received_count || 0}</span>
+                        Assignments Received: <span className="font-medium text-gray-800">{selectedRowData.metrics?.assignments_received_count || 0}</span>
                       </div>
                       <div className="text-sm text-gray-600">
-                        Assignments Sent: <span className="font-medium text-gray-800">{selectedRowData.metrics.assignments_sent_count || 0}</span>
+                        Assignments Sent: <span className="font-medium text-gray-800">{selectedRowData.metrics?.assignments_sent_count || 0}</span>
                       </div>
                       <div className="text-sm text-gray-600">
-                        New Applicants: <span className="font-medium text-gray-800">{selectedRowData.metrics.total_new_count || 0}</span>
+                        New Applicants: <span className="font-medium text-gray-800">{selectedRowData.metrics?.total_new_count || 0}</span>
                       </div>
                       <div className="text-sm text-gray-600">
-                        Total Applications: <span className="font-medium text-gray-800">{selectedRowData.metrics.total_applications_count || 0}</span>
+                        Total Applications: <span className="font-medium text-gray-800">{selectedRowData.metrics?.total_applications_count || 0}</span>
                       </div>
                     </div>
                   </div>
                 )}
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Additional Details</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-sm text-gray-600">
+                      Expiry Date: <span className="font-medium text-gray-800">{selectedRowData.expiry_date || 'N/A'}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Created By: <span className="font-medium text-gray-800">{selectedRowData.platform_data?.created_by || 'N/A'}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Automated By: <span className="font-medium text-gray-800">{selectedRowData.platform_data?.automated_by || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>

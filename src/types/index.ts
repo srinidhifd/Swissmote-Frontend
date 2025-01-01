@@ -30,12 +30,34 @@ export interface AutomatedJob extends BaseEntity {
   };
   followup2Message?: string; // Added property
   followup4Message?: string; // Added property
+  expiry_date?: string;
+  platform_data?: {
+    created_by: string;
+    automated_by: string;
+  };
 }
 
 // Interface for not automated job listings
 export interface NotAutomatedJob extends BaseEntity {
-  listing_name: string; // Required: Name of the listing
-  listing_number: string; // Required: Unique identifier for the listing
+  listing_name: string;
+  listing_number: string;
+  projectname?: string;
+  date?: string;
+  posted_over?: string;
+  expiry_date?: string;
+  conversion_rate?: string;
+  assignment_link?: string[];
+  review_link?: string[];
+  metrics?: {
+    assignments_received_count: number;
+    assignments_sent_count: number;
+    total_new_count: number;
+    total_applications_count: number;
+  };
+  platform_data?: {
+    created_by: string;
+    automated_by: string;
+  };
 }
 
 // Interface for closed automated job listings
@@ -44,9 +66,21 @@ export interface ClosedAutomatedJob extends BaseEntity {
   listing_number: string;
   projectname?: string;
   date?: string;
+  expiry_date?: string;
+  posted_over?: string;
+  platform_data?: {
+    created_by: string;
+    automated_by: string;
+  };
   conversion_rate?: string;
   assignment_link?: string[];
   review_link?: string[];
+  metrics?: {
+    assignments_received_count: number;
+    assignments_sent_count: number;
+    total_new_count: number;
+    total_applications_count: number;
+  };
 }
 
 // Shared interface for follow-up details
