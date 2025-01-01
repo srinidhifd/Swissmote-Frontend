@@ -23,6 +23,15 @@ const PostFullTimeJobPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
+    // Get username from localStorage
+    const username = localStorage.getItem("userName");
+    console.log("Current logged in user:", username); // Debug log
+
+    if (!username) {
+      toast.error("User session not found. Please login again.", { position: "top-right", autoClose: 3000 });
+      return;
+    }
+
     if (!title.trim()) {
       toast.error("Job Title is required.", { position: "top-right", autoClose: 3000 });
       return;
@@ -41,6 +50,7 @@ const PostFullTimeJobPage = () => {
     }
 
     const jobData = {
+      username, // Add username to request body
       job_title: title,
       skills,
       job_type: type,
@@ -56,7 +66,7 @@ const PostFullTimeJobPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/postJob?dev=true`, {
+      const response = await fetch(`${apiUrl}/postJob?dev=false`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

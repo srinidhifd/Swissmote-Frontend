@@ -19,6 +19,15 @@ const PostUnpaidInternshipPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
+    // Get username from localStorage
+    const username = localStorage.getItem("userName");
+    console.log("Current logged in user:", username); // Debug log
+
+    if (!username) {
+      toast.error("User session not found. Please login again.", { position: "top-right", autoClose: 3000 });
+      return;
+    }
+
     if (!title.trim()) {
       toast.error("Internship Title is required.", { position: "top-right", autoClose: 3000 });
       return;
@@ -37,6 +46,7 @@ const PostUnpaidInternshipPage = () => {
     }
 
     const unpaidInternshipData = {
+      username,  // Add username to request body
       job_title: title,
       skills,
       job_type: type,
@@ -49,7 +59,7 @@ const PostUnpaidInternshipPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/unpaidArmy?dev=true`, {
+      const response = await fetch(`${apiUrl}/unpaidArmy?dev=false`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
