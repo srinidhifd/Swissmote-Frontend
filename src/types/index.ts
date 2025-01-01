@@ -114,3 +114,24 @@ export interface Message extends BaseEntity {
   type?: "text" | "file" | "image"; // Optional: Type of the message
   status?: "sent" | "delivered" | "read"; // Optional: Status of the message
 }
+
+export interface ActiveListing {
+  "Project Name": string;
+  "Organisation": string;
+  "Listing No": number;
+  "Process": string;
+  "Designation": string;
+  "Date": string;
+  platform_data: {
+    created_by: string;
+    created_by_platform: string;
+    automated_by: string;
+    automated_by_platform: string;
+  };
+  expiry_at: string;
+  "Conversion Rate": string;
+  Internshala: string;
+  "Leader link": string;
+  "Candidate link": string;
+  "Assignment link": string;
+}
