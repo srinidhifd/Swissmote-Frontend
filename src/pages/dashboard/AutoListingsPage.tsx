@@ -401,11 +401,24 @@ const AutoListingsPage = () => {
   };
 
   const handleAutomateListing = async () => {
+
+    const username = localStorage.getItem("userName");
+  console.log("Current logged-in user:", username); // Debug log
+
+  // Validate username
+  if (!username) {
+    toast.error("User session not found. Please login again.", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    return; // Stop further execution if username is missing
+  }
     try {
       setListingsLoading(true);
 
       const payload = {
         ...automateForm,
+        username,
         invite_message:
           automateForm.introMessage === "default"
             ? messages.intro_message // Use the displayed intro message
